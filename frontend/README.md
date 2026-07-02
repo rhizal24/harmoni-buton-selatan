@@ -1,36 +1,141 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Harmoni Buton Selatan — Frontend Monorepo
 
-## Getting Started
+Monorepo frontend untuk website desa-desa di wilayah Buton Selatan menggunakan **pnpm workspaces**.
 
-First, run the development server:
+## Struktur
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+frontend/
+├─ apps/
+│  ├─ desagayabaru/        → desagayabaru.butonselatan.com
+│  └─ desagerakmakmur/     → desagerakmakmur.butonselatan.com
+│
+├─ packages/
+│  ├─ ui/                  → Shared UI components (Navbar, Footer, Button, dll)
+│  └─ config/              → Shared config (ESLint, Tailwind, TypeScript)
+│
+├─ package.json
+├─ pnpm-workspace.yaml
+└─ .gitignore
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Package Manager**: pnpm workspaces (monorepo)
+- **Runtime**: Node.js ≥ 20
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Cara Memulai
 
-## Learn More
+### Prasyarat
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+# Install pnpm jika belum ada
+npm install -g pnpm
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Install semua dependencies
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+pnpm install
+```
 
-## Deploy on Vercel
+### Jalankan dev server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# Jalankan SEMUA apps sekaligus
+pnpm dev
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Jalankan hanya Desa Gayabaru (port 3000)
+pnpm dev:gayabaru
+
+# Jalankan hanya Desa Gerak Makmur (port 3001)
+pnpm dev:gerakmakmur
+```
+
+### Build production
+
+```bash
+# Build semua apps
+pnpm build
+
+# Build satu app
+pnpm build:gayabaru
+pnpm build:gerakmakmur
+```
+
+---
+
+## 🚀 Cara Menjalankan
+
+### Cara 1 — Jalankan keduanya sekaligus (paling mudah)
+
+```bash
+pnpm dev
+```
+
+> Menjalankan **desagayabaru** di `:3000` dan **desagerakmakmur** di `:3001` secara paralel.
+
+### Cara 2 — Jalankan satu app saja
+
+```bash
+# Hanya Desa Gayabaru
+pnpm dev:gayabaru
+
+# Hanya Desa Gerak Makmur
+pnpm dev:gerakmakmur
+```
+
+### Cara 3 — Masuk langsung ke folder app
+
+```bash
+# Desa Gayabaru
+cd apps/desagayabaru
+pnpm dev
+
+# Desa Gerak Makmur
+cd apps/desagerakmakmur
+pnpm dev
+```
+
+### 🌐 Buka di Browser
+
+| App | URL Lokal | Subdomain Produksi |
+|---|---|---|
+| Desa Gayabaru | http://localhost:3000 | desagayabaru.butonselatan.com |
+| Desa Gerak Makmur | http://localhost:3001 | desagerakmakmur.butonselatan.com |
+
+### ⚠️ Troubleshooting — Port Already in Use
+
+Jika muncul error `EADDRINUSE: address already in use :::3000`:
+
+```bash
+# Matikan proses yang memakai port 3000 & 3001
+lsof -ti:3000,3001 | xargs kill -9
+
+# Lalu jalankan ulang
+pnpm dev
+```
+
+---
+
+## Shared Packages
+
+### `packages/ui`
+
+Berisi komponen UI yang digunakan bersama oleh kedua desa (Navbar, Footer, Button, Card, dll).
+
+Import di app:
+```tsx
+import { Button } from "@harmoni/ui";
+```
+
+### `packages/config`
+
+Berisi konfigurasi bersama: ESLint rules, TypeScript base config, Tailwind preset.
+
+## Environment Variables
+
+Setiap app punya `.env.local` sendiri. Lihat `.env.example` di masing-masing folder app.
