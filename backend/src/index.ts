@@ -1,21 +1,19 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
+import { createApp } from "./app";
+import { env } from "./config/env";
+import { pool } from "./db";
 
-dotenv.config();
+const app = createApp();
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+const server = app.listen(env.PORT, "0.0.0.0", () => {
+  console.log(`Server running on http://localhost:${env.PORT}`);
+});
 
-app.use(cors());
-app.use(express.json());
-
-app.get("/", (req, res) => {
-  res.json({
-    message: "Backend KKN API running",
+async function shutdown(signal: string): Promise<void> {
+  console.log(`\n${signal} received, shutting down...`);
+  server.close(() => {
+    void pool.end().then(() => process.exit(0));
   });
-});
+}
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+process.on("SIGINT", () => void shutdown("SIGINT"));
+process.on("SIGTERM", () => void shutdown("SIGTERM"));
