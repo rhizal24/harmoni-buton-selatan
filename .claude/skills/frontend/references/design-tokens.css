@@ -1,0 +1,404 @@
+/**
+ * design-tokens.css
+ * Design System — Website Desa Gerak Makmur
+ * Sumber kebenaran token CSS untuk seluruh frontend.
+ * Import file ini di root stylesheet (misal: globals.css / app.css).
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,600&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+
+:root {
+  /* =========================================================
+     WARNA — Surface
+  ========================================================= */
+  --color-surface:                    #EEEEEE;
+  --color-surface-dim:                #DCDCDC;
+  --color-surface-bright:             #FFFFFF;
+  --color-surface-container-lowest:   #FFFFFF;
+  --color-surface-container-low:      #F6F6F6;
+  --color-surface-container:          #EEEEEE;
+  --color-surface-container-high:     #E2E2E2;
+  --color-surface-container-highest:  #D6D6D6;
+
+  /* =========================================================
+     WARNA — On-Surface
+  ========================================================= */
+  --color-on-surface:         #2E2E2E;
+  --color-on-surface-variant: #5A5A5A;
+
+  /* =========================================================
+     WARNA — Outline
+  ========================================================= */
+  --color-outline:         #9A9A9A;
+  --color-outline-variant: #D0D0D0;
+
+  /* =========================================================
+     WARNA — Inverse
+  ========================================================= */
+  --color-inverse-surface:    #2E2E2E;
+  --color-inverse-on-surface: #EEEEEE;
+
+  /* =========================================================
+     WARNA — Primary / Tosca
+  ========================================================= */
+  --color-primary:              #028090;
+  --color-on-primary:           #FFFFFF;
+  --color-primary-container:    #CFF1F4;
+  --color-on-primary-container: #00434B;
+  --color-primary-hover:        #026F7D;
+  --color-primary-border:       #028090;
+
+  /* =========================================================
+     WARNA — Secondary / Coral  (PAKAI TERBATAS)
+     Hanya untuk: menu Karamba, badge "Paling Diminati",
+                  badge "Wisata Unggulan" di hero.
+  ========================================================= */
+  --color-secondary:              #F45B69;
+  --color-on-secondary:           #FFFFFF;
+  --color-secondary-container:    #FFDEE1;
+  --color-on-secondary-container: #7A1F2A;
+  --color-secondary-hover:        #D94A56;
+
+  /* =========================================================
+     WARNA — Tertiary
+  ========================================================= */
+  --color-tertiary:               #2E2E2E;
+  --color-on-tertiary:            #FFFFFF;
+  --color-tertiary-container:     #E2E2E2;
+  --color-on-tertiary-container:  #2E2E2E;
+
+  /* =========================================================
+     WARNA — Error
+  ========================================================= */
+  --color-error:             #BA1A1A;
+  --color-on-error:          #FFFFFF;
+  --color-error-container:   #FFDAD6;
+  --color-on-error-container:#93000A;
+
+  /* =========================================================
+     WARNA — Background
+  ========================================================= */
+  --color-background:    #EEEEEE;
+  --color-on-background: #2E2E2E;
+
+  /* =========================================================
+     TIPOGRAFI
+  ========================================================= */
+  --font-display:       'Fraunces', serif;
+  --font-body:          'Plus Jakarta Sans', sans-serif;
+
+  /* =========================================================
+     RADIUS — Hanya rounded.md/lg/xl untuk kartu & tombol.
+              rounded.full HANYA badge & nav-item-karamba.
+  ========================================================= */
+  --rounded-sm:      4px;
+  --rounded-default: 8px;
+  --rounded-md:     12px;
+  --rounded-lg:     16px;
+  --rounded-xl:     24px;
+  --rounded-full: 9999px;
+
+  /* =========================================================
+     BORDER
+  ========================================================= */
+  --border-hairline:    1px solid var(--color-outline-variant);
+  --border-frame:       1.5px solid var(--color-primary-border);
+  --border-frame-hover: 2px solid var(--color-primary);
+
+  /* =========================================================
+     ELEVATION — minimal, flat-first
+  ========================================================= */
+  --elevation-card-hover: 0 4px 12px rgba(46, 46, 46, 0.08);
+  --elevation-floating:   0 8px 24px rgba(46, 46, 46, 0.12);
+  --elevation-nav:        0 1px 0   rgba(46, 46, 46, 0.06);
+
+  /* =========================================================
+     SPACING
+  ========================================================= */
+  --spacing-xs:     4px;
+  --spacing-sm:    12px;
+  --spacing-base:   8px;
+  --spacing-md:    24px;
+  --spacing-lg:    40px;
+  --spacing-xl:    64px;
+  --spacing-gutter:16px;
+
+  /* =========================================================
+     LAYOUT
+  ========================================================= */
+  --container-max-width:       1280px;
+  --container-reading-width:    720px;
+  --padding-inline-mobile:      20px;
+  --padding-inline-tablet:      32px;
+  --padding-inline-desktop:     64px;
+
+  /* =========================================================
+     SECTION RHYTHM
+  ========================================================= */
+  --section-rhythm-sm:  48px;
+  --section-rhythm-md:  80px;
+  --section-rhythm-lg: 120px;
+
+  /* =========================================================
+     HERO
+  ========================================================= */
+  --hero-height-desktop: 92vh;
+  --hero-height-mobile:  70vh;
+}
+
+/* =========================================================
+   BASE RESET & GLOBAL
+========================================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* =========================================================
+   UTILITY — Typography Classes
+========================================================= */
+.text-display {
+  font-family: var(--font-display);
+  font-size: 56px;
+  font-weight: 600;
+  line-height: 62px;
+  letter-spacing: -0.01em;
+}
+.text-headline-lg {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 44px;
+}
+.text-headline-md {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 34px;
+}
+.text-title-lg {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+}
+.text-body-lg {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
+}
+.text-body-md {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 26px;
+}
+.text-label-md {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0.01em;
+}
+.text-label-sm {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+}
+.text-stat-number {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 44px;
+}
+
+/* =========================================================
+   UTILITY — Container
+========================================================= */
+.container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-inline: auto;
+  padding-inline: var(--padding-inline-mobile);
+}
+@media (min-width: 640px) {
+  .container { padding-inline: var(--padding-inline-tablet); }
+}
+@media (min-width: 1024px) {
+  .container { padding-inline: var(--padding-inline-desktop); }
+}
+
+.container-reading {
+  max-width: var(--container-reading-width);
+  margin-inline: auto;
+}
+
+/* =========================================================
+   UTILITY — Section Header Patterns
+========================================================= */
+
+/* Divider tipis atas section */
+.section-divider {
+  border: none;
+  border-top: var(--border-hairline);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Pattern: intro di kiri, judul "— Nama" di kanan (desktop) */
+.section-intro-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: center;
+}
+@media (min-width: 1024px) {
+  .section-intro-inline {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+  .section-intro-inline .section-intro-text {
+    max-width: 480px;
+  }
+}
+.section-intro-text {
+  color: var(--color-on-surface-variant);
+}
+.section-title-inline {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 44px;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+/* Pattern: judul + subtitle di tengah */
+.section-title-centered {
+  text-align: center;
+}
+.section-title-centered h2 {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 44px;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-sm);
+}
+.section-title-centered p {
+  color: var(--color-on-surface-variant);
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+/* =========================================================
+   UTILITY — Buttons
+========================================================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0.01em;
+  padding: var(--spacing-sm) var(--spacing-md);
+  min-height: 44px;
+  border-radius: var(--rounded-md);   /* 12px — bukan pill */
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn-primary:hover { background-color: var(--color-primary-hover); }
+}
+.btn-outline {
+  background-color: transparent;
+  border: var(--border-frame);
+  color: var(--color-primary);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn-outline:hover { border: var(--border-frame-hover); }
+}
+.btn-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-on-secondary);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .btn-secondary:hover { background-color: var(--color-secondary-hover); }
+}
+
+/* =========================================================
+   UTILITY — Card Base
+========================================================= */
+.card {
+  background-color: var(--color-surface-bright);
+  border: var(--border-hairline);
+  border-radius: var(--rounded-lg);
+  overflow: hidden;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card:hover {
+    border-color: var(--color-primary-border);
+    box-shadow: var(--elevation-card-hover);
+  }
+}
+.card-frame {
+  border: var(--border-frame);
+}
+
+/* =========================================================
+   UTILITY — Badge
+========================================================= */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: var(--rounded-full);   /* pill — boleh untuk badge */
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.02em;
+}
+.badge-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.badge-secondary {
+  background-color: var(--color-secondary);   /* coral — terbatas */
+  color: var(--color-on-secondary);
+}
+
+/* =========================================================
+   UTILITY — Fade-up animation (viewport masuk)
+========================================================= */
+@media (prefers-reduced-motion: no-preference) {
+  .fade-up {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 300ms ease, transform 300ms ease;
+  }
+  .fade-up.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
