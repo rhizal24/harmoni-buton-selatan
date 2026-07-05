@@ -27,10 +27,6 @@ interface ScrollCoverRevealProps {
   start?: string;
   /** POSISI SCROLL — kapan efek selesai / panjang scroll (mis. "bottom top", "+=120%"). */
   end?: string;
-  /** Blur maksimum (px) pada `cover` di akhir cover. */
-  maxBlur?: number;
-  /** Rasio progres saat blur mulai (0–1). 0.75 = mulai di seperempat terakhir. */
-  blurStart?: number;
 }
 
 /**
@@ -41,8 +37,8 @@ interface ScrollCoverRevealProps {
  *
  * Asset (`bawah.avif`) menempel di TEPI ATAS panel dan bergerak bersamanya
  * (menyatu, seperti lengkung Biak Elok). Di awal panel sedikit didorong turun
- * (`hideDistance`) agar asset belum terlihat; saat cover hampir selesai hero
- * di-blur. Semua ter-scrub pada satu ScrollTrigger. Menghormati reduced-motion.
+ * (`hideDistance`) agar asset belum terlihat. Semua ter-scrub pada satu
+ * ScrollTrigger. Menghormati reduced-motion.
  */
 export function ScrollCoverReveal({
   cover,
@@ -55,8 +51,6 @@ export function ScrollCoverReveal({
   hideDistance = 400,
   start = "top top",
   end = "bottom top",
-  maxBlur = 12,
-  blurStart = 0.75,
 }: ScrollCoverRevealProps) {
   const coverRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -72,7 +66,6 @@ export function ScrollCoverReveal({
     }
 
     const ctx = gsap.context(() => {
-      gsap.set(coverEl, { filter: "blur(0px)" });
       gsap.set(panelEl, { y: hideDistance });
 
       const tl = gsap.timeline({
@@ -88,17 +81,10 @@ export function ScrollCoverReveal({
 
       // Panel (beserta asset tepi atasnya) naik menutupi hero.
       tl.to(panelEl, { y: 0, ease: "none", duration: 1 }, 0);
-
-      // Hero blur hanya di seperempat terakhir.
-      tl.to(
-        coverEl,
-        { filter: `blur(${maxBlur}px)`, ease: "none", duration: 1 - blurStart },
-        blurStart,
-      );
     });
 
     return () => ctx.revert();
-  }, [hideDistance, start, end, maxBlur, blurStart]);
+  }, [hideDistance, start, end]);
 
   return (
     <>

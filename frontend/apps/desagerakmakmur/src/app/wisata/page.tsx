@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Footer } from "@/components/sections";
+import { JelajahDesa, Footer } from "@/components/sections";
 import { ScrollCoverReveal } from "@/components/ui/ScrollCoverReveal";
 import { HeroWisata } from "./_components/HeroWisata";
 import { DaftarWisata } from "./_components/DaftarWisata";
@@ -20,8 +20,7 @@ export default function WisataPage() {
   return (
     <main>
       {/* Hero di-pin; panel di bawahnya (asset tepi atas + section) naik
-          menutupi hero sebagai satu kesatuan, dari utuh (0) sampai tertutup.
-          Hero di-blur di seperempat terakhir cover. */}
+          menutupi hero sebagai satu kesatuan, dari utuh (0) sampai tertutup. */}
       <ScrollCoverReveal
         cover={<HeroWisata />}
         capSrc="/assets/bawah.avif"
@@ -31,6 +30,7 @@ export default function WisataPage() {
         hideDistance={0}
       >
         <DaftarWisata />
+        <JelajahDesa />
         <Footer />
       </ScrollCoverReveal>
     </main>
