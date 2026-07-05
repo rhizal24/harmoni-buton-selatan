@@ -32,7 +32,7 @@ export function HeroBeranda() {
       ].map(({ edge, end }) => (
         <ScrollRevealImage
           key={edge}
-          src="/images/bawah.avif"
+          src="/assets/bawah.avif"
           trigger="#hero"
           revealEnd={end}
           className={`pointer-events-none absolute inset-x-0 z-[6] w-full mix-blend-screen [filter:drop-shadow(0_0_16px_rgba(150,230,240,0.55))_drop-shadow(0_0_44px_rgba(90,200,220,0.35))] ${edge}`}
@@ -58,14 +58,14 @@ export function HeroBeranda() {
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
           <Link
-            href="/karamba"
-            className="inline-flex items-center rounded-md bg-[#006572] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+            href="/wisata#daftar-wisata"
+            className="inline-flex items-center rounded-md bg-[#006572] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-200 hover:-translate-y-0.5 hover:[filter:drop-shadow(0_0_16px_rgba(0,101,114,0.55))_drop-shadow(0_0_44px_rgba(0,101,114,0.30))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
           >
             Jelajahi Karamba
           </Link>
           <Link
             href="/informasi/umkm"
-            className="inline-flex items-center rounded-md bg-[#ae263a] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+            className="inline-flex items-center rounded-md bg-[#ae263a] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-200 hover:-translate-y-0.5 hover:[filter:drop-shadow(0_0_16px_rgba(174,38,58,0.55))_drop-shadow(0_0_44px_rgba(174,38,58,0.30))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
           >
             Lihat UMKM
           </Link>

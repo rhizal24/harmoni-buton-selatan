@@ -45,7 +45,7 @@ export function MitraKolaborasi() {
             <button
               key={m}
               type="button"
-              className="flex h-[108px] w-[190px] cursor-pointer items-center justify-center rounded-lg border-0 bg-[#d9d9d9] px-3 text-center font-body text-sm font-semibold text-[#006572] grayscale motion-safe:transition-[filter,box-shadow] motion-safe:duration-300 hover:grayscale-0 hover:shadow-[0_0_18px_rgba(0,101,114,0.45),0_0_44px_rgba(0,101,114,0.22)] active:shadow-[0_0_22px_rgba(0,101,114,0.65),0_0_54px_rgba(0,101,114,0.35)]"
+              className="flex h-[108px] w-[190px] cursor-pointer items-center justify-center rounded-lg border-0 bg-[#d9d9d9] px-3 text-center font-body text-sm font-semibold text-[#006572] [filter:grayscale(1)] motion-safe:transition-[filter] motion-safe:duration-300 hover:[filter:grayscale(0)_drop-shadow(0_0_16px_rgba(0,101,114,0.55))_drop-shadow(0_0_44px_rgba(0,101,114,0.30))] active:[filter:grayscale(0)_drop-shadow(0_0_20px_rgba(0,101,114,0.7))_drop-shadow(0_0_54px_rgba(0,101,114,0.4))]"
             >
               {m}
             </button>
