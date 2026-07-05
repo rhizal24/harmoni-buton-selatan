@@ -304,7 +304,7 @@ export function Navbar() {
             className="group flex shrink-0 items-center gap-2.5 text-on-surface no-underline"
           >
             <img
-              src="/images/logo-caheabusel.avif"
+              src="/assets/logo-caheabusel.avif"
               alt="Logo Cahea Busel"
               width={40}
               height={40}
