@@ -1,5 +1,21 @@
 {
   "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem frontend\\\\apps\\\\desagerakmakmur -Recurse -File | Where-Object { $_.FullName -notmatch 'node_modules|\\\\.next' } | ForEach-Object { $_.FullName.Replace\\('C:\\\\Users\\\\saida\\\\harmoni-buton-selatan\\\\frontend\\\\apps\\\\', ''\\) })",
+      "PowerShell(Get-ChildItem C:\\\\Users\\\\saida\\\\harmoni-buton-selatan\\\\.claude\\\\skills -Recurse -File | ForEach-Object { $_.FullName.Replace\\('C:\\\\Users\\\\saida\\\\harmoni-buton-selatan\\\\.claude\\\\skills\\\\',''\\) + ' \\(' + $_.Length + ' bytes\\)' })",
+      "Bash(rm -rf desagayabaru/src)",
+      "Bash(cp -r desagerakmakmur/src desagayabaru/src)",
+      "Bash(cp -r desagerakmakmur/public desagayabaru/public)",
+      "Bash(sed -i 's|NEXT_PUBLIC_API_URL=http://localhost:3000/api|NEXT_PUBLIC_API_URL=http://localhost:4000/api|' desagayabaru/.env.example)",
+      "Bash(sed -i 's|NEXT_PUBLIC_API_URL=http://localhost:3001/api|NEXT_PUBLIC_API_URL=http://localhost:4000/api|' desagerakmakmur/.env.example)",
+      "Bash([ -f \"$MEMDIR/MEMORY.md\" ])",
+      "Read(//c/Users/saida/.claude/projects/c--Users-saida-harmoni-buton-selatan/memory/**)",
+      "Bash(curl -s --retry 20 --retry-connrefused --retry-delay 2 -o /dev/null -w \"boot /: %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /tmp/login.html -w \"/admin/login: %{http_code}\\\\n\" http://localhost:3000/admin/login)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"/admin: %{http_code}\\\\n\" http://localhost:3000/admin)",
+      "Bash(curl -s -w \"\\\\nHTTP %{http_code}\\\\n\" -X POST \"https://nrfstzwjvqkndmzhdlgc.supabase.co/auth/v1/token?grant_type=password\" -H \"apikey: sb_publishable_MFMdQ-ZS5X4FGUYtMwhAPA_rm0K_9h_\" -H \"Content-Type: application/json\" -d '{\"email\":\"tes@contoh.com\",\"password\":\"salah\"}')"
+    ],
     "additionalDirectories": [
       "c:\\Users\\saida\\.claude\\projects\\c--Users-saida-harmoni-buton-selatan\\memory"
     ]
