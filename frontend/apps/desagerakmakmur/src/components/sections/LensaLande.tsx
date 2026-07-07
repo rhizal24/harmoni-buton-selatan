@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ExpandingGallery } from "@/components/ui/ExpandingGallery";
 import { Pagination } from "@/components/ui/Pagination";
+import type { GaleriFoto } from "@/lib/konten";
 
 const IMG = {
-  panorama: { src: "/images/hero-bg.jpg", alt: "Panorama Karamba dari udara" },
+  panorama: { src: "/images/hero-bg.jpg", alt: "Panorama Desa Gerak Makmur dari udara" },
   pantai: {
     src: "/images/wisata-pantai.jpg",
     alt: "Garis pantai berpasir putih Buton Selatan",
@@ -26,13 +27,24 @@ const PAGES = [
 
 const FADE_MS = 300;
 
+/** Pecah daftar foto jadi halaman berisi maksimal 6 foto. */
+function chunkPages(images: GaleriFoto[]): GaleriFoto[][] {
+  const pages: GaleriFoto[][] = [];
+  for (let i = 0; i < images.length; i += 6) {
+    pages.push(images.slice(i, i + 6));
+  }
+  return pages;
+}
+
 /**
  * Lensa Lande — galeri foto (strip melebar saat hover) + pagination.
  * Ganti halaman → seluruh set foto ditukar dengan crossfade halus
  * (fade-out → swap saat invisible → fade-in), tanpa pergeseran.
  * Figma node 92:1397 / 94:1447.
+ * `images` (dari Supabase) menggantikan foto default bila tersedia.
  */
-export function LensaLande() {
+export function LensaLande({ images }: { images?: GaleriFoto[] }) {
+  const pages = images && images.length > 0 ? chunkPages(images) : PAGES;
   const [page, setPage] = useState(1); // 1-based
   const [fading, setFading] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -44,7 +56,7 @@ export function LensaLande() {
   }, []);
 
   function changePage(next: number) {
-    if (next === page || next < 1 || next > PAGES.length || fading) return;
+    if (next === page || next < 1 || next > pages.length || fading) return;
     setFading(true); // fade-out halus seluruh set lama
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
@@ -68,7 +80,7 @@ export function LensaLande() {
           </h2>
           <p className="mt-4 max-w-[730px] font-body text-lg leading-relaxed text-[#006572]">
             Lensa Lande menghadirkan potret alam, budaya, dan kehidupan Desa
-            Gerak Makmur. Setiap gambar menyimpan cerita tentang pesona desa.
+            Gaya Baru. Setiap gambar menyimpan cerita tentang pesona desa.
           </p>
         </div>
 
@@ -83,14 +95,14 @@ export function LensaLande() {
         >
           <ExpandingGallery
             key={page}
-            images={PAGES[page - 1]}
+            images={pages[page - 1]}
             staggerMs={90}
           />
         </div>
 
         <Pagination
           page={page}
-          count={PAGES.length}
+          count={pages.length}
           onChange={changePage}
           className="mt-10"
         />

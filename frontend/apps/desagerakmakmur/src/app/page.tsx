@@ -8,6 +8,7 @@ import {
   Footer,
 } from "@/components/sections";
 import { getWisata } from "@/data/wisata";
+import { fetchGaleri, fetchPaket } from "@/lib/konten";
 
 export const metadata: Metadata = {
   title: "Beranda",
@@ -19,17 +20,25 @@ export const metadata: Metadata = {
  * Homepage — Server Component (default di Next.js App Router).
  * Section disusun sesuai design system: hero → jelajah desa → lensa lande →
  * mitra kolaborasi → footer. Semua styling pakai Tailwind utilities.
- * Data wisata ditarik dari `@/data/wisata` (sumber sama dgn halaman /wisata)
- * dan diteruskan ke WisataUnggulan sebagai props.
+ * Data wisata ditarik dari `@/data/wisata` (sumber sama dgn halaman /wisata,
+ * kini Supabase dgn fallback seed statis) dan diteruskan sebagai props.
  */
+// ISR — konten Supabase disegarkan tiap 5 menit.
+export const revalidate = 300;
+
 export default async function HomePage() {
-  const wisata = await getWisata();
+  const [wisata, paket, galeri] = await Promise.all([
+    getWisata(),
+    fetchPaket(),
+    fetchGaleri(),
+  ]);
+
   return (
     <main>
       <HeroBeranda />
       <WisataUnggulan data={wisata} />
-      <JelajahDesa />
-      <LensaLande />
+      <JelajahDesa items={paket ?? undefined} />
+      <LensaLande images={galeri ?? undefined} />
       <MitraKolaborasi />
       <Footer />
     </main>

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "../styles/globals.css";
-import { Navbar } from "@/components/sections/Navbar";
-import { SmoothScroll } from "@/components/ui/SmoothScroll";
+import { SiteChrome } from "@/components/SiteChrome";
 
 export const metadata: Metadata = {
   title: {
@@ -36,8 +35,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <SmoothScroll />
-        <Navbar />
+        <SiteChrome />
         <div id="main-content" tabIndex={-1}>
           {children}
         </div>

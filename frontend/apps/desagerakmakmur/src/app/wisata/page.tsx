@@ -4,6 +4,7 @@ import { ScrollCoverReveal } from "@/components/ui/ScrollCoverReveal";
 import { HeroWisata } from "./_components/HeroWisata";
 import { DaftarWisata } from "./_components/DaftarWisata";
 import { getWisata } from "@/data/wisata";
+import { fetchPaket } from "@/lib/konten";
 
 export const metadata: Metadata = {
   title: "Wisata",
@@ -17,8 +18,11 @@ export const metadata: Metadata = {
  * lintas-halaman diambil dari `@/components/sections`. Navbar sudah dirender
  * di root layout, jadi tidak diulang di sini.
  */
+// ISR — konten Supabase disegarkan tiap 5 menit.
+export const revalidate = 300;
+
 export default async function WisataPage() {
-  const wisata = await getWisata();
+  const [wisata, paket] = await Promise.all([getWisata(), fetchPaket()]);
 
   return (
     <main>
@@ -33,7 +37,7 @@ export default async function WisataPage() {
         hideDistance={0}
       >
         <DaftarWisata data={wisata} />
-        <JelajahDesa />
+        <JelajahDesa items={paket ?? undefined} />
         <Footer />
       </ScrollCoverReveal>
     </main>
