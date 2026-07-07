@@ -1,6 +1,6 @@
 import { Reveal } from "@/components/ui/Reveal";
 
-interface Paket {
+export interface Paket {
   nama: string;
   desc: string;
   harga: string;
@@ -9,7 +9,7 @@ interface Paket {
   highlight?: boolean;
 }
 
-const PAKET: Paket[] = [
+const PAKET_DEFAULT: Paket[] = [
   {
     nama: "Senja di Karamba",
     desc: "Tur singkat menikmati sunset",
@@ -104,7 +104,7 @@ function PaketCard({ paket }: { paket: Paket }) {
  * Jelajah Desa — 3 kartu paket wisata Karamba.
  * Header rata kanan (paragraf • dash • judul). Figma node 92:1395.
  */
-export function JelajahDesa() {
+export function JelajahDesa({ items = PAKET_DEFAULT }: { items?: Paket[] }) {
   return (
     <section
       id="jelajah-desa"
@@ -126,7 +126,7 @@ export function JelajahDesa() {
 
         {/* Kartu */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {PAKET.map((paket, i) => (
+          {items.map((paket, i) => (
             <Reveal key={paket.nama} delay={i * 90}>
               <PaketCard paket={paket} />
             </Reveal>

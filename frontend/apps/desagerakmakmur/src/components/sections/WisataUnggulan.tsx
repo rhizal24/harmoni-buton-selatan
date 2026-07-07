@@ -4,9 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 import { TiltScene, TiltLayer } from "@/components/ui/TiltScene";
+import type { WisataItem } from "@/lib/konten";
 
 /** Daftar wisata — klik untuk ganti foto & deskripsi (Figma node 89:1291) */
-const WISATA = [
+const WISATA_DEFAULT: WisataItem[] = [
   {
     name: "Karamba Resto",
     href: "/karamba",
@@ -39,9 +40,9 @@ const WISATA = [
  * Tiga elemen miring 3D mengikuti pointer; kiri & kanan berlawanan (cekung ke
  * tengah). Figma node 89:1295.
  */
-export function WisataUnggulan() {
+export function WisataUnggulan({ items = WISATA_DEFAULT }: { items?: WisataItem[] }) {
   const [active, setActive] = useState(0);
-  const current = WISATA[active];
+  const current = items[active];
 
   return (
     <section
@@ -77,7 +78,7 @@ export function WisataUnggulan() {
           {/* Daftar wisata — searah dengan teks (satu sisi kiri) */}
           <TiltLayer strength={7}>
             <ul className="flex flex-col gap-5">
-              {WISATA.map((w, i) => (
+              {items.map((w, i) => (
                 <li key={w.name}>
                   <button
                     type="button"

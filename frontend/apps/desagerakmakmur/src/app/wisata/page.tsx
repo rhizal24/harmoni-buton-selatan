@@ -3,6 +3,7 @@ import { JelajahDesa, Footer } from "@/components/sections";
 import { ScrollCoverReveal } from "@/components/ui/ScrollCoverReveal";
 import { HeroWisata } from "./_components/HeroWisata";
 import { DaftarWisata } from "./_components/DaftarWisata";
+import { fetchPaket, fetchWisata } from "@/lib/konten";
 
 export const metadata: Metadata = {
   title: "Wisata",
@@ -16,7 +17,12 @@ export const metadata: Metadata = {
  * lintas-halaman diambil dari `@/components/sections`. Navbar sudah dirender
  * di root layout, jadi tidak diulang di sini.
  */
-export default function WisataPage() {
+// ISR — konten Supabase disegarkan tiap 5 menit.
+export const revalidate = 300;
+
+export default async function WisataPage() {
+  const [wisata, paket] = await Promise.all([fetchWisata(), fetchPaket()]);
+
   return (
     <main>
       {/* Hero di-pin; panel di bawahnya (asset tepi atas + section) naik
@@ -29,8 +35,8 @@ export default function WisataPage() {
         capOffset={0.15}
         hideDistance={0}
       >
-        <DaftarWisata />
-        <JelajahDesa />
+        <DaftarWisata wisata={wisata} />
+        <JelajahDesa items={paket ?? undefined} />
         <Footer />
       </ScrollCoverReveal>
     </main>

@@ -1,10 +1,9 @@
 /**
- * Utility functions — Desa Gayabaru
+ * Utility functions — Desa Gaya Baru
  */
 
 /**
  * Gabungkan class names, filter falsy values
- * Ringan, tidak butuh dependency eksternal
  */
 export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(" ");
