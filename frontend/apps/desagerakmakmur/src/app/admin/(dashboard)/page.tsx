@@ -5,11 +5,17 @@ import Link from "next/link";
 import { getSupabase } from "@/lib/supabase";
 import { useAdmin } from "./admin-context";
 
+interface CardStat {
+  total: number;
+  published: number | null; // null = tidak punya status tayang (mis. galeri)
+}
+
 interface Stats {
-  spotTotal: number;
-  spotPublished: number;
-  paketTotal: number;
-  paketPublished: number;
+  wisata: CardStat;
+  paket: CardStat;
+  galeri: CardStat;
+  berita: CardStat;
+  umkm: CardStat;
 }
 
 /** Ringkasan — jumlah konten + pintasan ke tiap modul CRUD. */
@@ -20,41 +26,48 @@ export default function AdminOverviewPage() {
 
   useEffect(() => {
     const supabase = getSupabase();
+    const vid = admin.village.id;
     Promise.all([
-      supabase.from("tourism_spots").select("id, is_published").eq("village_id", admin.village.id),
-      supabase
-        .from("tourism_packages")
-        .select("id, is_published")
-        .eq("village_id", admin.village.id),
-    ]).then(([spots, pakets]) => {
-      if (spots.error || pakets.error) {
-        setError(spots.error?.message ?? pakets.error?.message ?? "Gagal memuat data");
-        return;
-      }
-      const spotRows = (spots.data ?? []) as { is_published: boolean }[];
-      const paketRows = (pakets.data ?? []) as { is_published: boolean }[];
+      supabase.from("tourism_spots").select("id, is_published").eq("village_id", vid),
+      supabase.from("tourism_packages").select("id, is_published").eq("village_id", vid),
+      supabase.from("gallery_images").select("id").eq("village_id", vid),
+      supabase.from("articles").select("id, is_published, category").eq("village_id", vid),
+    ]).then(([spots, pakets, galeri, artikel]) => {
+      const firstError =
+        spots.error ?? pakets.error ?? galeri.error ?? artikel.error;
+      if (firstError) setError(firstError.message);
+
+      const pub = (rows: unknown) =>
+        ((rows ?? []) as { is_published: boolean }[]).filter((r) => r.is_published).length;
+      const artikelRows = (artikel.data ?? []) as {
+        is_published: boolean;
+        category: string;
+      }[];
+      const beritaRows = artikelRows.filter((r) => r.category === "berita");
+      const umkmRows = artikelRows.filter((r) => r.category === "umkm");
+
       setStats({
-        spotTotal: spotRows.length,
-        spotPublished: spotRows.filter((r) => r.is_published).length,
-        paketTotal: paketRows.length,
-        paketPublished: paketRows.filter((r) => r.is_published).length,
+        wisata: { total: spots.data?.length ?? 0, published: pub(spots.data) },
+        paket: { total: pakets.data?.length ?? 0, published: pub(pakets.data) },
+        galeri: { total: galeri.data?.length ?? 0, published: null },
+        berita: {
+          total: beritaRows.length,
+          published: beritaRows.filter((r) => r.is_published).length,
+        },
+        umkm: {
+          total: umkmRows.length,
+          published: umkmRows.filter((r) => r.is_published).length,
+        },
       });
     });
   }, [admin.village.id]);
 
-  const cards = [
-    {
-      label: "Destinasi Wisata",
-      href: "/admin/wisata",
-      total: stats?.spotTotal,
-      published: stats?.spotPublished,
-    },
-    {
-      label: "Paket Wisata",
-      href: "/admin/paket",
-      total: stats?.paketTotal,
-      published: stats?.paketPublished,
-    },
+  const cards: { label: string; href: string; stat?: CardStat }[] = [
+    { label: "Destinasi Wisata", href: "/admin/wisata", stat: stats?.wisata },
+    { label: "Paket Wisata", href: "/admin/paket", stat: stats?.paket },
+    { label: "Galeri Foto", href: "/admin/galeri", stat: stats?.galeri },
+    { label: "Berita", href: "/admin/berita", stat: stats?.berita },
+    { label: "UMKM", href: "/admin/umkm", stat: stats?.umkm },
   ];
 
   return (
@@ -73,7 +86,7 @@ export default function AdminOverviewPage() {
         </p>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:max-w-2xl">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:max-w-4xl">
         {cards.map((card) => (
           <Link
             key={card.href}
@@ -82,10 +95,14 @@ export default function AdminOverviewPage() {
           >
             <p className="font-body text-sm font-semibold text-[#5A5A5A]">{card.label}</p>
             <p className="mt-2 font-body text-3xl font-bold text-[#006572]">
-              {card.total ?? "…"}
+              {card.stat?.total ?? "…"}
             </p>
             <p className="mt-1 font-body text-xs text-[#5A5A5A]">
-              {card.published ?? "…"} tayang di situs
+              {card.stat == null
+                ? "…"
+                : card.stat.published == null
+                  ? "foto tersimpan"
+                  : `${card.stat.published} tayang di situs`}
             </p>
           </Link>
         ))}

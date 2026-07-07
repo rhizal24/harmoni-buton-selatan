@@ -83,6 +83,15 @@ export interface TourismSpotRow {
   latitude: number | null;
   longitude: number | null;
   cover_image_url: string | null;
+  /** Kolom detail — lihat docs/supabase-migration-wisata-detail.sql */
+  tagline: string | null;
+  tags: string[];
+  phone: string | null;
+  whatsapp: string | null;
+  instagram_url: string | null;
+  tiktok_url: string | null;
+  facebook_url: string | null;
+  maps_url: string | null;
   is_published: boolean;
   created_at: string;
   updated_at: string;
@@ -120,6 +129,8 @@ export interface TourismPackageRow {
   updated_at: string;
 }
 
+export type ArticleCategory = "berita" | "umkm";
+
 export interface ArticleRow {
   id: string;
   village_id: string;
@@ -129,8 +140,20 @@ export interface ArticleRow {
   content: string;
   excerpt: string | null;
   author_id: string | null;
+  /** Kolom tambahan — lihat docs/supabase-migration-galeri-artikel.sql */
+  category: ArticleCategory;
   is_published: boolean;
   published_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** Galeri foto desa — lihat docs/supabase-migration-galeri-artikel.sql */
+export interface GalleryImageRow {
+  id: string;
+  village_id: string;
+  image_url: string;
+  caption: string | null;
+  display_order: number;
+  created_at: string;
 }

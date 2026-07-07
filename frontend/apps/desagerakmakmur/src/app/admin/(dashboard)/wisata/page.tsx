@@ -9,10 +9,18 @@ import { useAdmin } from "../admin-context";
 interface SpotForm {
   id: string | null;
   name: string;
+  tagline: string;
   description: string;
+  tags: string; // dipisah koma
   address: string;
   latitude: string;
   longitude: string;
+  maps_url: string;
+  phone: string;
+  whatsapp: string;
+  instagram_url: string;
+  tiktok_url: string;
+  facebook_url: string;
   cover_image_url: string;
   is_published: boolean;
 }
@@ -20,10 +28,18 @@ interface SpotForm {
 const EMPTY_FORM: SpotForm = {
   id: null,
   name: "",
+  tagline: "",
   description: "",
+  tags: "",
   address: "",
   latitude: "",
   longitude: "",
+  maps_url: "",
+  phone: "",
+  whatsapp: "",
+  instagram_url: "",
+  tiktok_url: "",
+  facebook_url: "",
   cover_image_url: "",
   is_published: true,
 };
@@ -68,10 +84,18 @@ export default function AdminWisataPage() {
     setForm({
       id: spot.id,
       name: spot.name,
+      tagline: spot.tagline ?? "",
       description: spot.description ?? "",
+      tags: (spot.tags ?? []).join(", "),
       address: spot.address ?? "",
       latitude: spot.latitude != null ? String(spot.latitude) : "",
       longitude: spot.longitude != null ? String(spot.longitude) : "",
+      maps_url: spot.maps_url ?? "",
+      phone: spot.phone ?? "",
+      whatsapp: spot.whatsapp ?? "",
+      instagram_url: spot.instagram_url ?? "",
+      tiktok_url: spot.tiktok_url ?? "",
+      facebook_url: spot.facebook_url ?? "",
       cover_image_url: spot.cover_image_url ?? "",
       is_published: spot.is_published,
     });
@@ -87,10 +111,21 @@ export default function AdminWisataPage() {
       const payload = {
         village_id: admin.village.id,
         name: form.name.trim(),
+        tagline: form.tagline.trim() || null,
         description: form.description.trim() || null,
+        tags: form.tags
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
         address: form.address.trim() || null,
         latitude: form.latitude.trim() ? Number(form.latitude) : null,
         longitude: form.longitude.trim() ? Number(form.longitude) : null,
+        maps_url: form.maps_url.trim() || null,
+        phone: form.phone.trim() || null,
+        whatsapp: form.whatsapp.replace(/[^0-9]/g, "") || null,
+        instagram_url: form.instagram_url.trim() || null,
+        tiktok_url: form.tiktok_url.trim() || null,
+        facebook_url: form.facebook_url.trim() || null,
         cover_image_url: form.cover_image_url || null,
         is_published: form.is_published,
       };
@@ -315,6 +350,16 @@ export default function AdminWisataPage() {
             </label>
 
             <label className="flex flex-col gap-1.5">
+              <span className={labelCls}>Tagline</span>
+              <input
+                placeholder="mis. Pasir putih & senja pesisir"
+                value={form.tagline}
+                onChange={(e) => setForm((f) => ({ ...f, tagline: e.target.value }))}
+                className={inputCls}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
               <span className={labelCls}>Deskripsi</span>
               <textarea
                 rows={4}
@@ -325,12 +370,36 @@ export default function AdminWisataPage() {
             </label>
 
             <label className="flex flex-col gap-1.5">
+              <span className={labelCls}>Tag (pisahkan dengan koma)</span>
+              <input
+                placeholder="Pantai, Spot sunset, Area piknik"
+                value={form.tags}
+                onChange={(e) => setForm((f) => ({ ...f, tags: e.target.value }))}
+                className={inputCls}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
               <span className={labelCls}>Alamat / lokasi singkat</span>
               <input
                 value={form.address}
                 onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
                 className={inputCls}
               />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelCls}>Link Google Maps</span>
+              <input
+                type="url"
+                placeholder="https://maps.app.goo.gl/…"
+                value={form.maps_url}
+                onChange={(e) => setForm((f) => ({ ...f, maps_url: e.target.value }))}
+                className={inputCls}
+              />
+              <span className="font-body text-xs text-[#5A5A5A]">
+                Kosongkan untuk memakai koordinat / pencarian nama otomatis.
+              </span>
             </label>
 
             <div className="grid grid-cols-2 gap-3">
@@ -355,6 +424,60 @@ export default function AdminWisataPage() {
                 />
               </label>
             </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1.5">
+                <span className={labelCls}>Telepon (tampilan)</span>
+                <input
+                  placeholder="+62 812-3456-7890"
+                  value={form.phone}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                  className={inputCls}
+                />
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className={labelCls}>WhatsApp (angka saja)</span>
+                <input
+                  placeholder="6281234567890"
+                  value={form.whatsapp}
+                  onChange={(e) => setForm((f) => ({ ...f, whatsapp: e.target.value }))}
+                  className={inputCls}
+                />
+              </label>
+            </div>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelCls}>Instagram (URL profil)</span>
+              <input
+                type="url"
+                placeholder="https://instagram.com/namadestinasi"
+                value={form.instagram_url}
+                onChange={(e) => setForm((f) => ({ ...f, instagram_url: e.target.value }))}
+                className={inputCls}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelCls}>TikTok (URL profil)</span>
+              <input
+                type="url"
+                placeholder="https://tiktok.com/@namadestinasi"
+                value={form.tiktok_url}
+                onChange={(e) => setForm((f) => ({ ...f, tiktok_url: e.target.value }))}
+                className={inputCls}
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelCls}>Facebook (URL profil)</span>
+              <input
+                type="url"
+                placeholder="https://facebook.com/namadestinasi"
+                value={form.facebook_url}
+                onChange={(e) => setForm((f) => ({ ...f, facebook_url: e.target.value }))}
+                className={inputCls}
+              />
+            </label>
 
             {/* Cover */}
             <div className="flex flex-col gap-1.5">

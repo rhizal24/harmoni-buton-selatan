@@ -6,6 +6,7 @@
 import { getSupabase } from "./supabase";
 import type {
   ArticleRow,
+  GalleryImageRow,
   OrganizationStructureRow,
   PopulationDataRow,
   DocumentRow,
@@ -108,6 +109,19 @@ export async function getOrganizationStructure(): Promise<OrganizationStructureR
     .order("display_order", { ascending: true });
   if (error) throw new Error(`Gagal memuat organization_structure: ${error.message}`);
   return (data ?? []) as OrganizationStructureRow[];
+}
+
+export async function getGalleryImages(): Promise<GalleryImageRow[]> {
+  const villageId = await requireVillageId();
+  if (!villageId) return [];
+  const { data, error } = await getSupabase()
+    .from("gallery_images")
+    .select("*")
+    .eq("village_id", villageId)
+    .order("display_order", { ascending: true })
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(`Gagal memuat gallery_images: ${error.message}`);
+  return (data ?? []) as GalleryImageRow[];
 }
 
 export async function getPopulationData(year?: number): Promise<PopulationDataRow[]> {

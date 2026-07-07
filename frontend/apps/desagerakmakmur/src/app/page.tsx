@@ -7,7 +7,7 @@ import {
   MitraKolaborasi,
   Footer,
 } from "@/components/sections";
-import { fetchPaket, fetchWisataUnggulan } from "@/lib/konten";
+import { fetchGaleri, fetchPaket, fetchWisataUnggulan } from "@/lib/konten";
 
 export const metadata: Metadata = {
   title: "Beranda",
@@ -24,14 +24,14 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [unggulan, paket] = await Promise.all([fetchWisataUnggulan(), fetchPaket()]);
+  const [unggulan, paket, galeri] = await Promise.all([fetchWisataUnggulan(), fetchPaket(), fetchGaleri()]);
 
   return (
     <main>
       <HeroBeranda />
       <WisataUnggulan items={unggulan ?? undefined} />
       <JelajahDesa items={paket ?? undefined} />
-      <LensaLande />
+      <LensaLande images={galeri ?? undefined} />
       <MitraKolaborasi />
       <Footer />
     </main>

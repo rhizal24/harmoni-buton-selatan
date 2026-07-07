@@ -11,6 +11,9 @@ const NAV = [
   { label: "Ringkasan", href: "/admin" },
   { label: "Wisata", href: "/admin/wisata" },
   { label: "Paket Wisata", href: "/admin/paket" },
+  { label: "Galeri", href: "/admin/galeri" },
+  { label: "Berita", href: "/admin/berita" },
+  { label: "UMKM", href: "/admin/umkm" },
 ];
 
 /**

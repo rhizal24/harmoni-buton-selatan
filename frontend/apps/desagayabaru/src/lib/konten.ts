@@ -7,7 +7,7 @@
  * Supabase, data DB otomatis menggantikan placeholder (ISR, lihat
  * `export const revalidate` di tiap page).
  */
-import { getTourismPackages, getTourismSpots } from "./desa";
+import { getGalleryImages, getTourismPackages, getTourismSpots } from "./desa";
 import { CONTACT_INFO } from "./constants";
 import type { TourismPackageRow, TourismSpotWithImages } from "./db-types";
 import { WISATA as WISATA_PLACEHOLDER, type Wisata } from "@/app/wisata/_data/wisata";
@@ -38,22 +38,25 @@ function spotImages(spot: TourismSpotWithImages): string[] {
 }
 
 function toWisata(spot: TourismSpotWithImages): Wisata {
+  // Prioritas link maps: maps_url dari admin → koordinat → pencarian nama.
   const maps =
-    spot.latitude != null && spot.longitude != null
+    spot.maps_url ??
+    (spot.latitude != null && spot.longitude != null
       ? `https://www.google.com/maps/search/?api=1&query=${spot.latitude},${spot.longitude}`
       : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
           `${spot.name} Buton Selatan`,
-        )}`;
+        )}`);
 
-  // Kolom tagline/tags/kontak belum ada di schema tourism_spots —
-  // isi seadanya dari kolom yang tersedia + kontak desa.
   return {
     nama: spot.name,
-    tagline: spot.address ?? "",
+    tagline: spot.tagline ?? spot.address ?? "",
     deskripsi: spot.description ?? "",
-    tags: [],
-    telepon: CONTACT_INFO.phone,
-    wa: "",
+    tags: spot.tags ?? [],
+    telepon: spot.phone ?? CONTACT_INFO.phone,
+    wa: spot.whatsapp ?? "",
+    instagram: spot.instagram_url ?? undefined,
+    tiktok: spot.tiktok_url ?? undefined,
+    facebook: spot.facebook_url ?? undefined,
     maps,
     imgs: spotImages(spot),
     alt: spot.name,
@@ -85,6 +88,27 @@ export async function fetchWisataUnggulan(): Promise<WisataItem[] | null> {
     }));
   } catch (err) {
     console.warn("[konten] Gagal memuat wisata unggulan, pakai placeholder:", err);
+    return null;
+  }
+}
+
+/** Foto galeri (section Lensa di beranda). */
+export interface GaleriFoto {
+  src: string;
+  alt: string;
+}
+
+/** Foto galeri desa. null → komponen memakai foto default statisnya. */
+export async function fetchGaleri(): Promise<GaleriFoto[] | null> {
+  try {
+    const rows = await getGalleryImages();
+    if (rows.length === 0) return null;
+    return rows.map((row) => ({
+      src: row.image_url,
+      alt: row.caption ?? "Foto galeri desa",
+    }));
+  } catch (err) {
+    console.warn("[konten] Gagal memuat galeri, pakai placeholder:", err);
     return null;
   }
 }
