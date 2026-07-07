@@ -7,6 +7,7 @@ import {
   MitraKolaborasi,
   Footer,
 } from "@/components/sections";
+import { getWisata } from "@/data/wisata";
 
 export const metadata: Metadata = {
   title: "Beranda",
@@ -18,12 +19,15 @@ export const metadata: Metadata = {
  * Homepage — Server Component (default di Next.js App Router).
  * Section disusun sesuai design system: hero → jelajah desa → lensa lande →
  * mitra kolaborasi → footer. Semua styling pakai Tailwind utilities.
+ * Data wisata ditarik dari `@/data/wisata` (sumber sama dgn halaman /wisata)
+ * dan diteruskan ke WisataUnggulan sebagai props.
  */
-export default function HomePage() {
+export default async function HomePage() {
+  const wisata = await getWisata();
   return (
     <main>
       <HeroBeranda />
-      <WisataUnggulan />
+      <WisataUnggulan data={wisata} />
       <JelajahDesa />
       <LensaLande />
       <MitraKolaborasi />

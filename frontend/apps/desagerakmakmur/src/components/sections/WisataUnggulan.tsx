@@ -4,44 +4,21 @@ import { useState } from "react";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 import { TiltScene, TiltLayer } from "@/components/ui/TiltScene";
-
-/** Daftar wisata — klik untuk ganti foto & deskripsi (Figma node 89:1291) */
-const WISATA = [
-  {
-    name: "Karamba Resto",
-    href: "/karamba",
-    img: "/images/hero-bg.jpg",
-    desc: "menjadi ikon wisata bahari Desa Gerak Makmur — panggung apung tempat menikmati seafood segar dan senja di atas laut Buton Selatan.",
-  },
-  {
-    name: "Singkung",
-    href: "/wisata/singkung",
-    img: "/images/wisata-pantai.jpg",
-    desc: "menyuguhkan hamparan pasir putih dan air laut jernih — tempat sempurna untuk berenang, bersantai, dan menikmati deburan ombak.",
-  },
-  {
-    name: "Wisata 3",
-    href: "/wisata",
-    img: "/images/wisata-diving.jpg",
-    desc: "menghadirkan keindahan bawah laut dengan terumbu karang berwarna — surga bagi penyelam dan pencinta snorkeling.",
-  },
-  {
-    name: "Wisata 4",
-    href: "/wisata",
-    img: "/images/wisata-mangrove.jpg",
-    desc: "menawarkan susur hutan mangrove yang teduh — jalur ekowisata untuk mengenal ekosistem pesisir desa.",
-  },
-];
+import type { Wisata } from "@/types/wisata";
 
 /**
  * Wisata Unggulan — split 2 kolom: teks & daftar (kiri), foto berbingkai (kanan).
  * Daftar interaktif: pilih item → foto & deskripsi berganti (nama di-bold).
  * Tiga elemen miring 3D mengikuti pointer; kiri & kanan berlawanan (cekung ke
  * tengah). Figma node 89:1295.
+ *
+ * Data destinasi diterima sebagai props dari page beranda (sumber sama dengan
+ * halaman /wisata via `@/data/wisata`) — ubah di satu tempat, tampil di
+ * keduanya.
  */
-export function WisataUnggulan() {
+export function WisataUnggulan({ data }: { data: Wisata[] }) {
   const [active, setActive] = useState(0);
-  const current = WISATA[active];
+  const current = data[active];
 
   return (
     <section
@@ -62,12 +39,12 @@ export function WisataUnggulan() {
               className="min-h-[6.5rem] font-body text-lg leading-relaxed text-[#006572] motion-safe:animate-gallery-fade"
             >
               <strong className="font-bold text-[#004750]">
-                {current.name}
+                {current.nama}
               </strong>{" "}
-              {current.desc}
+              — {current.deskripsi}
             </p>
             <Link
-              href={current.href}
+              href="/wisata#daftar-wisata"
               className="inline-flex items-center rounded-md border border-white bg-[#006572] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-200 hover:-translate-y-0.5 hover:[filter:drop-shadow(0_0_16px_rgba(0,101,114,0.55))_drop-shadow(0_0_44px_rgba(0,101,114,0.30))] focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2"
             >
               Lihat Detail
@@ -77,8 +54,8 @@ export function WisataUnggulan() {
           {/* Daftar wisata — searah dengan teks (satu sisi kiri) */}
           <TiltLayer strength={7}>
             <ul className="flex flex-col gap-5">
-              {WISATA.map((w, i) => (
-                <li key={w.name}>
+              {data.map((w, i) => (
+                <li key={w.nama}>
                   <button
                     type="button"
                     onClick={() => setActive(i)}
@@ -89,7 +66,7 @@ export function WisataUnggulan() {
                         : "text-[#3e494b]/30 hover:text-[#006572]"
                     }`}
                   >
-                    {w.name}
+                    {w.nama}
                   </button>
                 </li>
               ))}
@@ -106,8 +83,8 @@ export function WisataUnggulan() {
           >
             <img
               key={active}
-              src={current.img}
-              alt={current.name}
+              src={current.imgs[0]}
+              alt={current.alt}
               className="aspect-[698/569] w-full object-cover motion-safe:animate-gallery-fade"
               loading="lazy"
             />
