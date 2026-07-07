@@ -9,6 +9,10 @@ import { AdminContext } from "./admin-context";
 
 const NAV = [
   { label: "Ringkasan", href: "/admin" },
+  { label: "Profil Desa", href: "/admin/profil" },
+  { label: "Struktur Organisasi", href: "/admin/struktur" },
+  { label: "Desa dalam Angka", href: "/admin/statistik" },
+  { label: "Dokumen Desa", href: "/admin/dokumen" },
   { label: "Wisata", href: "/admin/wisata" },
   { label: "Paket Wisata", href: "/admin/paket" },
   { label: "Galeri", href: "/admin/galeri" },

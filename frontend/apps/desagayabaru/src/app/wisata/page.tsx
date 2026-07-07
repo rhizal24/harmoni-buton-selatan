@@ -3,7 +3,8 @@ import { JelajahDesa, Footer } from "@/components/sections";
 import { ScrollCoverReveal } from "@/components/ui/ScrollCoverReveal";
 import { HeroWisata } from "./_components/HeroWisata";
 import { DaftarWisata } from "./_components/DaftarWisata";
-import { fetchPaket, fetchWisata } from "@/lib/konten";
+import { getWisata } from "@/data/wisata";
+import { fetchPaket } from "@/lib/konten";
 
 export const metadata: Metadata = {
   title: "Wisata",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function WisataPage() {
-  const [wisata, paket] = await Promise.all([fetchWisata(), fetchPaket()]);
+  const [wisata, paket] = await Promise.all([getWisata(), fetchPaket()]);
 
   return (
     <main>
@@ -35,7 +36,7 @@ export default async function WisataPage() {
         capOffset={0.15}
         hideDistance={0}
       >
-        <DaftarWisata wisata={wisata} />
+        <DaftarWisata data={wisata} />
         <JelajahDesa items={paket ?? undefined} />
         <Footer />
       </ScrollCoverReveal>

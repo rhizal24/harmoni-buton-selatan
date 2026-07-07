@@ -27,6 +27,14 @@ export function HeroWisata() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
     const ctx = gsap.context(() => {
+      gsap.from(el.children, {
+        opacity: 0,
+        y: 28,
+        duration: 0.8,
+        ease: "power3.out",
+        stagger: 0.12,
+        delay: 0.05,
+      });
       gsap.to(el, {
         y: -90,
         ease: "none",
@@ -76,7 +84,7 @@ export function HeroWisata() {
           </h1>
 
           <p className="mt-5 font-body text-base leading-[1.7] text-white/85 md:text-lg">
-            Selami keindahan bahari, mangrove, dan budaya pesisir Sampolawa.
+            Selami keindahan bahari, mangrove, dan budaya pesisir Buton Selatan.
             Mulai eksplorasi destinasi atau pesan paket wisata untuk pengalaman
             yang terkurasi bersama warga desa.
           </p>

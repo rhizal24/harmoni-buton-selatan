@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type Locale } from "@/components/ui/LanguageSwitcher";
 import { ProfileIcon } from "@/components/ui/ProfileIcon";
+import { GlassSurface } from "@/components/ui/GlassSurface";
 
 /* ─────────────────────────────────────────────
    Data navigasi
@@ -296,54 +297,69 @@ export function Navbar() {
       >
         <nav
           aria-label={lang === "id" ? "Navigasi utama" : "Main navigation"}
-          className="pointer-events-auto mx-auto flex w-full max-w-[1040px] items-center justify-between gap-5 rounded-full bg-[rgba(255,255,255,0.60)] px-4 py-4 font-body text-[0.9375rem] text-on-surface shadow-glass [backdrop-filter:blur(8px)_url(#liquid-glass)_saturate(1.5)] [-webkit-backdrop-filter:blur(8px)_saturate(1.5)] motion-safe:transition-[background-color,box-shadow] motion-safe:duration-300"
+          className="pointer-events-auto mx-auto w-full max-w-[1040px]"
         >
-          {/* ── Logo (kiri) ── */}
-          <Link
-            href="/"
-            className="group flex shrink-0 items-center gap-2.5 text-on-surface no-underline"
+          {/* Permukaan liquid-glass (GlassSurface) — refraksi + frost.
+              Tinggi 72px = py-4 lama + logo 40px; radius 36 = pill penuh. */}
+          <GlassSurface
+            width="100%"
+            height={72}
+            borderRadius={36}
+            backgroundOpacity={0.45}
+            saturation={1.5}
+            blur={11}
+            displace={2}
+            className="font-body text-[0.9375rem] text-on-surface"
           >
-            <img
-              src="/assets/logo-caheabusel.avif"
-              alt="Logo Cahea Busel"
-              width={40}
-              height={40}
-              className="h-10 w-10 object-contain motion-safe:transition-transform motion-safe:duration-[250ms] group-hover:-rotate-[8deg] group-hover:scale-[1.08]"
-            />
-          </Link>
+            <div className="flex w-full items-center justify-between gap-5 px-4">
+              {/* ── Logo (kiri) ── */}
+              <Link
+                href="/"
+                className="group flex shrink-0 items-center gap-2.5 text-on-surface no-underline"
+              >
+                <img
+                  src="/assets/logo-caheabusel.avif"
+                  alt="Logo Cahea Busel"
+                  width={40}
+                  height={40}
+                  className="h-10 w-10 object-contain motion-safe:transition-transform motion-safe:duration-[250ms] group-hover:-rotate-[8deg] group-hover:scale-[1.08]"
+                />
+              </Link>
 
-          {/* ── Menu desktop (tengah) ── */}
-          <div className="hidden shrink-0 items-center gap-0.5 lg:flex">
-            {NAV_ITEMS.map((item) => (
-              <NavItem
-                key={item.href}
-                href={item.href}
-                label={lang === "id" ? item.label : item.labelEn}
-                exact={item.exact}
-              />
-            ))}
-            <DropdownNav
-              label={lang === "id" ? "Informasi" : "Information"}
-              items={INFORMASI_ITEMS}
-              lang={lang}
-            />
-          </div>
+              {/* ── Menu desktop (tengah) ── */}
+              <div className="hidden shrink-0 items-center gap-0.5 lg:flex">
+                {NAV_ITEMS.map((item) => (
+                  <NavItem
+                    key={item.href}
+                    href={item.href}
+                    label={lang === "id" ? item.label : item.labelEn}
+                    exact={item.exact}
+                  />
+                ))}
+                <DropdownNav
+                  label={lang === "id" ? "Informasi" : "Information"}
+                  items={INFORMASI_ITEMS}
+                  lang={lang}
+                />
+              </div>
 
-          {/* ── Aksi kanan ── */}
-          <div className="flex shrink-0 items-center gap-2">
-            <ProfileIcon href="/admin/login" />
+              {/* ── Aksi kanan ── */}
+              <div className="flex shrink-0 items-center gap-2">
+                <ProfileIcon href="/admin/login" />
 
-            {/* Hamburger (mobile) */}
-            <button
-              type="button"
-              onClick={() => setMobileOpen((v) => !v)}
-              aria-expanded={mobileOpen}
-              aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
-              className="flex h-[34px] w-[34px] items-center justify-center rounded-lg border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-pointer motion-safe:transition-colors motion-safe:duration-150 hover:bg-primary-container hover:text-on-primary-container lg:hidden"
-            >
-              {mobileOpen ? <CloseIcon /> : <HamburgerIcon />}
-            </button>
-          </div>
+                {/* Hamburger (mobile) */}
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen((v) => !v)}
+                  aria-expanded={mobileOpen}
+                  aria-label={mobileOpen ? "Tutup menu" : "Buka menu"}
+                  className="flex h-[34px] w-[34px] items-center justify-center rounded-lg border border-outline-variant bg-surface-container-low text-on-surface-variant cursor-pointer motion-safe:transition-colors motion-safe:duration-150 hover:bg-primary-container hover:text-on-primary-container lg:hidden"
+                >
+                  {mobileOpen ? <CloseIcon /> : <HamburgerIcon />}
+                </button>
+              </div>
+            </div>
+          </GlassSurface>
         </nav>
 
         {/* ── Mobile fullscreen menu ── */}
