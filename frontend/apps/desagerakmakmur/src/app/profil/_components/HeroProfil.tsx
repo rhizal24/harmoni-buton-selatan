@@ -8,17 +8,13 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 /**
- * Hero halaman Wisata — full screen, konten rata kiri (beda dari hero Beranda
- * yang center), tapi lebar/jarak kiri-kanan mengikuti container standar situs
- * (`max-w-[1112px]` + `px-5 sm:px-8`) agar konsisten dengan section lain.
- *
- * Background foto full-bleed + overlay gradient dari kiri supaya teks terbaca.
- * Konten di-nudge sedikit ke atas (`pb-[10vh]`) dan diberi parallax halus
- * (GSAP, naik saat di-scroll). Dua CTA: "Mulai Eksplorasi" & "Pesan Paket".
- * Colocated di `app/wisata/_components`. (Pembatas parallax `bawah.avif`
- * dipasang di section berikutnya — DaftarWisata — agar menempel ke sana.)
+ * Hero halaman Profil — full screen, konten rata kiri, mengikuti pola
+ * `HeroWisata`: background foto full-bleed + overlay gradient dari kiri agar
+ * teks terbaca. Konten (eyebrow, judul, deskripsi, CTA) masuk ber-stagger saat
+ * halaman dibuka + parallax GSAP halus saat di-scroll. Menghormati
+ * prefers-reduced-motion.
  */
-export function HeroWisata() {
+export function HeroProfil() {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,7 +35,7 @@ export function HeroWisata() {
         y: -90,
         ease: "none",
         scrollTrigger: {
-          trigger: "#hero-wisata",
+          trigger: "#hero-profil",
           start: "top top",
           end: "bottom top",
           scrub: true,
@@ -52,14 +48,14 @@ export function HeroWisata() {
 
   return (
     <section
-      id="hero-wisata"
-      aria-label="Wisata Desa Gerak Makmur"
+      id="hero-profil"
+      aria-label="Profil Desa Gerak Makmur"
       className="relative flex min-h-screen items-center overflow-hidden pb-[10vh]"
     >
       {/* Background foto */}
       <img
-        src="/images/wisata-pantai.jpg"
-        alt="Panorama wisata bahari Desa Gerak Makmur"
+        src="/images/hero-bg.jpg"
+        alt="Panorama Desa Gerak Makmur, Buton Selatan"
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden
       />
@@ -69,40 +65,40 @@ export function HeroWisata() {
         aria-hidden
       />
 
-      {/* Konten — container standar, tapi teks rata kiri */}
+      {/* Konten — container standar, teks rata kiri */}
       <div className="relative z-10 mx-auto w-full max-w-[1112px] px-5 sm:px-8">
         <div
           ref={contentRef}
           className="flex max-w-[640px] flex-col items-start text-left"
         >
           <p className="font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#CFF1F4]/90 md:text-sm">
-            Jelajahi Pesona
+            Profil Desa
           </p>
 
           <h1 className="mt-3 font-body text-[clamp(2.5rem,6vw,4rem)] font-bold leading-[1.05] tracking-[-0.01em] text-white drop-shadow-sm">
-            Wisata Desa Gerak Makmur
+            Mengenal Gerak Makmur
           </h1>
 
           <p className="mt-5 font-body text-base leading-[1.7] text-white/85 md:text-lg">
-            Selami keindahan bahari, mangrove, dan budaya pesisir Sampolawa.
-            Mulai eksplorasi destinasi atau pesan paket wisata untuk pengalaman
-            yang terkurasi bersama warga desa.
+            Menelusuri sejarah, visi, dan denyut kehidupan masyarakat pesisir
+            Sampolawa — dari jejak berdirinya desa hingga susunan perangkat yang
+            menggerakkannya hari ini.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            {/* Primary — Mulai Eksplorasi */}
+            {/* Primary — Lihat Sejarah */}
             <Link
-              href="#daftar-wisata"
+              href="#sejarah"
               className="inline-flex items-center rounded-md bg-[#006572] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-200 hover:-translate-y-0.5 hover:[filter:drop-shadow(0_0_16px_rgba(0,101,114,0.55))_drop-shadow(0_0_44px_rgba(0,101,114,0.30))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
             >
-              Mulai Eksplorasi
+              Lihat Sejarah
             </Link>
-            {/* Secondary — Pesan Paket Wisata (ghost/glass) */}
+            {/* Secondary — Struktur Desa (ghost/glass) */}
             <Link
-              href="#paket-wisata"
-              className="inline-flex items-center rounded-md border border-white/70 bg-white/10 px-8 py-3 font-body text-sm font-semibold text-white no-underline backdrop-blur-sm shadow-sm motion-safe:transition-[transform,filter,background-color] motion-safe:duration-200 hover:-translate-y-0.5 hover:bg-white/20 hover:[filter:drop-shadow(0_0_16px_rgba(255,255,255,0.45))_drop-shadow(0_0_44px_rgba(255,255,255,0.25))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+              href="#struktur"
+              className="inline-flex items-center rounded-md border border-white/70 bg-white/10 px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm backdrop-blur-sm motion-safe:transition-[transform,filter,background-color] motion-safe:duration-200 hover:-translate-y-0.5 hover:bg-white/20 hover:[filter:drop-shadow(0_0_16px_rgba(255,255,255,0.45))_drop-shadow(0_0_44px_rgba(255,255,255,0.25))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
             >
-              Pesan Paket Wisata
+              Struktur Desa
             </Link>
           </div>
         </div>

@@ -6,25 +6,8 @@
  * `imgs` perlu diganti dengan data & foto resmi tiap wisata (kini pakai aset
  * sementara di `/public/images`). Teks deskripsi bisa disesuaikan.
  */
-export interface Wisata {
-  nama: string;
-  tagline: string;
-  deskripsi: string;
-  tags: string[];
-  /** Nomor untuk ditampilkan, mis. "+62 812-3456-7890". */
-  telepon: string;
-  /** Link WhatsApp (wa.me), tanpa "+"/spasi, mis. "6281234567890". */
-  wa: string;
-  instagram?: string; // URL profil
-  tiktok?: string; // URL profil
-  facebook?: string; // URL profil
-  /** Deep-link Google Maps ke titik lokasi. */
-  maps: string;
-  /** Beberapa foto untuk slideshow auto-fade (loop). Foto pertama juga dipakai
-   *  sebagai thumbnail panel accordion. */
-  imgs: string[];
-  alt: string;
-}
+import type { Wisata } from "@/types/wisata";
+export type { Wisata };
 
 export const WISATA: Wisata[] = [
   {
@@ -82,5 +65,19 @@ export const WISATA: Wisata[] = [
     maps: "https://www.google.com/maps/search/?api=1&query=Tebing+Lande+Gerak+Makmur+Buton+Selatan",
     imgs: ["/images/hero-bg.jpg", "/images/wisata-pantai.jpg", "/images/wisata-diving.jpg"],
     alt: "Tebing Lande yang menghadap laut lepas",
+  },
+  {
+    nama: "Sabana Gerak Makmur",
+    tagline: "Padang rumput luas di atas perbukitan",
+    deskripsi:
+      "Hamparan sabana yang membentang di perbukitan desa — rumput keemasan sejauh mata memandang dengan angin laut yang sejuk. Tempat terbaik menikmati lanskap terbuka, berkemah ringan, dan berburu golden hour menjelang senja.",
+    tags: ["Sabana", "Perbukitan", "Golden hour", "Spot camping"],
+    telepon: "+62 812-0000-0005",
+    wa: "6281200000005",
+    instagram: "https://instagram.com/",
+    tiktok: "https://tiktok.com/",
+    maps: "https://www.google.com/maps/search/?api=1&query=Sabana+Gerak+Makmur+Buton+Selatan",
+    imgs: ["/images/wisata-mangrove.jpg", "/images/hero-bg.jpg", "/images/wisata-diving.jpg"],
+    alt: "Padang sabana di perbukitan Desa Gerak Makmur",
   },
 ];

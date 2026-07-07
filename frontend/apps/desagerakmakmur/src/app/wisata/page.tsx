@@ -3,6 +3,7 @@ import { JelajahDesa, Footer } from "@/components/sections";
 import { ScrollCoverReveal } from "@/components/ui/ScrollCoverReveal";
 import { HeroWisata } from "./_components/HeroWisata";
 import { DaftarWisata } from "./_components/DaftarWisata";
+import { getWisata } from "@/data/wisata";
 
 export const metadata: Metadata = {
   title: "Wisata",
@@ -16,7 +17,9 @@ export const metadata: Metadata = {
  * lintas-halaman diambil dari `@/components/sections`. Navbar sudah dirender
  * di root layout, jadi tidak diulang di sini.
  */
-export default function WisataPage() {
+export default async function WisataPage() {
+  const wisata = await getWisata();
+
   return (
     <main>
       {/* Hero di-pin; panel di bawahnya (asset tepi atas + section) naik
@@ -29,7 +32,7 @@ export default function WisataPage() {
         capOffset={0.15}
         hideDistance={0}
       >
-        <DaftarWisata />
+        <DaftarWisata data={wisata} />
         <JelajahDesa />
         <Footer />
       </ScrollCoverReveal>
