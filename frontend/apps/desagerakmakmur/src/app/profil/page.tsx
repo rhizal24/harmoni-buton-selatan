@@ -27,6 +27,9 @@ export const metadata: Metadata = {
  * CATATAN: konten Sejarah/VisiMisi/Statistik masih PLACEHOLDER (seed di
  * `./_data/*`) sampai endpoint backend-nya tersedia.
  */
+// ISR — konten Supabase disegarkan tiap 5 menit.
+export const revalidate = 300;
+
 export default async function ProfilPage() {
   const [struktur, dokumen] = await Promise.all([getStruktur(), getDokumen()]);
 

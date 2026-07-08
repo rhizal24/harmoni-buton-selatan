@@ -69,7 +69,7 @@ export function Footer() {
               loading="lazy"
             />
             <p className="font-body text-base leading-relaxed text-white">
-              Bergerak bersama menuju kemakmuran — Kecamatan Sampolawa, Buton
+              Bergerak bersama menuju kemakmuran — Kabupaten Buton
               Selatan, Sulawesi Tenggara. Dikembangkan bersama KKN-PPM UGM.
             </p>
           </div>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { GlowPill } from "@/components/ui/GlowPill";
 import { ScrollRevealImage } from "@/components/ui/ScrollRevealImage";
+import { StaggerIn } from "@/components/ui/StaggerIn";
 
 /**
  * Hero Beranda — full-bleed foto drone desa + overlay gelap + konten center.
@@ -39,8 +40,8 @@ export function HeroBeranda() {
         />
       ))}
 
-      {/* Konten */}
-      <div className="relative z-10 mx-auto flex max-w-[820px] flex-col items-center px-5 text-center">
+      {/* Konten — tiap anak masuk ber-stagger saat halaman dibuka/di-reload */}
+      <StaggerIn className="relative z-10 mx-auto flex max-w-[820px] flex-col items-center px-5 text-center">
         <GlowPill>Portal Informasi Resmi</GlowPill>
 
         <p className="mt-7 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#CFF1F4]/90 md:text-sm">
@@ -70,7 +71,7 @@ export function HeroBeranda() {
             Lihat UMKM
           </Link>
         </div>
-      </div>
+      </StaggerIn>
 
       {/* Scroll down */}
       <a

@@ -22,6 +22,11 @@ export interface VillageRow {
   video_url: string | null;
   logo_url: string | null;
   cover_image_url: string | null;
+  /** Konten profil — lihat docs/supabase-migration-profil.sql.
+   *  about/history = paragraf dipisah baris kosong. */
+  about: string | null;
+  vision: string | null;
+  missions: string[];
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -44,6 +49,8 @@ export interface OrganizationStructureRow {
   short_bio: string | null;
   period_start: string | null;
   period_end: string | null;
+  /** id atasan langsung (bagan hierarki) — null = puncak struktur. */
+  parent_id: string | null;
   display_order: number;
   created_at: string;
   updated_at: string;
@@ -58,6 +65,10 @@ export interface PopulationDataRow {
   value: number;
   unit: string | null;
   notes: string | null;
+  /** Teks tampilan bebas (mis. "±2.500", "12,4 km²") + urutan tampil —
+   *  lihat docs/supabase-migration-profil.sql */
+  value_label: string | null;
+  display_order: number;
   created_at: string;
   updated_at: string;
 }
@@ -67,10 +78,13 @@ export interface DocumentRow {
   village_id: string;
   title: string;
   description: string | null;
-  category: DocumentCategory;
+  /** Kategori bebas (teks) sejak docs/supabase-migration-profil.sql */
+  category: string;
   file_url: string;
   file_size_kb: number | null;
   uploaded_by: string | null;
+  /** Label tahun/tanggal terbit untuk tampilan, mis. "2025". */
+  period_label: string | null;
   created_at: string;
 }
 

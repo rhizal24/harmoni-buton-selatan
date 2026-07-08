@@ -12,7 +12,7 @@ import {
   MapPinIcon,
   MapIcon,
 } from "@/components/ui";
-import { WISATA as WISATA_DEFAULT, type Wisata } from "../_data/wisata";
+import type { Wisata } from "@/types/wisata";
 
 /**
  * Daftar Wisata — accordion "expanding". Tiap panel melebar saat hover dan
@@ -24,9 +24,9 @@ import { WISATA as WISATA_DEFAULT, type Wisata } from "../_data/wisata";
  * Asset cap (`bawah.avif`) & gerak panel hero ditangani `ScrollCoverReveal`
  * yang membungkus blok ini di `page.tsx`.
  */
-export function DaftarWisata({ wisata = WISATA_DEFAULT }: { wisata?: Wisata[] }) {
+export function DaftarWisata({ data }: { data: Wisata[] }) {
   const [active, setActive] = useState(0); // item pertama terbuka default
-  const current = wisata[active];
+  const current = data[active];
 
   return (
     <section
@@ -46,7 +46,7 @@ export function DaftarWisata({ wisata = WISATA_DEFAULT }: { wisata?: Wisata[] })
               Daftar Wisata
             </h2>
             <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#006572]/80">
-              Empat destinasi unggulan Desa Gaya Baru. Arahkan kursor untuk
+              Lima destinasi unggulan Desa Gaya Baru. Arahkan kursor untuk
               mengintip tiap tempat, lalu klik untuk membuka informasi
               lengkapnya di bawah.
             </p>
@@ -56,7 +56,7 @@ export function DaftarWisata({ wisata = WISATA_DEFAULT }: { wisata?: Wisata[] })
         {/* ── Accordion desktop (md+) ── */}
         <Reveal delay={90}>
           <div className="hidden h-[460px] w-full items-stretch gap-3 md:flex">
-            {wisata.map((w, i) => {
+            {data.map((w, i) => {
               const isActive = active === i;
               return (
                 <button
@@ -117,7 +117,7 @@ export function DaftarWisata({ wisata = WISATA_DEFAULT }: { wisata?: Wisata[] })
 
         {/* ── Kartu grid mobile (<md) ── */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:hidden">
-          {wisata.map((w, i) => {
+          {data.map((w, i) => {
             const isActive = active === i;
             return (
               <button
