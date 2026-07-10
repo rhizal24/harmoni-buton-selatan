@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { TourismSpotImageRow, TourismSpotWithImages } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
@@ -135,6 +135,9 @@ export default function AdminWisataPage() {
         : await supabase.from("tourism_spots").insert(payload);
       if (error) throw new Error(error.message);
 
+      if (form.id && editing?.cover_image_url && editing.cover_image_url !== (form.cover_image_url || null)) {
+        void deleteUploadedFile(editing.cover_image_url, admin.accessToken);
+      }
       setMsg({ kind: "ok", text: form.id ? "Perubahan disimpan." : "Destinasi ditambahkan." });
       if (!form.id) setForm(EMPTY_FORM);
       await refresh();
@@ -160,6 +163,10 @@ export default function AdminWisataPage() {
       const { error } = await supabase.from("tourism_spots").delete().eq("id", spot.id);
       if (error) throw new Error(error.message);
       if (form.id === spot.id) setForm(EMPTY_FORM);
+      void deleteUploadedFile(spot.cover_image_url, admin.accessToken);
+      for (const img of spot.tourism_spot_images) {
+        void deleteUploadedFile(img.image_url, admin.accessToken);
+      }
       setMsg({ kind: "ok", text: "Destinasi dihapus." });
       await refresh();
     } catch (err) {
@@ -216,6 +223,7 @@ export default function AdminWisataPage() {
         .delete()
         .eq("id", img.id);
       if (error) throw new Error(error.message);
+      void deleteUploadedFile(img.image_url, admin.accessToken);
       await refresh();
     } catch (err) {
       setMsg({ kind: "err", text: err instanceof Error ? err.message : "Gagal menghapus foto." });

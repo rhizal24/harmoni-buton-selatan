@@ -1,7 +1,7 @@
 import type { FotoGaleri } from "@/types/galeri";
 
 /**
- * SEED Galeri (Lensa Gaya Baru) — placeholder sampai tabel backend tersedia.
+ * SEED Galeri (Lensa Gaya Baru), placeholder sampai tabel backend tersedia.
  * Ganti dengan foto asli desa; atur `span` untuk variasi tile bento.
  */
 export const GALERI_SEED: FotoGaleri[] = [

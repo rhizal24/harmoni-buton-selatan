@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { ArticleCategory, ArticleRow } from "@/lib/db-types";
 import { useAdmin } from "./admin-context";
 
@@ -25,7 +25,7 @@ const EMPTY_FORM: ArtikelForm = {
 };
 
 const inputCls =
-  "h-10 w-full rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20";
+  "h-10 w-full rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20";
 const labelCls = "font-body text-sm font-semibold text-[#2E2E2E]";
 
 function slugify(input: string): string {
@@ -39,7 +39,7 @@ function slugify(input: string): string {
 }
 
 /**
- * CRUD artikel (dipakai halaman Berita & UMKM — kategori berbeda,
+ * CRUD artikel (halaman Berita,
  * tabel sama: articles). Slug dibuat otomatis dari judul, unik per desa;
  * published_at terisi saat pertama kali ditayangkan.
  */
@@ -128,6 +128,9 @@ export function ArtikelManager({
         : await supabase.from("articles").insert(payload);
       if (error) throw new Error(error.message);
 
+      if (form.id && editing?.cover_image_url && editing.cover_image_url !== (form.cover_image_url || null)) {
+        void deleteUploadedFile(editing.cover_image_url, admin.accessToken);
+      }
       setMsg({ kind: "ok", text: form.id ? "Perubahan disimpan." : "Artikel ditambahkan." });
       if (!form.id) setForm(EMPTY_FORM);
       await refresh();
@@ -146,6 +149,7 @@ export function ArtikelManager({
       const { error } = await getSupabase().from("articles").delete().eq("id", row.id);
       if (error) throw new Error(error.message);
       if (form.id === row.id) setForm(EMPTY_FORM);
+      void deleteUploadedFile(row.cover_image_url, admin.accessToken);
       setMsg({ kind: "ok", text: "Artikel dihapus." });
       await refresh();
     } catch (err) {
@@ -182,7 +186,7 @@ export function ArtikelManager({
             setForm(EMPTY_FORM);
             setMsg(null);
           }}
-          className="rounded-md bg-[#006572] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#026F7D]"
+          className="rounded-md bg-[#31577F] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#27466A]"
         >
           + Artikel Baru
         </button>
@@ -193,7 +197,7 @@ export function ArtikelManager({
           role="status"
           className={`rounded-md border px-3 py-2 font-body text-sm ${
             msg.kind === "ok"
-              ? "border-[#CFF1F4] bg-[#EFFBFC] text-[#00434B]"
+              ? "border-[#D9E4F1] bg-[#F2F6FB] text-[#1F3A59]"
               : "border-[#FFDAD6] bg-[#FFF4F3] text-[#93000A]"
           }`}
         >
@@ -238,7 +242,7 @@ export function ArtikelManager({
                     <span
                       className={`rounded-full px-2.5 py-0.5 font-body text-xs font-semibold ${
                         row.is_published
-                          ? "bg-[#CFF1F4] text-[#00434B]"
+                          ? "bg-[#D9E4F1] text-[#1F3A59]"
                           : "bg-[#E2E2E2] text-[#5A5A5A]"
                       }`}
                     >
@@ -259,7 +263,7 @@ export function ArtikelManager({
                         });
                         setMsg(null);
                       }}
-                      className="rounded-md border border-[#006572] px-3 py-1.5 font-body text-xs font-semibold text-[#006572] hover:bg-[#CFF1F4]"
+                      className="rounded-md border border-[#31577F] px-3 py-1.5 font-body text-xs font-semibold text-[#31577F] hover:bg-[#D9E4F1]"
                     >
                       Edit
                     </button>
@@ -301,7 +305,7 @@ export function ArtikelManager({
                 rows={2}
                 value={form.excerpt}
                 onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))}
-                className="w-full rounded-md border border-[#D0D0D0] px-3 py-2 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20"
+                className="w-full rounded-md border border-[#D0D0D0] px-3 py-2 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20"
               />
             </label>
 
@@ -312,7 +316,7 @@ export function ArtikelManager({
                 rows={10}
                 value={form.content}
                 onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-                className="w-full rounded-md border border-[#D0D0D0] px-3 py-2 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20"
+                className="w-full rounded-md border border-[#D0D0D0] px-3 py-2 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20"
               />
             </label>
 
@@ -336,7 +340,7 @@ export function ArtikelManager({
                   if (file) void handleCoverUpload(file);
                   e.target.value = "";
                 }}
-                className="font-body text-sm text-[#5A5A5A] file:mr-3 file:rounded-md file:border file:border-[#006572] file:bg-white file:px-3 file:py-1.5 file:font-body file:text-xs file:font-semibold file:text-[#006572]"
+                className="font-body text-sm text-[#5A5A5A] file:mr-3 file:rounded-md file:border file:border-[#31577F] file:bg-white file:px-3 file:py-1.5 file:font-body file:text-xs file:font-semibold file:text-[#31577F]"
               />
             </div>
 
@@ -345,7 +349,7 @@ export function ArtikelManager({
                 type="checkbox"
                 checked={form.is_published}
                 onChange={(e) => setForm((f) => ({ ...f, is_published: e.target.checked }))}
-                className="h-4 w-4 accent-[#006572]"
+                className="h-4 w-4 accent-[#31577F]"
               />
               <span className="font-body text-sm text-[#2E2E2E]">Tayangkan di situs</span>
             </label>
@@ -354,7 +358,7 @@ export function ArtikelManager({
               <button
                 type="submit"
                 disabled={busy}
-                className="rounded-md bg-[#006572] px-5 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#026F7D] disabled:opacity-60"
+                className="rounded-md bg-[#31577F] px-5 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#27466A] disabled:opacity-60"
               >
                 {busy ? "Menyimpan…" : form.id ? "Simpan Perubahan" : "Tambah Artikel"}
               </button>

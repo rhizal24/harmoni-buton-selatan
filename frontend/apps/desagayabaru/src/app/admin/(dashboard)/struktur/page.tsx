@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { OrganizationStructureRow } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
@@ -25,11 +25,11 @@ const EMPTY_FORM: AnggotaForm = {
 };
 
 const inputCls =
-  "h-10 w-full rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20";
+  "h-10 w-full rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20";
 const labelCls = "font-body text-sm font-semibold text-[#2E2E2E]";
 
 /**
- * Struktur Organisasi — CRUD perangkat desa untuk bagan hierarki di /profil.
+ * Struktur Organisasi, CRUD perangkat desa untuk bagan hierarki di /profil.
  * `Atasan langsung` menentukan posisi node di bagan (kosong = puncak).
  * Foto di-upload ke ImageKit; tanpa foto, node menampilkan inisial.
  */
@@ -78,6 +78,10 @@ export default function AdminStrukturPage() {
         ? await supabase.from("organization_structure").update(payload).eq("id", form.id)
         : await supabase.from("organization_structure").insert(payload);
       if (error) throw new Error(error.message);
+      const prev = form.id ? rows.find((r) => r.id === form.id) : null;
+      if (prev?.photo_url && prev.photo_url !== (form.photo_url || null)) {
+        void deleteUploadedFile(prev.photo_url, admin.accessToken);
+      }
       setMsg({ kind: "ok", text: form.id ? "Perubahan disimpan." : "Anggota ditambahkan." });
       if (!form.id) setForm(EMPTY_FORM);
       await refresh();
@@ -91,7 +95,7 @@ export default function AdminStrukturPage() {
   async function handleDelete(row: OrganizationStructureRow) {
     if (
       !window.confirm(
-        `Hapus "${row.position_name} — ${row.person_name}"? Bawahannya otomatis naik jadi tanpa atasan.`,
+        `Hapus "${row.position_name}, ${row.person_name}"? Bawahannya otomatis naik jadi tanpa atasan.`,
       )
     )
       return;
@@ -104,6 +108,7 @@ export default function AdminStrukturPage() {
         .eq("id", row.id);
       if (error) throw new Error(error.message);
       if (form.id === row.id) setForm(EMPTY_FORM);
+      void deleteUploadedFile(row.photo_url, admin.accessToken);
       setMsg({ kind: "ok", text: "Anggota dihapus." });
       await refresh();
     } catch (err) {
@@ -142,7 +147,7 @@ export default function AdminStrukturPage() {
             setForm(EMPTY_FORM);
             setMsg(null);
           }}
-          className="rounded-md bg-[#006572] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#026F7D]"
+          className="rounded-md bg-[#31577F] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#27466A]"
         >
           + Anggota Baru
         </button>
@@ -153,7 +158,7 @@ export default function AdminStrukturPage() {
           role="status"
           className={`rounded-md border px-3 py-2 font-body text-sm ${
             msg.kind === "ok"
-              ? "border-[#CFF1F4] bg-[#EFFBFC] text-[#00434B]"
+              ? "border-[#D9E4F1] bg-[#F2F6FB] text-[#1F3A59]"
               : "border-[#FFDAD6] bg-[#FFF4F3] text-[#93000A]"
           }`}
         >
@@ -196,7 +201,7 @@ export default function AdminStrukturPage() {
                           className="h-9 w-9 rounded-md border border-[#EEEEEE] object-cover"
                         />
                       ) : (
-                        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#CFF1F4] font-body text-xs font-bold text-[#00434B]">
+                        <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#D9E4F1] font-body text-xs font-bold text-[#1F3A59]">
                           {row.person_name
                             .split(" ")
                             .slice(0, 2)
@@ -213,7 +218,7 @@ export default function AdminStrukturPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3 font-body text-xs text-[#5A5A5A]">
-                    {row.parent_id ? (byId.get(row.parent_id)?.position_name ?? "—") : "Puncak"}
+                    {row.parent_id ? (byId.get(row.parent_id)?.position_name ?? "-") : "Puncak"}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <button
@@ -229,7 +234,7 @@ export default function AdminStrukturPage() {
                         });
                         setMsg(null);
                       }}
-                      className="rounded-md border border-[#006572] px-3 py-1.5 font-body text-xs font-semibold text-[#006572] hover:bg-[#CFF1F4]"
+                      className="rounded-md border border-[#31577F] px-3 py-1.5 font-body text-xs font-semibold text-[#31577F] hover:bg-[#D9E4F1]"
                     >
                       Edit
                     </button>
@@ -283,12 +288,12 @@ export default function AdminStrukturPage() {
                 onChange={(e) => setForm((f) => ({ ...f, parent_id: e.target.value }))}
                 className={inputCls}
               >
-                <option value="">— Puncak struktur (tanpa atasan) —</option>
+                <option value="">- Puncak struktur (tanpa atasan) -</option>
                 {rows
                   .filter((r) => r.id !== form.id)
                   .map((r) => (
                     <option key={r.id} value={r.id}>
-                      {r.position_name} — {r.person_name}
+                      {r.position_name}, {r.person_name}
                     </option>
                   ))}
               </select>
@@ -323,7 +328,7 @@ export default function AdminStrukturPage() {
                   if (file) void handlePhotoUpload(file);
                   e.target.value = "";
                 }}
-                className="font-body text-sm text-[#5A5A5A] file:mr-3 file:rounded-md file:border file:border-[#006572] file:bg-white file:px-3 file:py-1.5 file:font-body file:text-xs file:font-semibold file:text-[#006572]"
+                className="font-body text-sm text-[#5A5A5A] file:mr-3 file:rounded-md file:border file:border-[#31577F] file:bg-white file:px-3 file:py-1.5 file:font-body file:text-xs file:font-semibold file:text-[#31577F]"
               />
             </div>
 
@@ -331,7 +336,7 @@ export default function AdminStrukturPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="rounded-md bg-[#006572] px-5 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#026F7D] disabled:opacity-60"
+                className="rounded-md bg-[#31577F] px-5 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#27466A] disabled:opacity-60"
               >
                 {busy ? "Menyimpan…" : form.id ? "Simpan Perubahan" : "Tambah Anggota"}
               </button>

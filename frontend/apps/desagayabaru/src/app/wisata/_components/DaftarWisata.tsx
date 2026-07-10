@@ -15,7 +15,7 @@ import {
 import type { Wisata } from "@/types/wisata";
 
 /**
- * Daftar Wisata — accordion "expanding". Tiap panel melebar saat hover dan
+ * Daftar Wisata, accordion "expanding". Tiap panel melebar saat hover dan
  * judulnya muncul; klik untuk MENGUNCI panel tetap terbuka (`active`). Detail
  * destinasi aktif tampil di bawah (menyatu lewat divider): narasi + lokasi +
  * kontak di kiri, slideshow foto di kanan. Menghormati `prefers-reduced-motion`.
@@ -35,17 +35,17 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
       className="bg-white px-5 pt-16 pb-6 sm:px-8 lg:pt-24 lg:pb-8"
     >
       <div className="mx-auto flex w-full max-w-[1112px] flex-col gap-10">
-        {/* Header editorial rata kiri — selaras dengan hero */}
+        {/* Header editorial rata kiri, selaras dengan hero */}
         <Reveal>
           <div className="flex flex-col items-start gap-4">
-            <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#006572]">
-              <span className="h-[3px] w-[42px] bg-[#006572]" aria-hidden />
+            <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#31577F]">
+              <span className="h-[3px] w-[42px] bg-[#31577F]" aria-hidden />
               Destinasi
             </span>
-            <h2 className="font-body text-[clamp(2rem,4vw,3rem)] font-semibold text-[#006572]">
+            <h2 className="font-body text-[clamp(2rem,4vw,3rem)] font-semibold text-[#31577F]">
               Daftar Wisata
             </h2>
-            <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#006572]/80">
+            <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#31577F]/80">
               Lima destinasi unggulan Desa Gaya Baru. Arahkan kursor untuk
               mengintip tiap tempat, lalu klik untuk membuka informasi
               lengkapnya di bawah.
@@ -65,9 +65,9 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
                   onClick={() => setActive(i)}
                   aria-pressed={isActive}
                   aria-label={`Buka detail ${w.nama}`}
-                  className={`group relative h-full flex-grow overflow-hidden rounded-lg border-2 motion-safe:transition-all motion-safe:duration-500 motion-safe:ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006572] ${
+                  className={`group relative h-full flex-grow overflow-hidden rounded-lg border-2 motion-safe:transition-all motion-safe:duration-500 motion-safe:ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#31577F] ${
                     isActive
-                      ? "w-full border-[#006572] shadow-[0_0_16px_rgba(0,101,114,0.55),0_0_48px_rgba(0,101,114,0.32)]"
+                      ? "w-full border-[#31577F] shadow-[0_0_16px_rgba(49,87,127,0.55),0_0_48px_rgba(49,87,127,0.32)]"
                       : "w-56 border-transparent hover:w-full"
                   }`}
                 >
@@ -125,9 +125,9 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
                 type="button"
                 onClick={() => setActive(i)}
                 aria-pressed={isActive}
-                className={`group relative aspect-[4/3] overflow-hidden rounded-lg border-2 text-left motion-safe:transition-[box-shadow,border-color] motion-safe:duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006572] ${
+                className={`group relative aspect-[4/3] overflow-hidden rounded-lg border-2 text-left motion-safe:transition-[box-shadow,border-color] motion-safe:duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#31577F] ${
                   isActive
-                    ? "border-[#006572] shadow-[0_0_16px_rgba(0,101,114,0.55),0_0_48px_rgba(0,101,114,0.32)]"
+                    ? "border-[#31577F] shadow-[0_0_16px_rgba(49,87,127,0.55),0_0_48px_rgba(49,87,127,0.32)]"
                     : "border-transparent"
                 }`}
               >
@@ -152,29 +152,29 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
           })}
         </div>
 
-        {/* ── Detail destinasi aktif — menyatu dgn daftar (divider).
+        {/* ── Detail destinasi aktif, menyatu dgn daftar (divider).
               key → re-animate & reset slideshow saat berganti. ── */}
         <div
           key={current.nama}
           aria-live="polite"
-          className="grid items-start gap-10 border-t border-[#006572]/15 pt-8 motion-safe:animate-gallery-fade sm:pt-10 lg:grid-cols-[1.5fr_1fr] lg:gap-14"
+          className="grid items-start gap-10 border-t border-[#31577F]/15 pt-8 motion-safe:animate-gallery-fade sm:pt-10 lg:grid-cols-[1.5fr_1fr] lg:gap-14"
         >
-          {/* Kolom kiri — identitas, narasi, lokasi, kontak */}
+          {/* Kolom kiri, identitas, narasi, lokasi, kontak */}
           <div className="flex flex-col items-start gap-6">
-            <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#006572]">
-              <span className="h-[3px] w-[42px] bg-[#006572]" aria-hidden />
+            <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#31577F]">
+              <span className="h-[3px] w-[42px] bg-[#31577F]" aria-hidden />
               Detail Destinasi
             </span>
 
             <div className="flex flex-col gap-3">
-              <h3 className="font-body text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-tight text-[#006572]">
+              <h3 className="font-body text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-tight text-[#31577F]">
                 {current.nama}
               </h3>
               <ul className="flex flex-wrap gap-2">
                 {current.tags.map((t) => (
                   <li
                     key={t}
-                    className="rounded-full border border-[#006572]/30 px-3.5 py-1.5 font-body text-sm font-semibold text-[#006572]"
+                    className="rounded-full border border-[#31577F]/30 px-3.5 py-1.5 font-body text-sm font-semibold text-[#31577F]"
                   >
                     {t}
                   </li>
@@ -182,8 +182,8 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
               </ul>
             </div>
 
-            <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#006572]">
-              <strong className="font-bold text-[#004750]">
+            <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#31577F]">
+              <strong className="font-bold text-[#1F3A59]">
                 {current.tagline}.
               </strong>{" "}
               {current.deskripsi}
@@ -191,7 +191,7 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
 
             {/* Lokasi */}
             <div className="flex w-full flex-col gap-3">
-              <span className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-[#006572]/60">
+              <span className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-[#31577F]/60">
                 Lokasi
               </span>
               <div className="flex flex-wrap gap-3">
@@ -199,23 +199,23 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
                   href={current.maps}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md border-[1.5px] border-[#006572] bg-white px-4 py-2.5 font-body text-sm font-semibold text-[#006572] no-underline motion-safe:transition-colors hover:bg-[#006572]/5 focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2"
+                  className="inline-flex items-center gap-2 rounded-md border-[1.5px] border-[#31577F] bg-white px-4 py-2.5 font-body text-sm font-semibold text-[#31577F] no-underline motion-safe:transition-colors hover:bg-[#31577F]/5 focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2"
                 >
                   <MapPinIcon />
                   Buka di Google Maps
-                  <span className="text-[#006572]/60" aria-hidden>
+                  <span className="text-[#31577F]/60" aria-hidden>
                     ↗
                   </span>
                 </a>
-                {/* Peta Desa — halaman menyusul */}
+                {/* Peta Desa, halaman menyusul */}
                 <span
                   aria-disabled="true"
                   title="Halaman Peta Desa segera hadir"
-                  className="inline-flex cursor-not-allowed items-center gap-2 rounded-md border-[1.5px] border-[#006572]/25 bg-white px-4 py-2.5 font-body text-sm font-semibold text-[#006572]/50"
+                  className="inline-flex cursor-not-allowed items-center gap-2 rounded-md border-[1.5px] border-[#31577F]/25 bg-white px-4 py-2.5 font-body text-sm font-semibold text-[#31577F]/50"
                 >
                   <MapIcon />
                   Lihat di Peta Desa
-                  <span className="rounded-full bg-[#006572]/10 px-2 py-0.5 font-body text-[11px] font-semibold uppercase tracking-wide text-[#006572]">
+                  <span className="rounded-full bg-[#31577F]/10 px-2 py-0.5 font-body text-[11px] font-semibold uppercase tracking-wide text-[#31577F]">
                     Segera
                   </span>
                 </span>
@@ -224,15 +224,15 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
 
             {/* Kontak & sosial media */}
             <div className="flex w-full flex-col gap-3">
-              <span className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-[#006572]/60">
+              <span className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-[#31577F]/60">
                 Kontak &amp; Sosial Media
               </span>
-              {/* WhatsApp — di-highlight (glow tetap menyala + sedikit lebih besar) */}
+              {/* WhatsApp, di-highlight (glow tetap menyala + sedikit lebih besar) */}
               <a
                 href={`https://wa.me/${current.wa}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex w-full items-center justify-center gap-2.5 rounded-md border border-white bg-[#006572] px-6 py-3.5 font-body text-base font-semibold text-white no-underline shadow-[0_0_18px_rgba(0,101,114,0.45),0_0_44px_rgba(0,101,114,0.22)] motion-safe:transition-[transform,box-shadow] motion-safe:duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_22px_rgba(0,101,114,0.65),0_0_54px_rgba(0,101,114,0.35)] focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2 sm:w-auto"
+                className="inline-flex w-full items-center justify-center gap-2.5 rounded-md border border-white bg-[#31577F] px-6 py-3.5 font-body text-base font-semibold text-white no-underline shadow-[0_0_18px_rgba(49,87,127,0.45),0_0_44px_rgba(49,87,127,0.22)] motion-safe:transition-[transform,box-shadow] motion-safe:duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_22px_rgba(49,87,127,0.65),0_0_54px_rgba(49,87,127,0.35)] focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2 sm:w-auto"
               >
                 <WhatsAppIcon />
                 Chat via WhatsApp
@@ -240,12 +240,12 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
               <div className="flex flex-wrap items-center gap-4">
                 <a
                   href={`tel:${current.telepon.replace(/[^+\d]/g, "")}`}
-                  className="inline-flex items-center gap-2 font-body text-sm font-semibold text-[#006572] no-underline hover:underline"
+                  className="inline-flex items-center gap-2 font-body text-sm font-semibold text-[#31577F] no-underline hover:underline"
                 >
                   <PhoneIcon />
                   {current.telepon}
                 </a>
-                <span className="h-5 w-px bg-[#006572]/20" aria-hidden />
+                <span className="h-5 w-px bg-[#31577F]/20" aria-hidden />
                 <div className="flex items-center gap-3">
                   {current.instagram && (
                     <SocialLink href={current.instagram} label="Instagram">
@@ -267,7 +267,7 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
             </div>
           </div>
 
-          {/* Kolom kanan — slideshow foto auto-fade (loop) */}
+          {/* Kolom kanan, slideshow foto auto-fade (loop) */}
           <PhotoSlideshow images={current.imgs} label={current.nama} />
         </div>
       </div>
@@ -275,7 +275,7 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
   );
 }
 
-/* ── Social link — tombol bulat ikon sosmed (target eksternal) ─────── */
+/* ── Social link, tombol bulat ikon sosmed (target eksternal) ─────── */
 function SocialLink({
   href,
   label,
@@ -292,7 +292,7 @@ function SocialLink({
       rel="noopener noreferrer"
       aria-label={label}
       title={label}
-      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#006572]/30 text-[#006572] no-underline motion-safe:transition-[transform,filter,background-color,color] motion-safe:duration-200 hover:-translate-y-0.5 hover:bg-[#006572] hover:text-white hover:[filter:drop-shadow(0_0_14px_rgba(0,101,114,0.45))] focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2"
+      className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#31577F]/30 text-[#31577F] no-underline motion-safe:transition-[transform,filter,background-color,color] motion-safe:duration-200 hover:-translate-y-0.5 hover:bg-[#31577F] hover:text-white hover:[filter:drop-shadow(0_0_14px_rgba(49,87,127,0.45))] focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2"
     >
       {children}
     </a>

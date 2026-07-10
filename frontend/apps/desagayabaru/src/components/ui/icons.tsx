@@ -1,5 +1,5 @@
 /**
- * Kumpulan ikon SVG inline (stroke/fill `currentColor`) — dipakai lintas
+ * Kumpulan ikon SVG inline (stroke/fill `currentColor`), dipakai lintas
  * komponen (Footer, section Wisata, dll). Semua menerima `className` agar
  * warna & ukuran diatur lewat utility Tailwind. Pola mengikuti ProfileIcon.tsx.
  */

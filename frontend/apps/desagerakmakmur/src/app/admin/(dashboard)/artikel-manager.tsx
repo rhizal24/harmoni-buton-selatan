@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { ArticleCategory, ArticleRow } from "@/lib/db-types";
 import { useAdmin } from "./admin-context";
 
@@ -128,6 +128,9 @@ export function ArtikelManager({
         : await supabase.from("articles").insert(payload);
       if (error) throw new Error(error.message);
 
+      if (form.id && editing?.cover_image_url && editing.cover_image_url !== (form.cover_image_url || null)) {
+        void deleteUploadedFile(editing.cover_image_url, admin.accessToken);
+      }
       setMsg({ kind: "ok", text: form.id ? "Perubahan disimpan." : "Artikel ditambahkan." });
       if (!form.id) setForm(EMPTY_FORM);
       await refresh();
@@ -146,6 +149,7 @@ export function ArtikelManager({
       const { error } = await getSupabase().from("articles").delete().eq("id", row.id);
       if (error) throw new Error(error.message);
       if (form.id === row.id) setForm(EMPTY_FORM);
+      void deleteUploadedFile(row.cover_image_url, admin.accessToken);
       setMsg({ kind: "ok", text: "Artikel dihapus." });
       await refresh();
     } catch (err) {

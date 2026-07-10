@@ -2,7 +2,7 @@
  * Data destinasi wisata Desa Gaya Baru (route-spesifik, dikonsumsi oleh
  * `../_components/DaftarWisata`).
  *
- * CATATAN — masih PLACEHOLDER: nama destinasi, kontak, akun sosmed, titik
+ * CATATAN, masih PLACEHOLDER: nama destinasi, kontak, akun sosmed, titik
  * Google Maps, dan `imgs` perlu diganti dengan data & foto resmi tiap wisata
  * (kini pakai aset sementara di `/public/images`).
  */
@@ -14,7 +14,7 @@ export const WISATA: Wisata[] = [
     nama: "Pantai Gaya Baru",
     tagline: "Pasir putih & senja pesisir",
     deskripsi:
-      "Hamparan pasir putih dengan air jernih yang landai — cocok untuk berenang, bermain air, dan menikmati matahari terbenam khas pesisir Buton Selatan. Ikon wisata unggulan Desa Gaya Baru.",
+      "Hamparan pasir putih dengan air jernih yang landai, cocok untuk berenang, bermain air, dan menikmati matahari terbenam khas pesisir Buton Selatan. Ikon wisata unggulan Desa Gaya Baru.",
     tags: ["Pantai", "Pasir putih", "Spot sunset", "Area piknik"],
     telepon: "+62 812-0000-0001",
     wa: "6281200000001",
@@ -28,7 +28,7 @@ export const WISATA: Wisata[] = [
     nama: "Taman Terumbu",
     tagline: "Snorkeling di taman karang",
     deskripsi:
-      "Gugusan terumbu karang berwarna dengan air laut sebening kaca — surga bagi penyelam dan pencinta snorkeling yang ingin menyapa kehidupan bawah laut Buton Selatan dari dekat.",
+      "Gugusan terumbu karang berwarna dengan air laut sebening kaca, surga bagi penyelam dan pencinta snorkeling yang ingin menyapa kehidupan bawah laut Buton Selatan dari dekat.",
     tags: ["Snorkeling", "Terumbu karang", "Diving", "Bawah laut"],
     telepon: "+62 812-0000-0002",
     wa: "6281200000002",
@@ -42,7 +42,7 @@ export const WISATA: Wisata[] = [
     nama: "Hutan Mangrove",
     tagline: "Susur ekowisata pesisir yang teduh",
     deskripsi:
-      "Jalur susur hutan mangrove yang asri dan teduh — ruang belajar ekosistem pesisir sekaligus tempat menikmati ketenangan, jauh dari keramaian, ditemani suara alam dan air yang tenang.",
+      "Jalur susur hutan mangrove yang asri dan teduh, ruang belajar ekosistem pesisir sekaligus tempat menikmati ketenangan, jauh dari keramaian, ditemani suara alam dan air yang tenang.",
     tags: ["Ekowisata", "Mangrove", "Jalur susur", "Suasana tenang"],
     telepon: "+62 812-0000-0003",
     wa: "6281200000003",
@@ -56,7 +56,7 @@ export const WISATA: Wisata[] = [
     nama: "Bukit Cakrawala",
     tagline: "Panorama laut dari ketinggian",
     deskripsi:
-      "Bukit dengan pandangan luas ke laut lepas — titik terbaik memandang cakrawala dan mengabadikan foto dari ketinggian. Sensasi panorama pesisir yang megah dan berbeda.",
+      "Bukit dengan pandangan luas ke laut lepas, titik terbaik memandang cakrawala dan mengabadikan foto dari ketinggian. Sensasi panorama pesisir yang megah dan berbeda.",
     tags: ["Bukit", "View ketinggian", "Spot foto", "Laut lepas"],
     telepon: "+62 812-0000-0004",
     wa: "6281200000004",
@@ -70,7 +70,7 @@ export const WISATA: Wisata[] = [
     nama: "Sabana Gaya Baru",
     tagline: "Padang rumput luas di atas perbukitan",
     deskripsi:
-      "Hamparan sabana yang membentang di perbukitan desa — rumput keemasan sejauh mata memandang dengan angin laut yang sejuk. Tempat terbaik menikmati lanskap terbuka, berkemah ringan, dan berburu golden hour menjelang senja.",
+      "Hamparan sabana yang membentang di perbukitan desa, rumput keemasan sejauh mata memandang dengan angin laut yang sejuk. Tempat terbaik menikmati lanskap terbuka, berkemah ringan, dan berburu golden hour menjelang senja.",
     tags: ["Sabana", "Perbukitan", "Golden hour", "Spot camping"],
     telepon: "+62 812-0000-0005",
     wa: "6281200000005",

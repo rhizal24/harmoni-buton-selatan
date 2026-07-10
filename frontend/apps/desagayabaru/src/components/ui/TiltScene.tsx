@@ -24,7 +24,7 @@ interface TiltCtxValue {
 const TiltContext = createContext<TiltCtxValue | null>(null);
 
 /**
- * TiltScene — melacak posisi pointer di SELURUH viewport dan memiringkan
+ * TiltScene, melacak posisi pointer di SELURUH viewport dan memiringkan
  * semua TiltLayer di dalamnya secara 3D (GSAP). Tiap layer punya intensitas
  * (`strength`) & arah (`flip`) sendiri sehingga geraknya tidak seragam.
  * Nonaktif untuk reduced-motion / input sentuh.
@@ -78,7 +78,7 @@ export function TiltScene({
 }
 
 /**
- * TiltLayer — satu elemen yang ikut dimiringkan oleh TiltScene.
+ * TiltLayer, satu elemen yang ikut dimiringkan oleh TiltScene.
  * `strength` = besar sudut, `flip` = arah (1 atau -1) untuk variasi.
  */
 export function TiltLayer({

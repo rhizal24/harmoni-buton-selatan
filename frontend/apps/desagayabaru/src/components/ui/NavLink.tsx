@@ -1,5 +1,5 @@
 /**
- * NavLink — UI Atom
+ * NavLink, UI Atom
  *
  * Link navigasi navbar dengan active-state awareness (menggunakan usePathname).
  * Hanya rendering-level; tidak mengandung logic dropdown.

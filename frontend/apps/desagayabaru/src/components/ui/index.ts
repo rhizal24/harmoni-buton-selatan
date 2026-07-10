@@ -1,5 +1,5 @@
 /**
- * Komponen UI Atom — Desa Gaya Baru
+ * Komponen UI Atom, Desa Gaya Baru
  *
  * Ekspor semua komponen UI kecil dari sini agar import bersih:
  * import { Button, Card } from "@/components/ui"

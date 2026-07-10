@@ -2,19 +2,19 @@ import type { ReactNode } from "react";
 
 interface GlowPillProps {
   children: ReactNode;
-  /** Warna titik indikator (ping). Default coral — sesuai badge hero. */
+  /** Warna titik indikator (ping). Default coral, sesuai badge hero. */
   dotClassName?: string;
   className?: string;
 }
 
 /**
- * GlowPill — badge pill dengan glow border putih berputar (::before) dan
+ * GlowPill, badge pill dengan glow border putih berputar (::before) dan
  * titik indikator berdenyut (ping). Non-interaktif; dipakai untuk label
  * "website ini apa" di hero. Keyframes `rotate-glow` (globals.css).
  */
 export function GlowPill({
   children,
-  dotClassName = "bg-[#F45B69]",
+  dotClassName = "bg-[#D96F2F]",
   className = "",
 }: GlowPillProps) {
   return (

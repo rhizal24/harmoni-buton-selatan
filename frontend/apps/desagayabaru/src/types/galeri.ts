@@ -1,5 +1,5 @@
 /**
- * Tipe domain Galeri (Lensa Gaya Baru) — foto bento/masonry.
+ * Tipe domain Galeri (Lensa Gaya Baru), foto bento/masonry.
  */
 export interface FotoGaleri {
   src: string;

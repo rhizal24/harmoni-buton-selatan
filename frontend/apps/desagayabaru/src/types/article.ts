@@ -1,5 +1,5 @@
 /**
- * Artikel / Berita — tipe aplikasi (camelCase).
+ * Artikel / Berita, tipe aplikasi (camelCase).
  *
  * Sumber data LIVE dari backend (tabel `articles`). Bentuk mentah dari API
  * memakai snake_case (`ArticleRow` di `@/data/articles`) lalu dipetakan ke

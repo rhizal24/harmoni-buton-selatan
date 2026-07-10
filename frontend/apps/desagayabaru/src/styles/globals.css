@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* ============================================================
-   DESIGN TOKENS — dideklarasikan di @theme supaya Tailwind v4
+   DESIGN TOKENS, dideklarasikan di @theme supaya Tailwind v4
    men-generate utility classes otomatis (bg-*, text-*, border-*,
    font-*, rounded-*, shadow-*). Semua styling komponen
    HARUS pakai utility, bukan selector CSS.
@@ -31,18 +31,18 @@
   --color-inverse-on-surface: #EEEEEE;
 
   /* ── Primary (Tosca) ── */
-  --color-primary: #028090;
+  --color-primary: #31577F;
   --color-on-primary: #FFFFFF;
-  --color-primary-container: #CFF1F4;
-  --color-on-primary-container: #00434B;
-  --color-primary-hover: #026F7D;
+  --color-primary-container: #D9E4F1;
+  --color-on-primary-container: #1F3A59;
+  --color-primary-hover: #27466A;
 
-  /* ── Secondary (Coral) — pakai terbatas ── */
-  --color-secondary: #F45B69;
+  /* ── Secondary (Coral), pakai terbatas ── */
+  --color-secondary: #D96F2F;
   --color-on-secondary: #FFFFFF;
-  --color-secondary-container: #FFDEE1;
-  --color-on-secondary-container: #7A1F2A;
-  --color-secondary-hover: #D94A56;
+  --color-secondary-container: #F8D5B8;
+  --color-on-secondary-container: #7A430F;
+  --color-secondary-hover: #B65A22;
 
   /* ── Tertiary ── */
   --color-tertiary: #2E2E2E;
@@ -95,7 +95,7 @@
   --shadow-card-hover: 0 4px 12px rgba(46,46,46,0.08);
   --shadow-floating: 0 8px 24px rgba(46,46,46,0.12);
 
-  /* ── Glass reflex (liquid-glass navbar) — kilau kaca berlapis.
+  /* ── Glass reflex (liquid-glass navbar), kilau kaca berlapis.
      Layer terang = highlight tepi, layer gelap = bayangan dalam. ── */
   --shadow-glass:
     inset 0 0 0 1px rgba(255,255,255,0.1),
@@ -126,7 +126,7 @@
   }
 }
 
-/* Fade masuk tile galeri — dipakai bertahap (stagger) per gambar */
+/* Fade masuk tile galeri, dipakai bertahap (stagger) per gambar */
 @keyframes gallery-fade {
   from {
     opacity: 0;
@@ -136,7 +136,7 @@
   }
 }
 
-/* Glow tombol — bloom berlapis saat hover & klik. Warna dari `--glow`
+/* Glow tombol, bloom berlapis saat hover & klik. Warna dari `--glow`
    (format "R G B", default tosca). Override per tombol: class [--glow:R_G_B]. */
 @utility btn-glow {
   --glow: 0 101 114;
@@ -152,7 +152,7 @@
   }
 }
 
-/* BorderGlow (adaptasi React Bits, tema terang tosca) — border mesh-gradient
+/* BorderGlow (adaptasi React Bits, tema terang tosca), border mesh-gradient
    + glow tepi yang mengikuti arah kursor. Digerakkan komponen
    `ui/BorderGlow.tsx` lewat CSS var --edge-proximity / --cursor-angle;
    sisanya (warna, radius, spread) di-set inline dari props. Tanpa shadow
@@ -255,7 +255,7 @@
     mix-blend-mode: soft-light;
   }
 
-  /* Glow luar — halo tosca melewati tepi kartu */
+  /* Glow luar, halo tosca melewati tepi kartu */
   & > .edge-light {
     inset: calc(var(--glow-padding) * -1);
     pointer-events: none;
@@ -304,7 +304,7 @@
   z-index: 1;
 }
 
-/* GlassSurface (adaptasi React Bits, tema terang) — permukaan liquid-glass
+/* GlassSurface (adaptasi React Bits, tema terang), permukaan liquid-glass
    dengan refraksi displacement SVG; dipakai `ui/GlassSurface.tsx` (navbar).
    Var --glass-frost / --glass-saturation / --filter-id di-set inline dari
    props. Browser tanpa backdrop-filter SVG memakai `glass-surface-fallback`. */
@@ -371,7 +371,7 @@
 }
 
 /* ============================================================
-   BASE RESETS — minimal, sebagian besar Tailwind Preflight
+   BASE RESETS, minimal, sebagian besar Tailwind Preflight
    sudah menangani.
    ============================================================ */
 *, *::before, *::after { box-sizing: border-box; }
@@ -396,7 +396,7 @@ body {
 }
 
 /* ============================================================
-   LEGACY UTILITIES — masih dipakai page.tsx & home.css.
+   LEGACY UTILITIES, masih dipakai page.tsx & home.css.
    Akan dihapus per section saat konten dimigrasi ke Tailwind.
    ============================================================ */
 .container {

@@ -12,7 +12,7 @@ interface RevealProps {
 }
 
 /**
- * Reveal — fade-up saat elemen masuk viewport.
+ * Reveal, fade-up saat elemen masuk viewport.
  * Menghormati prefers-reduced-motion: bila user meminta minim gerak,
  * konten langsung tampil tanpa animasi.
  */

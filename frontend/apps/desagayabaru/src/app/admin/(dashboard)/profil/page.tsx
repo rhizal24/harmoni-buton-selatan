@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { VillageRow } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
@@ -18,19 +18,20 @@ interface ProfilForm {
 }
 
 const inputCls =
-  "h-10 w-full rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20";
+  "h-10 w-full rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20";
 const areaCls =
-  "w-full rounded-md border border-[#D0D0D0] px-3 py-2 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20";
+  "w-full rounded-md border border-[#D0D0D0] px-3 py-2 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20";
 const labelCls = "font-body text-sm font-semibold text-[#2E2E2E]";
 const hintCls = "font-body text-xs text-[#5A5A5A]";
 
 /**
- * Profil Desa — edit konten halaman /profil: tentang, sejarah (jejak desa),
+ * Profil Desa, edit konten halaman /profil: tentang, sejarah (jejak desa),
  * visi & misi, plus logo/cover desa. Disimpan ke baris `villages` desa ini.
  */
 export default function AdminProfilPage() {
   const admin = useAdmin();
   const [form, setForm] = useState<ProfilForm | null>(null);
+  const [savedMedia, setSavedMedia] = useState({ logo: "", cover: "" });
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
@@ -55,6 +56,7 @@ export default function AdminProfilPage() {
       cover_image_url: v.cover_image_url ?? "",
       map_embed_url: v.map_embed_url ?? "",
     });
+    setSavedMedia({ logo: v.logo_url ?? "", cover: v.cover_image_url ?? "" });
   }, [admin.village.id]);
 
   useEffect(() => {
@@ -85,6 +87,13 @@ export default function AdminProfilPage() {
         })
         .eq("id", admin.village.id);
       if (error) throw new Error(error.message);
+      if (savedMedia.logo && savedMedia.logo !== form.logo_url) {
+        void deleteUploadedFile(savedMedia.logo, admin.accessToken);
+      }
+      if (savedMedia.cover && savedMedia.cover !== form.cover_image_url) {
+        void deleteUploadedFile(savedMedia.cover, admin.accessToken);
+      }
+      setSavedMedia({ logo: form.logo_url, cover: form.cover_image_url });
       setMsg({ kind: "ok", text: "Profil desa disimpan." });
     } catch (err) {
       setMsg({ kind: "err", text: err instanceof Error ? err.message : "Gagal menyimpan." });
@@ -125,7 +134,7 @@ export default function AdminProfilPage() {
           role="status"
           className={`rounded-md border px-3 py-2 font-body text-sm ${
             msg.kind === "ok"
-              ? "border-[#CFF1F4] bg-[#EFFBFC] text-[#00434B]"
+              ? "border-[#D9E4F1] bg-[#F2F6FB] text-[#1F3A59]"
               : "border-[#FFDAD6] bg-[#FFF4F3] text-[#93000A]"
           }`}
         >
@@ -229,7 +238,7 @@ export default function AdminProfilPage() {
                   if (file) void handleUpload(file, field);
                   e.target.value = "";
                 }}
-                className="font-body text-sm text-[#5A5A5A] file:mr-3 file:rounded-md file:border file:border-[#006572] file:bg-white file:px-3 file:py-1.5 file:font-body file:text-xs file:font-semibold file:text-[#006572]"
+                className="font-body text-sm text-[#5A5A5A] file:mr-3 file:rounded-md file:border file:border-[#31577F] file:bg-white file:px-3 file:py-1.5 file:font-body file:text-xs file:font-semibold file:text-[#31577F]"
               />
             </div>
           ))}
@@ -238,7 +247,7 @@ export default function AdminProfilPage() {
         <button
           type="submit"
           disabled={busy}
-          className="self-start rounded-md bg-[#006572] px-6 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#026F7D] disabled:opacity-60"
+          className="self-start rounded-md bg-[#31577F] px-6 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#27466A] disabled:opacity-60"
         >
           {busy ? "Menyimpan…" : "Simpan Profil"}
         </button>

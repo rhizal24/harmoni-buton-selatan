@@ -1,5 +1,5 @@
 /**
- * Tipe domain Profil Desa — statistik, struktur organisasi, dan dokumen publik.
+ * Tipe domain Profil Desa, statistik, struktur organisasi, dan dokumen publik.
  * Sumber kebenaran tipe; data seed ada di `app/profil/_data/*`, disediakan ke
  * halaman lewat `@/data/profil`.
  */

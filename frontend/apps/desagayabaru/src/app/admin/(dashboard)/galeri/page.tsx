@@ -2,12 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { GalleryImageRow } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
 /**
- * CRUD Galeri — foto desa untuk section "Lensa" di beranda.
+ * CRUD Galeri, foto desa untuk section "Lensa" di beranda.
  * Upload multi-file ke ImageKit, caption (deskripsi singkat) bisa diedit
  * per foto, urutan mengikuti display_order (angka kecil tampil dulu).
  */
@@ -87,6 +87,7 @@ export default function AdminGaleriPage() {
     try {
       const { error } = await getSupabase().from("gallery_images").delete().eq("id", row.id);
       if (error) throw new Error(error.message);
+      void deleteUploadedFile(row.image_url, admin.accessToken);
       setMsg({ kind: "ok", text: "Foto dihapus." });
       await refresh();
     } catch (err) {
@@ -105,7 +106,7 @@ export default function AdminGaleriPage() {
             Foto section “Lensa” di beranda. Tiap 6 foto menjadi satu halaman galeri.
           </p>
         </div>
-        <label className="cursor-pointer rounded-md bg-[#006572] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#026F7D]">
+        <label className="cursor-pointer rounded-md bg-[#31577F] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#27466A]">
           + Upload Foto
           <input
             type="file"
@@ -126,7 +127,7 @@ export default function AdminGaleriPage() {
           role="status"
           className={`rounded-md border px-3 py-2 font-body text-sm ${
             msg.kind === "ok"
-              ? "border-[#CFF1F4] bg-[#EFFBFC] text-[#00434B]"
+              ? "border-[#D9E4F1] bg-[#F2F6FB] text-[#1F3A59]"
               : "border-[#FFDAD6] bg-[#FFF4F3] text-[#93000A]"
           }`}
         >
@@ -156,14 +157,14 @@ export default function AdminGaleriPage() {
                 onChange={(e) =>
                   setCaptions((c) => ({ ...c, [row.id]: e.target.value }))
                 }
-                className="mt-2 w-full rounded-md border border-[#D0D0D0] px-2.5 py-1.5 font-body text-xs text-[#2E2E2E] outline-none focus:border-[#006572]"
+                className="mt-2 w-full rounded-md border border-[#D0D0D0] px-2.5 py-1.5 font-body text-xs text-[#2E2E2E] outline-none focus:border-[#31577F]"
               />
               <div className="mt-2 flex gap-2">
                 <button
                   type="button"
                   disabled={busy || (captions[row.id] ?? "") === (row.caption ?? "")}
                   onClick={() => void handleSaveCaption(row)}
-                  className="flex-1 rounded-md border border-[#006572] px-2 py-1.5 font-body text-xs font-semibold text-[#006572] hover:bg-[#CFF1F4] disabled:opacity-40"
+                  className="flex-1 rounded-md border border-[#31577F] px-2 py-1.5 font-body text-xs font-semibold text-[#31577F] hover:bg-[#D9E4F1] disabled:opacity-40"
                 >
                   Simpan
                 </button>

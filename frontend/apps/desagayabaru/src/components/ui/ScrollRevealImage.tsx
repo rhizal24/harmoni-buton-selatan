@@ -17,7 +17,7 @@ interface ScrollRevealImageProps {
 }
 
 /**
- * ScrollRevealImage — gambar dekoratif yang opacity-nya naik mengikuti scroll
+ * ScrollRevealImage, gambar dekoratif yang opacity-nya naik mengikuti scroll
  * (GSAP ScrollTrigger, scrub). Awalnya transparan; muncul saat mulai men-scroll.
  * Hormati reduced-motion (langsung tampil penuh, tanpa animasi).
  */

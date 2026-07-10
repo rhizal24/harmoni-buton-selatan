@@ -26,11 +26,11 @@ const EMPTY_FORM: PaketForm = {
 };
 
 const inputCls =
-  "h-10 w-full rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20";
+  "h-10 w-full rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20";
 const labelCls = "font-body text-sm font-semibold text-[#2E2E2E]";
 
 /**
- * CRUD Paket Wisata — tampil di kartu "Jelajah Desa" (beranda & /wisata).
+ * CRUD Paket Wisata, tampil di kartu "Jelajah Desa" (beranda & /wisata).
  * Kolom `includes` dipakai sebagai daftar benefit kartu (satu per baris).
  */
 export default function AdminPaketPage() {
@@ -142,7 +142,7 @@ export default function AdminPaketPage() {
             setForm(EMPTY_FORM);
             setMsg(null);
           }}
-          className="rounded-md bg-[#006572] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#026F7D]"
+          className="rounded-md bg-[#31577F] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#27466A]"
         >
           + Paket Baru
         </button>
@@ -153,7 +153,7 @@ export default function AdminPaketPage() {
           role="status"
           className={`rounded-md border px-3 py-2 font-body text-sm ${
             msg.kind === "ok"
-              ? "border-[#CFF1F4] bg-[#EFFBFC] text-[#00434B]"
+              ? "border-[#D9E4F1] bg-[#F2F6FB] text-[#1F3A59]"
               : "border-[#FFDAD6] bg-[#FFF4F3] text-[#93000A]"
           }`}
         >
@@ -195,7 +195,7 @@ export default function AdminPaketPage() {
                       <p className="font-body text-xs text-[#5A5A5A]">{row.description}</p>
                     )}
                   </td>
-                  <td className="px-4 py-3 font-body text-sm text-[#006572]">
+                  <td className="px-4 py-3 font-body text-sm text-[#31577F]">
                     Rp {new Intl.NumberFormat("id-ID").format(row.price)}{" "}
                     <span className="text-xs text-[#5A5A5A]">{row.price_unit}</span>
                   </td>
@@ -203,7 +203,7 @@ export default function AdminPaketPage() {
                     <span
                       className={`rounded-full px-2.5 py-0.5 font-body text-xs font-semibold ${
                         row.is_published
-                          ? "bg-[#CFF1F4] text-[#00434B]"
+                          ? "bg-[#D9E4F1] text-[#1F3A59]"
                           : "bg-[#E2E2E2] text-[#5A5A5A]"
                       }`}
                     >
@@ -214,7 +214,7 @@ export default function AdminPaketPage() {
                     <button
                       type="button"
                       onClick={() => startEdit(row)}
-                      className="rounded-md border border-[#006572] px-3 py-1.5 font-body text-xs font-semibold text-[#006572] hover:bg-[#CFF1F4]"
+                      className="rounded-md border border-[#31577F] px-3 py-1.5 font-body text-xs font-semibold text-[#31577F] hover:bg-[#D9E4F1]"
                     >
                       Edit
                     </button>
@@ -288,7 +288,7 @@ export default function AdminPaketPage() {
                 placeholder={"Perahu privat\nPemandu lokal\nWelcome drink"}
                 value={form.includes}
                 onChange={(e) => setForm((f) => ({ ...f, includes: e.target.value }))}
-                className="w-full rounded-md border border-[#D0D0D0] px-3 py-2 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20"
+                className="w-full rounded-md border border-[#D0D0D0] px-3 py-2 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20"
               />
             </label>
 
@@ -297,7 +297,7 @@ export default function AdminPaketPage() {
                 type="checkbox"
                 checked={form.is_published}
                 onChange={(e) => setForm((f) => ({ ...f, is_published: e.target.checked }))}
-                className="h-4 w-4 accent-[#006572]"
+                className="h-4 w-4 accent-[#31577F]"
               />
               <span className="font-body text-sm text-[#2E2E2E]">Tayangkan di situs</span>
             </label>
@@ -306,7 +306,7 @@ export default function AdminPaketPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="rounded-md bg-[#006572] px-5 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#026F7D] disabled:opacity-60"
+                className="rounded-md bg-[#31577F] px-5 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#27466A] disabled:opacity-60"
               >
                 {busy ? "Menyimpan…" : form.id ? "Simpan Perubahan" : "Tambah Paket"}
               </button>

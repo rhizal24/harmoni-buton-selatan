@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { GalleryImageRow } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
@@ -87,6 +87,7 @@ export default function AdminGaleriPage() {
     try {
       const { error } = await getSupabase().from("gallery_images").delete().eq("id", row.id);
       if (error) throw new Error(error.message);
+      void deleteUploadedFile(row.image_url, admin.accessToken);
       setMsg({ kind: "ok", text: "Foto dihapus." });
       await refresh();
     } catch (err) {

@@ -5,7 +5,7 @@ import { SiteChrome } from "@/components/SiteChrome";
 export const metadata: Metadata = {
   title: {
     template: "%s | Desa Gaya Baru",
-    default: "Desa Gaya Baru — Buton Selatan",
+    default: "Desa Gaya Baru, Buton Selatan",
   },
   description:
     "Website resmi Desa Gaya Baru, Kecamatan Buton Selatan, Sulawesi Tenggara.",

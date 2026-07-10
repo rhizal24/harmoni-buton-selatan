@@ -1,7 +1,7 @@
 import type { Mitra } from "@/types/mitra";
 
 /**
- * SEED Mitra Kolaborasi — placeholder sampai tabel backend tersedia.
+ * SEED Mitra Kolaborasi, placeholder sampai tabel backend tersedia.
  * Ganti dengan data/logo mitra asli.
  */
 export const MITRA_SEED: Mitra[] = [

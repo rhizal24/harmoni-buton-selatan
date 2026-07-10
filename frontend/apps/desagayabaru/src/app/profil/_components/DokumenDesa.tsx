@@ -62,7 +62,7 @@ function CloseIcon() {
 }
 
 /**
- * Dokumen Desa — daftar dokumen publik (PDF). Klik "Lihat" membuka PDF dalam
+ * Dokumen Desa, daftar dokumen publik (PDF). Klik "Lihat" membuka PDF dalam
  * viewer pop-up (iframe); tersedia juga tautan buka di tab baru. Tutup viewer:
  * tombol ×, Esc, atau klik latar. Data via `@/data/profil` (prop dari page).
  */
@@ -93,15 +93,15 @@ export function DokumenDesa({ data }: { data: Dokumen[] }) {
       <div className="mx-auto flex w-full max-w-[1112px] flex-col gap-10">
         <Reveal>
           <div className="flex flex-col items-start gap-4">
-            <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#006572]">
-              <span className="h-[3px] w-[42px] bg-[#006572]" aria-hidden />
+            <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#31577F]">
+              <span className="h-[3px] w-[42px] bg-[#31577F]" aria-hidden />
               Transparansi
             </span>
-            <h2 className="font-body text-[clamp(2rem,4vw,3rem)] font-semibold text-[#006572]">
+            <h2 className="font-body text-[clamp(2rem,4vw,3rem)] font-semibold text-[#31577F]">
               Dokumen Desa
             </h2>
-            <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#006572]/80">
-              Dokumen publik dan produk hukum Desa Gaya Baru — klik untuk
+            <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#31577F]/80">
+              Dokumen publik dan produk hukum Desa Gaya Baru, klik untuk
               melihat langsung, atau buka di tab baru.
             </p>
           </div>
@@ -110,16 +110,16 @@ export function DokumenDesa({ data }: { data: Dokumen[] }) {
         <ul className="flex flex-col gap-3">
           {data.map((d, i) => (
             <Reveal key={d.file} as="li" delay={i * 60}>
-              <div className="flex flex-wrap items-center gap-4 rounded-lg border border-[#006572]/20 bg-white p-4 motion-safe:transition-shadow motion-safe:duration-200 hover:shadow-card-hover sm:p-5">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-[#006572]/10 text-[#006572]">
+              <div className="flex flex-wrap items-center gap-4 rounded-lg border border-[#31577F]/20 bg-white p-4 motion-safe:transition-shadow motion-safe:duration-200 hover:shadow-card-hover sm:p-5">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-[#31577F]/10 text-[#31577F]">
                   <FileIcon />
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-body text-base font-bold leading-tight text-[#006572]">
+                  <h3 className="font-body text-base font-bold leading-tight text-[#31577F]">
                     {d.judul}
                   </h3>
-                  <p className="mt-0.5 font-body text-sm text-[#006572]/60">
+                  <p className="mt-0.5 font-body text-sm text-[#31577F]/60">
                     {d.kategori} · {d.tanggal} · PDF
                   </p>
                 </div>
@@ -128,7 +128,7 @@ export function DokumenDesa({ data }: { data: Dokumen[] }) {
                   <button
                     type="button"
                     onClick={() => setAktif(d)}
-                    className="inline-flex items-center rounded-md bg-[#006572] px-5 py-2.5 font-body text-sm font-semibold text-white shadow-sm motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2"
+                    className="inline-flex items-center rounded-md bg-[#31577F] px-5 py-2.5 font-body text-sm font-semibold text-white shadow-sm motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2"
                   >
                     Lihat
                   </button>
@@ -138,7 +138,7 @@ export function DokumenDesa({ data }: { data: Dokumen[] }) {
                     rel="noopener noreferrer"
                     aria-label={`Buka ${d.judul} di tab baru`}
                     title="Buka di tab baru"
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[#006572]/25 text-[#006572] no-underline motion-safe:transition-colors hover:bg-[#006572]/5 focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[#31577F]/25 text-[#31577F] no-underline motion-safe:transition-colors hover:bg-[#31577F]/5 focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2"
                   >
                     <ExternalIcon />
                   </a>
@@ -165,15 +165,15 @@ export function DokumenDesa({ data }: { data: Dokumen[] }) {
               className="flex h-[85vh] max-h-[calc(100dvh-8rem)] w-full max-w-[820px] flex-col overflow-hidden rounded-xl bg-white shadow-floating"
             >
               {/* Bilah judul */}
-              <div className="flex items-center gap-3 border-b border-[#006572]/15 px-4 py-3">
-                <span className="text-[#006572]">
+              <div className="flex items-center gap-3 border-b border-[#31577F]/15 px-4 py-3">
+                <span className="text-[#31577F]">
                   <FileIcon />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-body text-sm font-bold text-[#006572]">
+                  <p className="truncate font-body text-sm font-bold text-[#31577F]">
                     {aktif.judul}
                   </p>
-                  <p className="font-body text-xs text-[#006572]/60">
+                  <p className="font-body text-xs text-[#31577F]/60">
                     {aktif.kategori} · {aktif.tanggal}
                   </p>
                 </div>
@@ -181,7 +181,7 @@ export function DokumenDesa({ data }: { data: Dokumen[] }) {
                   href={aktif.file}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hidden items-center gap-1.5 rounded-md border border-[#006572]/25 px-3 py-2 font-body text-xs font-semibold text-[#006572] no-underline hover:bg-[#006572]/5 sm:inline-flex"
+                  className="hidden items-center gap-1.5 rounded-md border border-[#31577F]/25 px-3 py-2 font-body text-xs font-semibold text-[#31577F] no-underline hover:bg-[#31577F]/5 sm:inline-flex"
                 >
                   <ExternalIcon />
                   Tab baru
@@ -190,7 +190,7 @@ export function DokumenDesa({ data }: { data: Dokumen[] }) {
                   type="button"
                   onClick={() => setAktif(null)}
                   aria-label="Tutup pratinjau"
-                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#006572] motion-safe:transition-colors hover:bg-[#006572] hover:text-white focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#31577F] motion-safe:transition-colors hover:bg-[#31577F] hover:text-white focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2"
                 >
                   <CloseIcon />
                 </button>
@@ -200,7 +200,7 @@ export function DokumenDesa({ data }: { data: Dokumen[] }) {
               <iframe
                 src={aktif.file}
                 title={aktif.judul}
-                className="min-h-0 w-full flex-1 bg-[#f6fafb]"
+                className="min-h-0 w-full flex-1 bg-[#f7f9fc]"
               />
             </div>
           </div>,

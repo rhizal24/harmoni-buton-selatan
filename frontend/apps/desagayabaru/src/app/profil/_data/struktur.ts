@@ -1,9 +1,9 @@
 /**
- * Struktur organisasi Desa Gaya Baru — hierarki perangkat desa. Dikonsumsi
+ * Struktur organisasi Desa Gaya Baru, hierarki perangkat desa. Dikonsumsi
  * oleh `../_components/StrukturOrganisasi` (React Flow). `parent` menunjuk id
  * atasan langsung; node tanpa `parent` = puncak (Kepala Desa).
  *
- * CATATAN: SEMUA NAMA masih PLACEHOLDER — ganti dengan perangkat desa asli
+ * CATATAN: SEMUA NAMA masih PLACEHOLDER, ganti dengan perangkat desa asli
  * (lewat dashboard admin atau file ini). `foto` kosong → node tampil inisial.
  */
 import type { Anggota } from "@/types/profil";

@@ -47,7 +47,7 @@ interface GlassSurfaceProps {
 }
 
 /**
- * GlassSurface — permukaan "liquid glass" dengan refraksi displacement SVG +
+ * GlassSurface, permukaan "liquid glass" dengan refraksi displacement SVG +
  * chromatic aberration di tepi (diadaptasi dari React Bits). Styling di
  * `@utility glass-surface*` (globals.css). Browser tanpa dukungan
  * backdrop-filter SVG (Safari/Firefox) memakai fallback frosted-blur biasa.

@@ -1,9 +1,9 @@
 /**
- * Daftar dokumen publik Desa Gaya Baru — dikonsumsi oleh
+ * Daftar dokumen publik Desa Gaya Baru, dikonsumsi oleh
  * `../_components/DokumenDesa`.
  *
  * CATATAN: `file` menunjuk berkas PDF di `/public/docs`. Folder & berkasnya
- * masih PLACEHOLDER — unggah PDF asli ke `public/docs/` lalu sesuaikan path,
+ * masih PLACEHOLDER, unggah PDF asli ke `public/docs/` lalu sesuaikan path,
  * judul, kategori, dan tanggalnya.
  */
 import type { Dokumen } from "@/types/profil";

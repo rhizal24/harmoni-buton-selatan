@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * Halaman Profil — Server Component (App Router). Section route-spesifik
+ * Halaman Profil, Server Component (App Router). Section route-spesifik
  * dicolocate di `./_components`, datanya di `./_data`. Footer diambil dari
  * `@/components/sections`; Navbar sudah dirender di root layout.
  *
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
  * CATATAN: konten Sejarah/VisiMisi/Statistik masih PLACEHOLDER (seed di
  * `./_data/*`) sampai endpoint backend-nya tersedia.
  */
-// ISR — konten Supabase disegarkan tiap 5 menit.
+// ISR, konten Supabase disegarkan tiap 5 menit.
 export const revalidate = 300;
 
 export default async function ProfilPage() {
@@ -39,8 +39,8 @@ export default async function ProfilPage() {
       <TentangDesa />
       <SejarahDesa />
       <VisiMisi />
-      <StatistikDesa />
       <StrukturOrganisasi data={struktur} />
+      <StatistikDesa />
       <DokumenDesa data={dokumen} />
       <Footer />
     </main>

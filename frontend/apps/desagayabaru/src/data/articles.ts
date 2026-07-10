@@ -4,7 +4,7 @@ import { VILLAGE, DEFAULT_REVALIDATE } from "@/lib/api/config";
 import type { Article } from "@/types/article";
 
 /**
- * Data-access Berita/Artikel — LIVE dari backend (tabel `articles`).
+ * Data-access Berita/Artikel, LIVE dari backend (tabel `articles`).
  *
  * Endpoint publik hanya mengembalikan artikel `published`, di-scope per desa:
  *   GET /villages/:village/articles          → { articles: ArticleRow[] }

@@ -13,7 +13,7 @@ interface ParallaxHoverProps {
 }
 
 /**
- * ParallaxHover — konten bergeser halus mengikuti kursor + zoom ringan saat
+ * ParallaxHover, konten bergeser halus mengikuti kursor + zoom ringan saat
  * hover (GSAP). Dipakai sebagai lapisan dalam di kartu ber-tilt (TiltCard)
  * agar teks terasa "mengambang" di atas kartu. Reset halus saat pointer
  * keluar. Nonaktif untuk reduced-motion / perangkat sentuh.

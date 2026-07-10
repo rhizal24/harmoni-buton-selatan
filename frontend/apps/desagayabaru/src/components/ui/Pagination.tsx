@@ -28,7 +28,7 @@ function ArrowIcon({ flip = false }: { flip?: boolean }) {
 }
 
 /**
- * Pagination — kontrol halaman (prev/next + nomor). Terkontrol penuh lewat
+ * Pagination, kontrol halaman (prev/next + nomor). Terkontrol penuh lewat
  * props `page`, `count`, `onChange`. Warna mengikuti tosca design system.
  */
 export function Pagination({
@@ -38,12 +38,12 @@ export function Pagination({
   className = "",
 }: PaginationProps) {
   const arrowBase =
-    "flex items-center justify-center rounded-full bg-[#006572]/10 text-[#006572] motion-safe:transition-colors hover:bg-[#006572]/20 disabled:pointer-events-none disabled:opacity-40";
+    "flex items-center justify-center rounded-full bg-[#31577F]/10 text-[#31577F] motion-safe:transition-colors hover:bg-[#31577F]/20 disabled:pointer-events-none disabled:opacity-40";
 
   return (
     <nav
       aria-label="Navigasi galeri"
-      className={`mx-auto flex w-full max-w-80 items-center justify-between font-medium text-[#006572] ${className}`}
+      className={`mx-auto flex w-full max-w-80 items-center justify-between font-medium text-[#31577F] ${className}`}
     >
       <button
         type="button"
@@ -66,8 +66,8 @@ export function Pagination({
               onClick={() => onChange(n)}
               className={`flex aspect-square h-10 w-10 items-center justify-center rounded-full motion-safe:transition-colors ${
                 active
-                  ? "border border-[#006572]/40 text-[#006572]"
-                  : "text-[#006572]/60 hover:text-[#006572]"
+                  ? "border border-[#31577F]/40 text-[#31577F]"
+                  : "text-[#31577F]/60 hover:text-[#31577F]"
               }`}
             >
               {n}

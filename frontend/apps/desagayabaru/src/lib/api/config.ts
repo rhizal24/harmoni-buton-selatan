@@ -7,7 +7,7 @@
  * dipanggil dari Client Component).
  *
  * CATATAN PORT: dev server Next.js app ini jalan di :3001 (lihat package.json),
- * sama dengan default backend. Jalankan backend di port lain — mis. PORT=4000 —
+ * sama dengan default backend. Jalankan backend di port lain, mis. PORT=4000 -
  * dan set `API_URL` di `.env.local` sesuai itu.
  */
 export const API_BASE_URL =

@@ -13,7 +13,7 @@ interface PhotoSlideshowProps {
 }
 
 /**
- * PhotoSlideshow — menumpuk beberapa foto dan mem-fade-nya bergantian secara
+ * PhotoSlideshow, menumpuk beberapa foto dan mem-fade-nya bergantian secara
  * otomatis (loop). Bingkai tosca mengikuti design system. Hormati
  * prefers-reduced-motion: bila minim gerak, hanya foto pertama yang tampil
  * (tanpa cycling). State reset otomatis bila komponen di-remount lewat `key`.
@@ -41,7 +41,7 @@ export function PhotoSlideshow({
     <div
       role="img"
       aria-label={`Foto ${label}`}
-      className={`relative h-full min-h-[320px] self-stretch overflow-hidden rounded-xl border-2 border-[#006572] shadow-card-hover sm:min-h-[420px] ${className}`}
+      className={`relative h-full min-h-[320px] self-stretch overflow-hidden rounded-xl border-2 border-[#31577F] shadow-card-hover sm:min-h-[420px] ${className}`}
     >
       {images.map((src, i) => (
         <img

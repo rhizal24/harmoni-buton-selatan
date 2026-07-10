@@ -15,10 +15,9 @@ interface Stats {
   paket: CardStat;
   galeri: CardStat;
   berita: CardStat;
-  umkm: CardStat;
 }
 
-/** Ringkasan — jumlah konten + pintasan ke tiap modul CRUD. */
+/** Ringkasan, jumlah konten + pintasan ke tiap modul CRUD. */
 export default function AdminOverviewPage() {
   const admin = useAdmin();
   const [stats, setStats] = useState<Stats | null>(null);
@@ -44,7 +43,6 @@ export default function AdminOverviewPage() {
         category: string;
       }[];
       const beritaRows = artikelRows.filter((r) => r.category === "berita");
-      const umkmRows = artikelRows.filter((r) => r.category === "umkm");
 
       setStats({
         wisata: { total: spots.data?.length ?? 0, published: pub(spots.data) },
@@ -53,10 +51,6 @@ export default function AdminOverviewPage() {
         berita: {
           total: beritaRows.length,
           published: beritaRows.filter((r) => r.is_published).length,
-        },
-        umkm: {
-          total: umkmRows.length,
-          published: umkmRows.filter((r) => r.is_published).length,
         },
       });
     });
@@ -67,7 +61,6 @@ export default function AdminOverviewPage() {
     { label: "Paket Wisata", href: "/admin/paket", stat: stats?.paket },
     { label: "Galeri Foto", href: "/admin/galeri", stat: stats?.galeri },
     { label: "Berita", href: "/admin/berita", stat: stats?.berita },
-    { label: "UMKM", href: "/admin/umkm", stat: stats?.umkm },
   ];
 
   return (
@@ -91,10 +84,10 @@ export default function AdminOverviewPage() {
           <Link
             key={card.href}
             href={card.href}
-            className="rounded-xl border border-[#D0D0D0] bg-white p-5 no-underline motion-safe:transition-colors hover:border-[#006572]"
+            className="rounded-xl border border-[#D0D0D0] bg-white p-5 no-underline motion-safe:transition-colors hover:border-[#31577F]"
           >
             <p className="font-body text-sm font-semibold text-[#5A5A5A]">{card.label}</p>
-            <p className="mt-2 font-body text-3xl font-bold text-[#006572]">
+            <p className="mt-2 font-body text-3xl font-bold text-[#31577F]">
               {card.stat?.total ?? "…"}
             </p>
             <p className="mt-1 font-body text-xs text-[#5A5A5A]">

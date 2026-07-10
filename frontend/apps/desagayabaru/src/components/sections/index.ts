@@ -1,5 +1,5 @@
 /**
- * Komponen Section — Desa Gaya Baru
+ * Komponen Section, Desa Gaya Baru
  *
  * Section adalah blok halaman yang lebih besar (Hero, Navbar, Footer, dll).
  * import { HeroBeranda, Navbar } from "@/components/sections"
