@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 let client: SupabaseClient | null = null;
 
 /**
- * Client Supabase publik (publishable key — aman di browser, dilindungi RLS).
+ * Client Supabase publik (publishable key, aman di browser, dilindungi RLS).
  * Dibuat lazy supaya import file ini tidak langsung error saat env belum diisi
  * (mis. saat build tanpa .env.local).
  */

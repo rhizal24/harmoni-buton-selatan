@@ -15,7 +15,7 @@ gsap.registerPlugin(ScrollTrigger);
  * Dinonaktifkan otomatis bila user memilih "reduce motion".
  *
  * Karena Lenis di-mount sekali di root layout (persist antar-navigasi), posisi
- * scroll-nya harus di-reset manual tiap ganti route — jika tidak, kembali ke
+ * scroll-nya harus di-reset manual tiap ganti route, jika tidak, kembali ke
  * halaman yang tadi ter-scroll akan "menarik" balik ke posisi lama. Reset
  * dilewati bila URL punya hash (#anchor) agar navigasi ke section tetap jalan.
  */
@@ -51,7 +51,7 @@ export function SmoothScroll() {
 
   // Reset ke atas tiap pindah route (kecuali bila ada #anchor di URL).
   // Bukan lompat seketika: halaman baru mulai di posisi scroll halaman lama,
-  // lalu meluncur halus ke atas — perpindahan terasa menyambung.
+  // lalu meluncur halus ke atas, perpindahan terasa menyambung.
   useEffect(() => {
     if (window.location.hash) return;
 
@@ -63,7 +63,7 @@ export function SmoothScroll() {
     }
 
     // Recalc pin/scroll-trigger SETELAH posisi & layout halaman baru settle
-    // (dua frame) — kalau tidak, refresh terlalu dini bikin pin hero glitch.
+    // (dua frame), kalau tidak, refresh terlalu dini bikin pin hero glitch.
     let inner = 0;
     const outer = requestAnimationFrame(() => {
       inner = requestAnimationFrame(() => ScrollTrigger.refresh());

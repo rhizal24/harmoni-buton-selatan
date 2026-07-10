@@ -1,5 +1,5 @@
 /**
- * Tipe domain Wisata — sumber kebenaran tipe untuk destinasi wisata.
+ * Tipe domain Wisata, sumber kebenaran tipe untuk destinasi wisata.
  * Data seed sementara ada di `app/wisata/_data/wisata.ts`; layer akses data
  * (`@/data/wisata`) yang menyediakannya ke halaman.
  */

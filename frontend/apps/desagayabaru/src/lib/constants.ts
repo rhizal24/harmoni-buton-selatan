@@ -1,5 +1,5 @@
 /**
- * Konstanta aplikasi — Desa Gaya Baru
+ * Konstanta aplikasi, Desa Gaya Baru
  */
 
 export const SITE_NAME = "Desa Gaya Baru";

@@ -1,5 +1,5 @@
 /**
- * Tipe domain Mitra Kolaborasi — logo/nama mitra pada section beranda.
+ * Tipe domain Mitra Kolaborasi, logo/nama mitra pada section beranda.
  */
 export interface Mitra {
   nama: string;

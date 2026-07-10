@@ -31,8 +31,8 @@ type AnggotaNode = Node<AnggotaData, "anggota">;
 
 /** Inisial dari nama untuk avatar placeholder (mis. "La Ode Arlan" → "LA"). */
 function initials(nama: string) {
-  const bersih = nama.replace(/[.,—]/g, "").trim();
-  if (!bersih) return "—";
+  const bersih = nama.replace(/[.,-]/g, "").trim();
+  if (!bersih) return "-";
   return bersih
     .split(" ")
     .filter(Boolean)
@@ -41,42 +41,42 @@ function initials(nama: string) {
     .join("");
 }
 
-/** Node kartu perangkat — foto/inisial + jabatan + nama. Root di-highlight. */
+/** Node kartu perangkat, foto/inisial + jabatan + nama. Root di-highlight. */
 function AnggotaNodeCard({ data }: NodeProps<AnggotaNode>) {
   return (
     <div
       style={{ width: NODE_W }}
       className={`overflow-hidden rounded-lg bg-white text-center ${
         data.root
-          ? "border-2 border-[#006572] shadow-card-hover"
-          : "border border-[#006572]/20"
+          ? "border-2 border-[#31577F] shadow-card-hover"
+          : "border border-[#31577F]/20"
       }`}
     >
       <Handle
         type="target"
         position={Position.Top}
-        className="!h-2 !w-2 !border-0 !bg-[#006572]"
+        className="!h-2 !w-2 !border-0 !bg-[#31577F]"
       />
 
-      <div className="flex aspect-[4/3] items-center justify-center bg-[#f6fafb]">
+      <div className="flex aspect-[4/3] items-center justify-center bg-[#f7f9fc]">
         {data.foto ? (
           <img
             src={data.foto}
-            alt={`${data.jabatan} — ${data.nama}`}
+            alt={`${data.jabatan}, ${data.nama}`}
             className="h-full w-full object-cover"
           />
         ) : (
-          <span className="font-body text-3xl font-semibold text-[#006572]/40">
+          <span className="font-body text-3xl font-semibold text-[#31577F]/40">
             {initials(data.nama)}
           </span>
         )}
       </div>
 
       <div className="flex flex-col gap-0.5 px-3 py-3">
-        <h3 className="font-body text-sm font-bold leading-tight text-[#006572]">
+        <h3 className="font-body text-sm font-bold leading-tight text-[#31577F]">
           {data.jabatan}
         </h3>
-        <p className="font-body text-xs leading-snug text-[#006572]/70">
+        <p className="font-body text-xs leading-snug text-[#31577F]/70">
           {data.nama}
         </p>
       </div>
@@ -84,7 +84,7 @@ function AnggotaNodeCard({ data }: NodeProps<AnggotaNode>) {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!h-2 !w-2 !border-0 !bg-[#006572]"
+        className="!h-2 !w-2 !border-0 !bg-[#31577F]"
       />
     </div>
   );
@@ -125,7 +125,7 @@ function computeLayout(data: Anggota[]) {
   return pos;
 }
 
-/** Kanvas bagan React Flow — dipakai ulang di kotak inline & modal layar penuh. */
+/** Kanvas bagan React Flow, dipakai ulang di kotak inline & modal layar penuh. */
 function OrgChart({ nodes, edges }: { nodes: AnggotaNode[]; edges: Edge[] }) {
   return (
     <ReactFlow
@@ -142,7 +142,7 @@ function OrgChart({ nodes, edges }: { nodes: AnggotaNode[]; edges: Edge[] }) {
       preventScrolling={false}
       defaultEdgeOptions={{
         type: "smoothstep",
-        style: { stroke: "#006572", strokeWidth: 1.5 },
+        style: { stroke: "#31577F", strokeWidth: 1.5 },
       }}
       proOptions={{ hideAttribution: true }}
     >
@@ -150,7 +150,7 @@ function OrgChart({ nodes, edges }: { nodes: AnggotaNode[]; edges: Edge[] }) {
         variant={BackgroundVariant.Dots}
         gap={22}
         size={1.5}
-        color="#00657222"
+        color="#31577F22"
       />
       <Controls showInteractive={false} />
     </ReactFlow>
@@ -194,7 +194,7 @@ function CloseIcon() {
 }
 
 /**
- * Struktur Organisasi — bagan perangkat desa interaktif (React Flow). Layout
+ * Struktur Organisasi, bagan perangkat desa interaktif (React Flow). Layout
  * hierarki dihitung otomatis dari `parent` di `../_data/struktur`. Responsif:
  * `fitView` menyesuaikan bagan ke kontainer. Tombol layar-penuh membuka bagan
  * dalam modal pop-up (tutup: tombol ×, Esc, atau klik latar). Scroll roda tetap
@@ -245,34 +245,34 @@ export function StrukturOrganisasi({ data }: { data: Anggota[] }) {
     <section
       id="struktur"
       aria-label="Struktur organisasi desa"
-      className="bg-[#f6fafb] px-5 py-16 sm:px-8 lg:py-24"
+      className="bg-[#f7f9fc] px-5 py-16 sm:px-8 lg:py-24"
     >
       <div className="mx-auto flex w-full max-w-[1112px] flex-col gap-6">
         <Reveal>
           <div className="flex flex-col items-start gap-4">
-            <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#006572]">
-              <span className="h-[3px] w-[42px] bg-[#006572]" aria-hidden />
+            <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#31577F]">
+              <span className="h-[3px] w-[42px] bg-[#31577F]" aria-hidden />
               Pemerintahan
             </span>
-            <h2 className="font-body text-[clamp(2rem,4vw,3rem)] font-semibold text-[#006572]">
+            <h2 className="font-body text-[clamp(2rem,4vw,3rem)] font-semibold text-[#31577F]">
               Struktur Organisasi
             </h2>
-            <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#006572]/80">
-              Susunan perangkat Desa Gaya Baru dan alur koordinasinya —
+            <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#31577F]/80">
+              Susunan perangkat Desa Gaya Baru dan alur koordinasinya -
               dari Kepala Desa hingga kepala dusun.
             </p>
           </div>
         </Reveal>
 
         <Reveal delay={120}>
-          <div className="relative h-[520px] w-full overflow-hidden rounded-xl border border-[#006572]/20 bg-white sm:h-[620px]">
+          <div className="relative h-[520px] w-full overflow-hidden rounded-xl border border-[#31577F]/20 bg-white sm:h-[620px]">
             <OrgChart nodes={nodes} edges={edges} />
 
             {/* Tombol layar penuh */}
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="absolute right-3 top-3 z-10 inline-flex items-center gap-2 rounded-md border border-[#006572]/25 bg-white/90 px-3 py-2 font-body text-xs font-semibold text-[#006572] shadow-sm backdrop-blur-sm motion-safe:transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2"
+              className="absolute right-3 top-3 z-10 inline-flex items-center gap-2 rounded-md border border-[#31577F]/25 bg-white/90 px-3 py-2 font-body text-xs font-semibold text-[#31577F] shadow-sm backdrop-blur-sm motion-safe:transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2"
             >
               <MaximizeIcon />
               Layar Penuh
@@ -280,7 +280,7 @@ export function StrukturOrganisasi({ data }: { data: Anggota[] }) {
           </div>
         </Reveal>
 
-        <p className="font-body text-sm text-[#006572]/60">
+        <p className="font-body text-sm text-[#31577F]/60">
           Geser untuk menjelajah bagan; gunakan tombol +/− atau cubit untuk
           memperbesar, atau buka Layar Penuh.
         </p>
@@ -299,7 +299,7 @@ export function StrukturOrganisasi({ data }: { data: Anggota[] }) {
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative h-[80vh] max-h-[calc(100dvh-8rem)] w-full max-w-[1720px] overflow-hidden rounded-xl border border-[#006572]/20 bg-white shadow-floating"
+              className="relative h-[80vh] max-h-[calc(100dvh-8rem)] w-full max-w-[1720px] overflow-hidden rounded-xl border border-[#31577F]/20 bg-white shadow-floating"
             >
               <OrgChart nodes={nodes} edges={edges} />
 
@@ -307,7 +307,7 @@ export function StrukturOrganisasi({ data }: { data: Anggota[] }) {
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label="Tutup layar penuh"
-                className="absolute right-4 top-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#006572]/25 bg-white/90 text-[#006572] shadow-sm backdrop-blur-sm motion-safe:transition-colors hover:bg-[#006572] hover:text-white focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2"
+                className="absolute right-4 top-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#31577F]/25 bg-white/90 text-[#31577F] shadow-sm backdrop-blur-sm motion-safe:transition-colors hover:bg-[#31577F] hover:text-white focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2"
               >
                 <CloseIcon />
               </button>

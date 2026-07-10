@@ -135,6 +135,7 @@ export async function POST(request: NextRequest) {
     submitted_by: nama || null,
     status: "pending",
     display_order: 0,
+    file_size_kb: Math.ceil(file.size / 1024),
   });
   if (insertError) {
     await imagekit.deleteFile(uploaded.fileId).catch(() => {});
@@ -142,6 +143,19 @@ export async function POST(request: NextRequest) {
       { error: `Gagal menyimpan kiriman: ${insertError.message}` },
       { status: 500 },
     );
+  }
+
+  // Pembersihan otomatis: kiriman pending > 15 hari + kuota total 500 MB
+  // (row dihapus fungsi SECURITY DEFINER; file ImageKit dihapus di sini).
+  try {
+    const { data: removed } = await supabase.rpc("gallery_kiriman_cleanup", {
+      v_village: village.id,
+    });
+    for (const r of (removed ?? []) as { o_file_id: string | null }[]) {
+      if (r.o_file_id) await imagekit.deleteFile(r.o_file_id).catch(() => {});
+    }
+  } catch {
+    // best effort; kegagalan pembersihan tidak menggagalkan kiriman
   }
 
   return NextResponse.json({ ok: true }, { status: 201 });

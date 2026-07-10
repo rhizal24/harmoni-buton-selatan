@@ -72,3 +72,27 @@ export async function uploadFile(file: File, accessToken: string): Promise<strin
   }
   return json.url;
 }
+
+/**
+ * Hapus file lama di ImageKit lewat DELETE /api/upload. Best effort:
+ * tidak pernah melempar error (kegagalan hanya meninggalkan file yatim,
+ * bukan masalah bagi admin), dan URL non-ImageKit dilewati diam-diam.
+ */
+export async function deleteUploadedFile(
+  url: string | null | undefined,
+  accessToken: string,
+): Promise<void> {
+  if (!url || !url.includes("ik.imagekit.io")) return;
+  try {
+    await fetch("/api/upload", {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url }),
+    });
+  } catch (err) {
+    console.warn("Gagal menghapus file lama di ImageKit:", err);
+  }
+}

@@ -17,11 +17,10 @@ const NAV = [
   { label: "Paket Wisata", href: "/admin/paket" },
   { label: "Galeri", href: "/admin/galeri" },
   { label: "Berita", href: "/admin/berita" },
-  { label: "UMKM", href: "/admin/umkm" },
 ];
 
 /**
- * Layout dashboard admin — sidebar kiri + konten kanan (design system §18:
+ * Layout dashboard admin, sidebar kiri + konten kanan (design system §18:
  * padat, dominan tosca, tanpa coral). Guard sesi: tanpa sesi admin yang sah
  * langsung diarahkan ke /admin/login.
  */
@@ -66,7 +65,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         {/* Sidebar */}
         <aside className="flex w-60 shrink-0 flex-col border-r border-[#D0D0D0] bg-white">
           <div className="border-b border-[#D0D0D0] px-5 py-5">
-            <p className="font-body text-[11px] font-semibold uppercase tracking-[0.24em] text-[#006572]">
+            <p className="font-body text-[11px] font-semibold uppercase tracking-[0.24em] text-[#31577F]">
               Panel Admin
             </p>
             <p className="mt-1 font-body text-base font-bold text-[#2E2E2E]">{SITE_NAME}</p>
@@ -82,8 +81,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                   href={item.href}
                   className={`rounded-md px-3 py-2 font-body text-sm font-semibold no-underline motion-safe:transition-colors ${
                     active
-                      ? "bg-[#006572] text-white"
-                      : "text-[#2E2E2E] hover:bg-[#CFF1F4] hover:text-[#00434B]"
+                      ? "bg-[#31577F] text-white"
+                      : "text-[#2E2E2E] hover:bg-[#D9E4F1] hover:text-[#1F3A59]"
                   }`}
                 >
                   {item.label}

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { DocumentRow } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
@@ -83,6 +83,10 @@ export default function AdminDokumenPage() {
         ? await supabase.from("documents").update(payload).eq("id", form.id)
         : await supabase.from("documents").insert(payload);
       if (error) throw new Error(error.message);
+      const prev = form.id ? rows.find((r) => r.id === form.id) : null;
+      if (prev && prev.file_url !== form.file_url) {
+        void deleteUploadedFile(prev.file_url, admin.accessToken);
+      }
       setMsg({ kind: "ok", text: form.id ? "Perubahan disimpan." : "Dokumen ditambahkan." });
       if (!form.id) setForm(EMPTY_FORM);
       await refresh();
@@ -101,6 +105,7 @@ export default function AdminDokumenPage() {
       const { error } = await getSupabase().from("documents").delete().eq("id", row.id);
       if (error) throw new Error(error.message);
       if (form.id === row.id) setForm(EMPTY_FORM);
+      void deleteUploadedFile(row.file_url, admin.accessToken);
       setMsg({ kind: "ok", text: "Dokumen dihapus." });
       await refresh();
     } catch (err) {

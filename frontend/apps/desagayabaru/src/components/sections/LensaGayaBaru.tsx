@@ -37,7 +37,7 @@ function chunkPages(images: GaleriFoto[]): GaleriFoto[][] {
 }
 
 /**
- * Lensa Gaya Baru — galeri foto (strip melebar saat hover) + pagination.
+ * Lensa Gaya Baru, galeri foto (strip melebar saat hover) + pagination.
  * Ganti halaman → seluruh set foto ditukar dengan crossfade halus
  * (fade-out → swap saat invisible → fade-in), tanpa pergeseran.
  * Figma node 92:1397 / 94:1447.
@@ -68,17 +68,17 @@ export function LensaGayaBaru({ images }: { images?: GaleriFoto[] }) {
   return (
     <section
       id="lensa-gaya-baru"
-      aria-label="Lensa Gaya Baru — galeri foto desa"
+      aria-label="Lensa Gaya Baru, galeri foto desa"
       className="bg-white px-5 py-16 sm:px-8 lg:py-24"
     >
       <div className="mx-auto w-full max-w-[1112px]">
-        <hr className="mb-12 border-t border-[#006572]/15" />
+        <hr className="mb-12 border-t border-[#31577F]/15" />
 
         <div className="mb-12 flex flex-col items-center text-center">
-          <h2 className="font-body text-[clamp(2.5rem,5vw,3.75rem)] font-semibold text-[#006572]">
+          <h2 className="font-body text-[clamp(2.5rem,5vw,3.75rem)] font-semibold text-[#31577F]">
             Lensa Gaya Baru
           </h2>
-          <p className="mt-4 max-w-[730px] font-body text-lg leading-relaxed text-[#006572]">
+          <p className="mt-4 max-w-[730px] font-body text-lg leading-relaxed text-[#31577F]">
             Lensa Gaya Baru menghadirkan potret alam, budaya, dan kehidupan Desa
             Gaya Baru. Setiap gambar menyimpan cerita tentang pesona desa.
           </p>

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { VillageRow } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
@@ -31,6 +31,7 @@ const hintCls = "font-body text-xs text-[#5A5A5A]";
 export default function AdminProfilPage() {
   const admin = useAdmin();
   const [form, setForm] = useState<ProfilForm | null>(null);
+  const [savedMedia, setSavedMedia] = useState({ logo: "", cover: "" });
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
@@ -55,6 +56,7 @@ export default function AdminProfilPage() {
       cover_image_url: v.cover_image_url ?? "",
       map_embed_url: v.map_embed_url ?? "",
     });
+    setSavedMedia({ logo: v.logo_url ?? "", cover: v.cover_image_url ?? "" });
   }, [admin.village.id]);
 
   useEffect(() => {
@@ -85,6 +87,13 @@ export default function AdminProfilPage() {
         })
         .eq("id", admin.village.id);
       if (error) throw new Error(error.message);
+      if (savedMedia.logo && savedMedia.logo !== form.logo_url) {
+        void deleteUploadedFile(savedMedia.logo, admin.accessToken);
+      }
+      if (savedMedia.cover && savedMedia.cover !== form.cover_image_url) {
+        void deleteUploadedFile(savedMedia.cover, admin.accessToken);
+      }
+      setSavedMedia({ logo: form.logo_url, cover: form.cover_image_url });
       setMsg({ kind: "ok", text: "Profil desa disimpan." });
     } catch (err) {
       setMsg({ kind: "err", text: err instanceof Error ? err.message : "Gagal menyimpan." });

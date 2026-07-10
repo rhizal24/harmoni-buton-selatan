@@ -11,7 +11,7 @@ interface TiltCardProps {
 }
 
 /**
- * TiltCard — memiringkan elemen dalam 3D mengikuti posisi pointer (GSAP).
+ * TiltCard, memiringkan elemen dalam 3D mengikuti posisi pointer (GSAP).
  * rotateX/rotateY dihitung dari posisi kursor relatif terhadap kartu, reset
  * halus saat pointer keluar. Nonaktif untuk reduced-motion / perangkat sentuh.
  */

@@ -14,7 +14,7 @@ function parseNumeric(label: string): number {
 }
 
 /**
- * Desa dalam Angka — HANYA angkanya yang bisa diubah. Kelompok dan label
+ * Desa dalam Angka, HANYA angkanya yang bisa diubah. Kelompok dan label
  * mengikuti struktur yang sudah ada di database (di-seed lewat
  * docs/supabase-seed-profil.sql); tidak ada tambah/hapus/ubah label di sini.
  */
@@ -104,7 +104,7 @@ export default function AdminStatistikPage() {
           order += 1;
         }
       }
-      setMsg({ kind: "ok", text: "Statistik awal dibuat — silakan ubah angkanya." });
+      setMsg({ kind: "ok", text: "Statistik awal dibuat, silakan ubah angkanya." });
       await refresh();
     } catch (err) {
       setMsg({ kind: "err", text: err instanceof Error ? err.message : "Gagal membuat data awal." });
@@ -118,7 +118,7 @@ export default function AdminStatistikPage() {
       <header>
         <h1 className="font-body text-2xl font-bold text-[#2E2E2E]">Desa dalam Angka</h1>
         <p className="mt-1 font-body text-sm text-[#5A5A5A]">
-          Ubah angkanya saja — kelompok dan label mengikuti struktur yang sudah ada.
+          Ubah angkanya saja, kelompok dan label mengikuti struktur yang sudah ada.
         </p>
       </header>
 
@@ -127,7 +127,7 @@ export default function AdminStatistikPage() {
           role="status"
           className={`rounded-md border px-3 py-2 font-body text-sm ${
             msg.kind === "ok"
-              ? "border-[#CFF1F4] bg-[#EFFBFC] text-[#00434B]"
+              ? "border-[#D9E4F1] bg-[#F2F6FB] text-[#1F3A59]"
               : "border-[#FFDAD6] bg-[#FFF4F3] text-[#93000A]"
           }`}
         >
@@ -147,7 +147,7 @@ export default function AdminStatistikPage() {
             type="button"
             disabled={busy}
             onClick={() => void handleInit()}
-            className="rounded-md bg-[#006572] px-5 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#026F7D] disabled:opacity-60"
+            className="rounded-md bg-[#31577F] px-5 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#27466A] disabled:opacity-60"
           >
             {busy ? "Membuat…" : "Buat Entri Statistik Awal"}
           </button>
@@ -178,10 +178,10 @@ export default function AdminStatistikPage() {
                           onChange={(e) =>
                             setValues((v) => ({ ...v, [row.id]: e.target.value }))
                           }
-                          className={`h-10 w-full rounded-md border px-3 font-body text-sm text-[#2E2E2E] outline-none focus:ring-2 focus:ring-[#006572]/20 ${
+                          className={`h-10 w-full rounded-md border px-3 font-body text-sm text-[#2E2E2E] outline-none focus:ring-2 focus:ring-[#31577F]/20 ${
                             dirty
-                              ? "border-[#006572] bg-[#EFFBFC]"
-                              : "border-[#D0D0D0] focus:border-[#006572]"
+                              ? "border-[#31577F] bg-[#F2F6FB]"
+                              : "border-[#D0D0D0] focus:border-[#31577F]"
                           }`}
                         />
                       </label>
@@ -197,7 +197,7 @@ export default function AdminStatistikPage() {
                 type="button"
                 disabled={busy || dirtyRows.length === 0}
                 onClick={() => void handleSaveAll()}
-                className="rounded-md bg-[#006572] px-6 py-2.5 font-body text-sm font-semibold text-white shadow-md hover:bg-[#026F7D] disabled:opacity-50"
+                className="rounded-md bg-[#31577F] px-6 py-2.5 font-body text-sm font-semibold text-white shadow-md hover:bg-[#27466A] disabled:opacity-50"
               >
                 {busy
                   ? "Menyimpan…"

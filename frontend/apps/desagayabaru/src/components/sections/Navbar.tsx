@@ -20,7 +20,6 @@ const NAV_ITEMS = [
 
 const INFORMASI_ITEMS = [
   { label: "Berita", labelEn: "News", href: "/informasi/berita" },
-  { label: "UMKM", labelEn: "SMEs", href: "/informasi/umkm" },
 ];
 
 /* ─────────────────────────────────────────────
@@ -32,7 +31,7 @@ function useLang() {
 }
 
 /* ─────────────────────────────────────────────
-   NavItem — slide-up hover animation
+   NavItem, slide-up hover animation
    Two spans: primary keluar ke atas, ghost masuk dari bawah.
    ───────────────────────────────────────────── */
 interface NavItemProps {
@@ -69,7 +68,7 @@ function NavItem({
       aria-current={isActive ? "page" : undefined}
       className={`group relative inline-flex items-start overflow-hidden rounded whitespace-nowrap no-underline motion-safe:transition-colors motion-safe:duration-200 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 ${size} ${state}`}
     >
-      {/* Teks utama — keluar ke atas saat hover */}
+      {/* Teks utama, keluar ke atas saat hover */}
       <span
         aria-hidden={isActive}
         className={`pointer-events-none block motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:-translate-y-full ${
@@ -78,7 +77,7 @@ function NavItem({
       >
         {label}
       </span>
-      {/* Teks bayangan — masuk dari bawah */}
+      {/* Teks bayangan, masuk dari bawah */}
       <span
         aria-hidden
         className={`pointer-events-none absolute top-full block motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.4,0,0.2,1)] group-hover:-translate-y-full ${
@@ -92,7 +91,7 @@ function NavItem({
 }
 
 /* ─────────────────────────────────────────────
-   DropdownNav — menu Informasi
+   DropdownNav, menu Informasi
    ───────────────────────────────────────────── */
 interface DropdownNavProps {
   label: string;
@@ -259,7 +258,7 @@ export function Navbar() {
         {lang === "id" ? "Langsung ke konten" : "Skip to content"}
       </a>
 
-      {/* Filter refraksi liquid-glass — dipakai oleh backdrop-filter navbar.
+      {/* Filter refraksi liquid-glass, dipakai oleh backdrop-filter navbar.
           feTurbulence bikin noise, feDisplacementMap membiaskan konten di belakang. */}
       <svg aria-hidden className="pointer-events-none absolute h-0 w-0">
         <defs>
@@ -290,7 +289,7 @@ export function Navbar() {
         </defs>
       </svg>
 
-      {/* Wrapper fixed — pointer-events off, pill sendiri yang on */}
+      {/* Wrapper fixed, pointer-events off, pill sendiri yang on */}
       <div
         role="banner"
         className="pointer-events-none fixed inset-x-0 top-0 z-[100] w-full px-3 py-6"
@@ -299,7 +298,7 @@ export function Navbar() {
           aria-label={lang === "id" ? "Navigasi utama" : "Main navigation"}
           className="pointer-events-auto mx-auto w-full max-w-[1040px]"
         >
-          {/* Permukaan liquid-glass (GlassSurface) — refraksi + frost.
+          {/* Permukaan liquid-glass (GlassSurface), refraksi + frost.
               Tinggi 72px = py-4 lama + logo 40px; radius 36 = pill penuh. */}
           <GlassSurface
             width="100%"

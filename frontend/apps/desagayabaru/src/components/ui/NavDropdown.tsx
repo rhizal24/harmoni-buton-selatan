@@ -1,13 +1,13 @@
 /**
- * NavDropdown — UI Atom
+ * NavDropdown, UI Atom
  *
- * Dropdown disclosure untuk menu Informasi (Berita + UMKM).
+ * Dropdown disclosure untuk menu Informasi (Berita).
  * Menggunakan Popover API (HTML-native) untuk positioning dan overlay handling.
  * Fallback: CSS-only approach via :focus-within jika Popover belum didukung.
  *
  * Accessibility:
  * - Trigger pakai <button> dengan aria-expanded
- * - Panel pakai popover="auto" — browser mengelola focus trap & dismiss otomatis
+ * - Panel pakai popover="auto", browser mengelola focus trap & dismiss otomatis
  * - Keyboard: Enter/Space buka panel, Escape tutup, Tab pindah antar item
  *
  * Catatan: Anchor Positioning belum Baseline Widely Available,
@@ -110,7 +110,7 @@ export function NavDropdown({
         </svg>
       </button>
 
-      {/* Panel dropdown — posisi absolute relatif terhadap parent */}
+      {/* Panel dropdown, posisi absolute relatif terhadap parent */}
       <div
         id={`dd-panel-${panelId}`}
         role="region"

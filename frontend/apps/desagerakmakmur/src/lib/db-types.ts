@@ -180,4 +180,6 @@ export interface GalleryImageRow {
   submitted_by?: string | null;
   /** fileId ImageKit — untuk menghapus file saat kiriman ditolak. */
   file_id?: string | null;
+  /** Ukuran file (KB), kiriman warga; untuk kuota 500 MB. */
+  file_size_kb?: number | null;
 }

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { OrganizationStructureRow } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
@@ -78,6 +78,10 @@ export default function AdminStrukturPage() {
         ? await supabase.from("organization_structure").update(payload).eq("id", form.id)
         : await supabase.from("organization_structure").insert(payload);
       if (error) throw new Error(error.message);
+      const prev = form.id ? rows.find((r) => r.id === form.id) : null;
+      if (prev?.photo_url && prev.photo_url !== (form.photo_url || null)) {
+        void deleteUploadedFile(prev.photo_url, admin.accessToken);
+      }
       setMsg({ kind: "ok", text: form.id ? "Perubahan disimpan." : "Anggota ditambahkan." });
       if (!form.id) setForm(EMPTY_FORM);
       await refresh();
@@ -104,6 +108,7 @@ export default function AdminStrukturPage() {
         .eq("id", row.id);
       if (error) throw new Error(error.message);
       if (form.id === row.id) setForm(EMPTY_FORM);
+      void deleteUploadedFile(row.photo_url, admin.accessToken);
       setMsg({ kind: "ok", text: "Anggota dihapus." });
       await refresh();
     } catch (err) {

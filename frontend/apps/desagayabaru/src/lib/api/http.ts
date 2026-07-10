@@ -1,7 +1,7 @@
 import { API_BASE_URL, DEFAULT_REVALIDATE } from "./config";
 
 /**
- * Error HTTP dari backend — membawa status code untuk penanganan di pemanggil
+ * Error HTTP dari backend, membawa status code untuk penanganan di pemanggil
  * (mis. 404 → notFound()).
  */
 export class ApiError extends Error {
@@ -54,7 +54,7 @@ export async function apiFetch<T>(
       const data = (await res.json()) as { message?: string; error?: string };
       detail = data.message ?? data.error ?? detail;
     } catch {
-      /* respons tanpa body JSON — pakai statusText */
+      /* respons tanpa body JSON, pakai statusText */
     }
     throw new ApiError(res.status, `${method} ${path} → ${res.status}: ${detail}`);
   }

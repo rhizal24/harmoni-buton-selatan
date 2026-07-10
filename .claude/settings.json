@@ -14,10 +14,13 @@
       "Bash(curl -s -o /tmp/login.html -w \"/admin/login: %{http_code}\\\\n\" http://localhost:3000/admin/login)",
       "Read(//tmp/**)",
       "Bash(curl -s -o /dev/null -w \"/admin: %{http_code}\\\\n\" http://localhost:3000/admin)",
-      "Bash(curl -s -w \"\\\\nHTTP %{http_code}\\\\n\" -X POST \"https://nrfstzwjvqkndmzhdlgc.supabase.co/auth/v1/token?grant_type=password\" -H \"apikey: sb_publishable_MFMdQ-ZS5X4FGUYtMwhAPA_rm0K_9h_\" -H \"Content-Type: application/json\" -d '{\"email\":\"tes@contoh.com\",\"password\":\"salah\"}')"
+      "Bash(curl -s -w \"\\\\nHTTP %{http_code}\\\\n\" -X POST \"https://nrfstzwjvqkndmzhdlgc.supabase.co/auth/v1/token?grant_type=password\" -H \"apikey: sb_publishable_MFMdQ-ZS5X4FGUYtMwhAPA_rm0K_9h_\" -H \"Content-Type: application/json\" -d '{\"email\":\"tes@contoh.com\",\"password\":\"salah\"}')",
+      "WebFetch(domain:gayabaru-desa.com)"
     ],
+    "defaultMode": "bypassPermissions",
     "additionalDirectories": [
       "c:\\Users\\saida\\.claude\\projects\\c--Users-saida-harmoni-buton-selatan\\memory"
     ]
+    
   }
 }

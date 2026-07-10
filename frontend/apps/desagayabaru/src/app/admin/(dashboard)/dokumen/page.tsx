@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { DocumentRow } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
@@ -29,11 +29,11 @@ const EMPTY_FORM: DokumenForm = {
 const KATEGORI_SARAN = ["Profil", "Perencanaan", "Anggaran", "Laporan", "Regulasi", "Lainnya"];
 
 const inputCls =
-  "h-10 w-full rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20";
+  "h-10 w-full rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20";
 const labelCls = "font-body text-sm font-semibold text-[#2E2E2E]";
 
 /**
- * Dokumen Desa — CRUD dokumen publik (PDF) di halaman /profil.
+ * Dokumen Desa, CRUD dokumen publik (PDF) di halaman /profil.
  * File di-upload ke ImageKit; URL + ukurannya tersimpan di tabel documents.
  */
 export default function AdminDokumenPage() {
@@ -83,6 +83,10 @@ export default function AdminDokumenPage() {
         ? await supabase.from("documents").update(payload).eq("id", form.id)
         : await supabase.from("documents").insert(payload);
       if (error) throw new Error(error.message);
+      const prev = form.id ? rows.find((r) => r.id === form.id) : null;
+      if (prev && prev.file_url !== form.file_url) {
+        void deleteUploadedFile(prev.file_url, admin.accessToken);
+      }
       setMsg({ kind: "ok", text: form.id ? "Perubahan disimpan." : "Dokumen ditambahkan." });
       if (!form.id) setForm(EMPTY_FORM);
       await refresh();
@@ -101,6 +105,7 @@ export default function AdminDokumenPage() {
       const { error } = await getSupabase().from("documents").delete().eq("id", row.id);
       if (error) throw new Error(error.message);
       if (form.id === row.id) setForm(EMPTY_FORM);
+      void deleteUploadedFile(row.file_url, admin.accessToken);
       setMsg({ kind: "ok", text: "Dokumen dihapus." });
       await refresh();
     } catch (err) {
@@ -144,7 +149,7 @@ export default function AdminDokumenPage() {
             setForm(EMPTY_FORM);
             setMsg(null);
           }}
-          className="rounded-md bg-[#006572] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#026F7D]"
+          className="rounded-md bg-[#31577F] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#27466A]"
         >
           + Dokumen Baru
         </button>
@@ -155,7 +160,7 @@ export default function AdminDokumenPage() {
           role="status"
           className={`rounded-md border px-3 py-2 font-body text-sm ${
             msg.kind === "ok"
-              ? "border-[#CFF1F4] bg-[#EFFBFC] text-[#00434B]"
+              ? "border-[#D9E4F1] bg-[#F2F6FB] text-[#1F3A59]"
               : "border-[#FFDAD6] bg-[#FFF4F3] text-[#93000A]"
           }`}
         >
@@ -193,7 +198,7 @@ export default function AdminDokumenPage() {
                       href={row.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-body text-sm font-semibold text-[#006572] no-underline hover:underline"
+                      className="font-body text-sm font-semibold text-[#31577F] no-underline hover:underline"
                     >
                       {row.title}
                     </a>
@@ -203,7 +208,7 @@ export default function AdminDokumenPage() {
                     </p>
                   </td>
                   <td className="px-4 py-3">
-                    <span className="rounded-full bg-[#CFF1F4] px-2.5 py-0.5 font-body text-xs font-semibold text-[#00434B]">
+                    <span className="rounded-full bg-[#D9E4F1] px-2.5 py-0.5 font-body text-xs font-semibold text-[#1F3A59]">
                       {row.category}
                     </span>
                   </td>
@@ -222,7 +227,7 @@ export default function AdminDokumenPage() {
                         });
                         setMsg(null);
                       }}
-                      className="rounded-md border border-[#006572] px-3 py-1.5 font-body text-xs font-semibold text-[#006572] hover:bg-[#CFF1F4]"
+                      className="rounded-md border border-[#31577F] px-3 py-1.5 font-body text-xs font-semibold text-[#31577F] hover:bg-[#D9E4F1]"
                     >
                       Edit
                     </button>
@@ -255,7 +260,7 @@ export default function AdminDokumenPage() {
                   href={form.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="truncate font-body text-xs text-[#006572] underline"
+                  className="truncate font-body text-xs text-[#31577F] underline"
                 >
                   {form.file_url}
                 </a>
@@ -269,7 +274,7 @@ export default function AdminDokumenPage() {
                   if (file) void handleFileUpload(file);
                   e.target.value = "";
                 }}
-                className="font-body text-sm text-[#5A5A5A] file:mr-3 file:rounded-md file:border file:border-[#006572] file:bg-white file:px-3 file:py-1.5 file:font-body file:text-xs file:font-semibold file:text-[#006572]"
+                className="font-body text-sm text-[#5A5A5A] file:mr-3 file:rounded-md file:border file:border-[#31577F] file:bg-white file:px-3 file:py-1.5 file:font-body file:text-xs file:font-semibold file:text-[#31577F]"
               />
             </div>
 
@@ -322,7 +327,7 @@ export default function AdminDokumenPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="rounded-md bg-[#006572] px-5 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#026F7D] disabled:opacity-60"
+                className="rounded-md bg-[#31577F] px-5 py-2.5 font-body text-sm font-semibold text-white hover:bg-[#27466A] disabled:opacity-60"
               >
                 {busy ? "Menyimpan…" : form.id ? "Simpan Perubahan" : "Tambah Dokumen"}
               </button>

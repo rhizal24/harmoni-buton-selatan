@@ -13,12 +13,12 @@ export const metadata: Metadata = {
 };
 
 /**
- * Halaman Wisata — Server Component (App Router).
+ * Halaman Wisata, Server Component (App Router).
  * Section route-spesifik dicolocate di `./_components`; Footer & komponen
  * lintas-halaman diambil dari `@/components/sections`. Navbar sudah dirender
  * di root layout, jadi tidak diulang di sini.
  */
-// ISR — konten Supabase disegarkan tiap 5 menit.
+// ISR, konten Supabase disegarkan tiap 5 menit.
 export const revalidate = 300;
 
 export default async function WisataPage() {

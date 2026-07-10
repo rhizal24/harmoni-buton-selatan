@@ -92,7 +92,7 @@ function animateValue({ start = 0, end = 100, duration = 1000, delay = 0, ease =
 }
 
 /**
- * BorderGlow — border mesh-gradient + glow tepi yang mengikuti arah kursor
+ * BorderGlow, border mesh-gradient + glow tepi yang mengikuti arah kursor
  * (diadaptasi dari React Bits untuk tema terang tosca proyek ini). Styling
  * di `@utility border-glow-card` (globals.css); efek digerakkan lewat CSS var
  * `--edge-proximity` & `--cursor-angle`. Sweep intro dilewati saat
@@ -109,7 +109,7 @@ export function BorderGlow({
   glowIntensity = 1.0,
   coneSpread = 25,
   animated = false,
-  colors = ["#028090", "#35A7B5", "#00434B"],
+  colors = ["#31577F", "#4A76A8", "#1F3A59"],
   fillOpacity = 0.5,
 }: BorderGlowProps) {
   const cardRef = useRef<HTMLDivElement>(null);

@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 interface GlowButtonProps {
   href: string;
   children: ReactNode;
-  /** Kelas warna latar tombol dalam, mis. "bg-[#006572]" */
+  /** Kelas warna latar tombol dalam, mis. "bg-[#31577F]" */
   innerClassName?: string;
   /** Buka di tab baru (link eksternal) */
   external?: boolean;
@@ -12,14 +12,14 @@ interface GlowButtonProps {
 }
 
 /**
- * GlowButton — tombol pill dengan glow border putih berputar (::before).
+ * GlowButton, tombol pill dengan glow border putih berputar (::before).
  * Warna isi tombol dikontrol lewat `innerClassName`. Animasi dijaga
  * `prefers-reduced-motion`. Keyframes: `rotate-glow` (globals.css).
  */
 export function GlowButton({
   href,
   children,
-  innerClassName = "bg-[#006572]",
+  innerClassName = "bg-[#31577F]",
   external = false,
   className = "",
 }: GlowButtonProps) {

@@ -4,7 +4,7 @@ import { ScrollRevealImage } from "@/components/ui/ScrollRevealImage";
 import { StaggerIn } from "@/components/ui/StaggerIn";
 
 /**
- * Hero Beranda — full-bleed foto drone desa + overlay gelap + konten center.
+ * Hero Beranda, full-bleed foto drone desa + overlay gelap + konten center.
  * Susunan: pill (identitas situs) → eyebrow → headline → deskripsi → CTA,
  * dengan indikator scroll-down di bawah. Sesuai Figma node 82:873.
  */
@@ -25,11 +25,11 @@ export function HeroBeranda() {
       {/* Overlay gelap */}
       <div className="absolute inset-0 bg-black/45" aria-hidden />
 
-      {/* Asset dekoratif tepi atas & bawah — blend screen + glow,
+      {/* Asset dekoratif tepi atas & bawah, blend screen + glow,
           muncul (opacity) saat scroll. Atas = mirror vertikal dari bawah. */}
       {[
-        { edge: "bottom-0", end: "55% top" }, // bawah — orientasi asli
-        { edge: "top-0 -scale-y-100", end: "22% top" }, // atas — muncul lebih awal
+        { edge: "bottom-0", end: "55% top" }, // bawah, orientasi asli
+        { edge: "top-0 -scale-y-100", end: "22% top" }, // atas, muncul lebih awal
       ].map(({ edge, end }) => (
         <ScrollRevealImage
           key={edge}
@@ -40,11 +40,11 @@ export function HeroBeranda() {
         />
       ))}
 
-      {/* Konten — tiap anak masuk ber-stagger saat halaman dibuka/di-reload */}
+      {/* Konten, tiap anak masuk ber-stagger saat halaman dibuka/di-reload */}
       <StaggerIn className="relative z-10 mx-auto flex max-w-[820px] flex-col items-center px-5 text-center">
         <GlowPill>Portal Informasi Resmi</GlowPill>
 
-        <p className="mt-7 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#CFF1F4]/90 md:text-sm">
+        <p className="mt-7 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#D9E4F1]/90 md:text-sm">
           Selamat Datang di
         </p>
 
@@ -54,21 +54,15 @@ export function HeroBeranda() {
 
         <p className="mt-5 max-w-xl font-body text-base leading-[1.7] text-white/80 md:text-lg">
           Pusat informasi, layanan publik, dan eksplorasi potensi wisata bahari
-          Buton Selatan — bergerak bersama menuju kesejahteraan.
+          Buton Selatan, bergerak bersama menuju kesejahteraan.
         </p>
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
           <Link
             href="/wisata#daftar-wisata"
-            className="inline-flex items-center rounded-md bg-[#006572] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-200 hover:-translate-y-0.5 hover:[filter:drop-shadow(0_0_16px_rgba(0,101,114,0.55))_drop-shadow(0_0_44px_rgba(0,101,114,0.30))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+            className="inline-flex items-center rounded-md bg-[#31577F] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-200 hover:-translate-y-0.5 hover:[filter:drop-shadow(0_0_16px_rgba(49,87,127,0.55))_drop-shadow(0_0_44px_rgba(49,87,127,0.30))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
           >
             Jelajahi Wisata
-          </Link>
-          <Link
-            href="/informasi/umkm"
-            className="inline-flex items-center rounded-md bg-[#ae263a] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-200 hover:-translate-y-0.5 hover:[filter:drop-shadow(0_0_16px_rgba(174,38,58,0.55))_drop-shadow(0_0_44px_rgba(174,38,58,0.30))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
-          >
-            Lihat UMKM
           </Link>
         </div>
       </StaggerIn>

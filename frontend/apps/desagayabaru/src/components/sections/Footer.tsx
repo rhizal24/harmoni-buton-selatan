@@ -26,7 +26,6 @@ const NAV_COLS: {
       { label: "Profil Desa", href: "/profil" },
       { label: "Peta Infografis", href: "/peta" },
       { label: "Berita", href: "/informasi/berita" },
-      { label: "UMKM", href: "/informasi/umkm" },
     ],
   },
 ];
@@ -50,13 +49,13 @@ const SOSMED: { label: string; href: string; icon: React.ReactNode }[] = [
 ];
 
 /**
- * Footer — brand kiri lebar, kolom navigasi, kolom kontak perangkat desa
+ * Footer, brand kiri lebar, kolom navigasi, kolom kontak perangkat desa
  * (direct WhatsApp + email), kolom sosmed. Semua kontak diberi icon.
  * Tagline italik di tengah, divider, copyright. Background tosca solid.
  */
 export function Footer() {
   return (
-    <footer className="bg-[#006572] px-5 py-14 text-white sm:px-8 lg:px-16 lg:py-16">
+    <footer className="bg-[#31577F] px-5 py-14 text-white sm:px-8 lg:px-16 lg:py-16">
       <div className="mx-auto flex w-full max-w-[1112px] flex-col gap-10">
         {/* Bagian atas: brand + kolom */}
         <div className="flex flex-col gap-10 lg:flex-row lg:gap-12">
@@ -69,7 +68,7 @@ export function Footer() {
               loading="lazy"
             />
             <p className="font-body text-base leading-relaxed text-white">
-              Bergerak bersama menuju kemakmuran — Kabupaten Buton
+              Bergerak bersama menuju kemakmuran, Kabupaten Buton
               Selatan, Sulawesi Tenggara. Dikembangkan bersama KKN-PPM UGM.
             </p>
           </div>

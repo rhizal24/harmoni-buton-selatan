@@ -1,5 +1,5 @@
 /**
- * Utility functions — Desa Gaya Baru
+ * Utility functions, Desa Gaya Baru
  */
 
 /**

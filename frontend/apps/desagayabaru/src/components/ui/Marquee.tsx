@@ -13,7 +13,7 @@ interface MarqueeProps {
 }
 
 /**
- * Marquee — satu baris berjalan otomatis kiri→kanan tanpa henti (infinite,
+ * Marquee, satu baris berjalan otomatis kiri→kanan tanpa henti (infinite,
  * via transform + GSAP ticker) dengan tepi fade. Auto TIDAK berhenti saat
  * diinteraksi; pengguna hanya menggeser posisinya (drag pointer) sambil pita
  * tetap jalan. Item digandakan agar loop mulus. Hormati reduced-motion.

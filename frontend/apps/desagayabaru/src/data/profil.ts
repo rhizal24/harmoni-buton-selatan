@@ -11,11 +11,11 @@ import {
 } from "@/lib/desa";
 
 /**
- * Data-access Profil Desa — ADAPTER.
+ * Data-access Profil Desa, ADAPTER.
  *
  * Sumber data: Supabase (dikelola lewat dashboard /admin). Bila kolom/tabel
  * masih kosong atau Supabase tidak terjangkau, otomatis fallback ke seed
- * statis (`_data/*`) — pemanggil tidak perlu berubah.
+ * statis (`_data/*`), pemanggil tidak perlu berubah.
  */
 
 /** Pecah teks jadi paragraf (dipisah baris kosong). */

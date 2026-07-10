@@ -23,14 +23,14 @@ interface ScrollCoverRevealProps {
   capOffset?: number;
   /** Jarak (px) panel didorong turun di awal agar asset tepi atasnya tak terlihat. */
   hideDistance?: number;
-  /** POSISI SCROLL — kapan efek mulai (format ScrollTrigger, mis. "top top"). */
+  /** POSISI SCROLL, kapan efek mulai (format ScrollTrigger, mis. "top top"). */
   start?: string;
-  /** POSISI SCROLL — kapan efek selesai / panjang scroll (mis. "bottom top", "+=120%"). */
+  /** POSISI SCROLL, kapan efek selesai / panjang scroll (mis. "bottom top", "+=120%"). */
   end?: string;
 }
 
 /**
- * ScrollCoverReveal — efek "cover": `cover` (hero) di-pin (diam) saat di-scroll,
+ * ScrollCoverReveal, efek "cover": `cover` (hero) di-pin (diam) saat di-scroll,
  * lalu panel `children` NAIK menutupinya sebagai satu kesatuan
  * (`pinSpacing: false` → saling tumpang-tindih), dari hero utuh (0) sampai
  * tertutup penuh.

@@ -17,7 +17,7 @@ interface StaggerInProps {
 }
 
 /**
- * StaggerIn — animasi "masuk" ber-stagger untuk ANAK-ANAK langsungnya: tiap
+ * StaggerIn, animasi "masuk" ber-stagger untuk ANAK-ANAK langsungnya: tiap
  * anak fade (opacity) + geser naik (posisi) berurutan saat komponen di-mount,
  * yakni ketika halaman baru dibuka dari halaman lain atau setelah reload.
  * Menghormati prefers-reduced-motion (konten langsung tampil tanpa animasi).

@@ -162,7 +162,11 @@ export interface ArticleRow {
   updated_at: string;
 }
 
-/** Galeri foto desa — lihat docs/supabase-migration-galeri-artikel.sql */
+/**
+ * Galeri foto desa — lihat docs/supabase-migration-galeri-artikel.sql dan
+ * docs/supabase-migration-galeri-kiriman.sql (kolom moderasi kiriman warga).
+ * Kolom moderasi opsional (`?`) agar kompatibel sebelum migrasi dijalankan.
+ */
 export interface GalleryImageRow {
   id: string;
   village_id: string;
@@ -170,4 +174,12 @@ export interface GalleryImageRow {
   caption: string | null;
   display_order: number;
   created_at: string;
+  /** 'pending' = kiriman warga menunggu verifikasi; default 'approved'. */
+  status?: "pending" | "approved";
+  /** Nama pengirim (kiriman warga), null untuk upload admin. */
+  submitted_by?: string | null;
+  /** fileId ImageKit — untuk menghapus file saat kiriman ditolak. */
+  file_id?: string | null;
+  /** Ukuran file (KB), kiriman warga; untuk kuota 500 MB. */
+  file_size_kb?: number | null;
 }

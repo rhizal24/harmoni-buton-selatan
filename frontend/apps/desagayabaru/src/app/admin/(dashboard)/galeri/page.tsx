@@ -2,15 +2,28 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { uploadFile } from "@/lib/admin";
+import { deleteUploadedFile, uploadFile } from "@/lib/admin";
 import type { GalleryImageRow } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
 /**
- * CRUD Galeri — foto desa untuk section "Lensa" di beranda.
+ * CRUD Galeri, foto desa untuk section "Lensa" di beranda.
  * Upload multi-file ke ImageKit, caption (deskripsi singkat) bisa diedit
  * per foto, urutan mengikuti display_order (angka kecil tampil dulu).
+ *
+ * Kiriman pengunjung (via /api/galeri/kirim) masuk berstatus 'pending' dan
+ * tampil di antrean "Menunggu Verifikasi": Terima → approved (tampil di
+ * galeri publik), Tolak → hapus. Lihat
+ * docs/supabase-migration-galeri-kiriman.sql.
  */
+
+/** Status default 'approved', kompatibel sebelum migrasi kolom status. */
+const statusOf = (row: GalleryImageRow) => row.status ?? "approved";
+
+/** Sisa hari sebelum kiriman pending dihapus otomatis (batas 15 hari). */
+const sisaHari = (createdAt: string) =>
+  Math.max(0, 15 - Math.floor((Date.now() - new Date(createdAt).getTime()) / 86_400_000));
+
 export default function AdminGaleriPage() {
   const admin = useAdmin();
   const [rows, setRows] = useState<GalleryImageRow[]>([]);
@@ -37,6 +50,30 @@ export default function AdminGaleriPage() {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  // Pembersihan otomatis saat halaman dibuka: kiriman pending > 15 hari
+  // dan kuota kiriman pengunjung 500 MB (row via RPC SECURITY DEFINER, file via
+  // DELETE /api/upload). Lihat docs/supabase-migration-galeri-kuota.sql.
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { data } = await getSupabase().rpc("gallery_kiriman_cleanup", {
+          v_village: admin.village.id,
+        });
+        const removed = (data ?? []) as { o_image_url: string | null }[];
+        for (const r of removed) {
+          if (r.o_image_url) void deleteUploadedFile(r.o_image_url, admin.accessToken);
+        }
+        if (!cancelled && removed.length > 0) await refresh();
+      } catch {
+        // best effort
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [admin.village.id, admin.accessToken, refresh]);
 
   async function handleUpload(files: FileList) {
     setBusy(true);
@@ -80,6 +117,44 @@ export default function AdminGaleriPage() {
     }
   }
 
+  /** Terima kiriman pengunjung: status → approved, taruh di urutan paling akhir. */
+  async function handleApprove(row: GalleryImageRow) {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const approvedCount = rows.filter((r) => statusOf(r) === "approved").length;
+      const { error } = await getSupabase()
+        .from("gallery_images")
+        .update({ status: "approved", display_order: approvedCount })
+        .eq("id", row.id);
+      if (error) throw new Error(error.message);
+      setMsg({ kind: "ok", text: "Kiriman diterima, foto kini tampil di galeri." });
+      await refresh();
+    } catch (err) {
+      setMsg({ kind: "err", text: err instanceof Error ? err.message : "Gagal menerima kiriman." });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** Tolak kiriman pengunjung: hapus row + file ImageKit-nya. */
+  async function handleReject(row: GalleryImageRow) {
+    if (!window.confirm("Tolak dan hapus kiriman ini?")) return;
+    setBusy(true);
+    setMsg(null);
+    try {
+      const { error } = await getSupabase().from("gallery_images").delete().eq("id", row.id);
+      if (error) throw new Error(error.message);
+      void deleteUploadedFile(row.image_url, admin.accessToken);
+      setMsg({ kind: "ok", text: "Kiriman ditolak." });
+      await refresh();
+    } catch (err) {
+      setMsg({ kind: "err", text: err instanceof Error ? err.message : "Gagal menolak kiriman." });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleDelete(row: GalleryImageRow) {
     if (!window.confirm("Hapus foto ini dari galeri?")) return;
     setBusy(true);
@@ -87,6 +162,7 @@ export default function AdminGaleriPage() {
     try {
       const { error } = await getSupabase().from("gallery_images").delete().eq("id", row.id);
       if (error) throw new Error(error.message);
+      void deleteUploadedFile(row.image_url, admin.accessToken);
       setMsg({ kind: "ok", text: "Foto dihapus." });
       await refresh();
     } catch (err) {
@@ -95,6 +171,15 @@ export default function AdminGaleriPage() {
       setBusy(false);
     }
   }
+
+  const pending = rows.filter((r) => statusOf(r) === "pending");
+  const kirimanKb = rows
+    .filter((r) => r.file_id)
+    .reduce((sum, r) => sum + (r.file_size_kb ?? 0), 0);
+  const approved = rows.filter((r) => statusOf(r) === "approved");
+  // Pisahkan foto upload admin vs kiriman pengunjung (kiriman punya file_id).
+  const fotoAdmin = approved.filter((r) => !r.file_id);
+  const fotoPengunjung = approved.filter((r) => r.file_id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -105,7 +190,7 @@ export default function AdminGaleriPage() {
             Foto section “Lensa” di beranda. Tiap 6 foto menjadi satu halaman galeri.
           </p>
         </div>
-        <label className="cursor-pointer rounded-md bg-[#006572] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#026F7D]">
+        <label className="cursor-pointer rounded-md bg-[#31577F] px-4 py-2 font-body text-sm font-semibold text-white hover:bg-[#27466A]">
           + Upload Foto
           <input
             type="file"
@@ -126,7 +211,7 @@ export default function AdminGaleriPage() {
           role="status"
           className={`rounded-md border px-3 py-2 font-body text-sm ${
             msg.kind === "ok"
-              ? "border-[#CFF1F4] bg-[#EFFBFC] text-[#00434B]"
+              ? "border-[#D9E4F1] bg-[#F2F6FB] text-[#1F3A59]"
               : "border-[#FFDAD6] bg-[#FFF4F3] text-[#93000A]"
           }`}
         >
@@ -134,52 +219,144 @@ export default function AdminGaleriPage() {
         </p>
       )}
 
-      {rows.length === 0 ? (
-        <p className="rounded-xl border border-[#D0D0D0] bg-white px-4 py-10 text-center font-body text-sm text-[#5A5A5A]">
-          Belum ada foto. Klik “Upload Foto” untuk menambahkan.
-        </p>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {rows.map((row) => (
-            <div key={row.id} className="rounded-xl border border-[#D0D0D0] bg-white p-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={row.image_url}
-                alt={row.caption ?? "Foto galeri"}
-                className="aspect-[4/3] w-full rounded-md border border-[#EEEEEE] object-cover"
-                loading="lazy"
-              />
-              <textarea
-                rows={2}
-                placeholder="Deskripsi singkat foto…"
-                value={captions[row.id] ?? ""}
-                onChange={(e) =>
-                  setCaptions((c) => ({ ...c, [row.id]: e.target.value }))
-                }
-                className="mt-2 w-full rounded-md border border-[#D0D0D0] px-2.5 py-1.5 font-body text-xs text-[#2E2E2E] outline-none focus:border-[#006572]"
-              />
-              <div className="mt-2 flex gap-2">
-                <button
-                  type="button"
-                  disabled={busy || (captions[row.id] ?? "") === (row.caption ?? "")}
-                  onClick={() => void handleSaveCaption(row)}
-                  className="flex-1 rounded-md border border-[#006572] px-2 py-1.5 font-body text-xs font-semibold text-[#006572] hover:bg-[#CFF1F4] disabled:opacity-40"
-                >
-                  Simpan
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void handleDelete(row)}
-                  className="rounded-md border border-[#FFDAD6] px-3 py-1.5 font-body text-xs font-semibold text-[#93000A] hover:bg-[#FFF4F3] disabled:opacity-50"
-                >
-                  Hapus
-                </button>
-              </div>
-            </div>
-          ))}
+      {/* ── Verifikasi kiriman pengunjung, selalu tampil ── */}
+      <section
+        aria-label="Foto menunggu verifikasi"
+        className="rounded-xl border border-[#D9E4F1] bg-[#F2F6FB] p-4"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-body text-base font-bold text-[#1F3A59]">
+            Foto yang harus diverifikasi ({pending.length})
+          </h2>
+          <p className="font-body text-xs font-semibold text-[#1F3A59]">
+            Kuota penyimpanan {(kirimanKb / 1024).toFixed(1)} MB / 500 MB
+          </p>
         </div>
-      )}
+        {pending.length === 0 ? (
+          <p className="mt-3 font-body text-sm text-[#1F3A59]/60">
+            Tidak ada foto yang menunggu verifikasi.
+          </p>
+        ) : (
+          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {pending.map((row) => (
+              <div key={row.id} className="rounded-xl border border-[#D0D0D0] bg-white p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={row.image_url}
+                  alt={row.caption ?? "Kiriman foto pengunjung"}
+                  className="aspect-[4/3] w-full rounded-md border border-[#EEEEEE] object-cover"
+                  loading="lazy"
+                />
+                <p className="mt-2 font-body text-xs text-[#2E2E2E]">
+                  {row.caption ?? <span className="text-[#5A5A5A]">Tanpa keterangan</span>}
+                </p>
+                <p className="mt-1 font-body text-[11px] text-[#5A5A5A]">
+                  Dari: {row.submitted_by ?? "Anonim"} ·{" "}
+                  {new Date(row.created_at).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
+                <p className="mt-0.5 font-body text-[11px] font-semibold text-[#93000A]">
+                  Terhapus otomatis dalam {sisaHari(row.created_at)} hari bila tidak diverifikasi
+                </p>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void handleApprove(row)}
+                    className="flex-1 rounded-md bg-[#31577F] px-2 py-1.5 font-body text-xs font-semibold text-white hover:bg-[#27466A] disabled:opacity-40"
+                  >
+                    Terima
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void handleReject(row)}
+                    className="rounded-md border border-[#FFDAD6] px-3 py-1.5 font-body text-xs font-semibold text-[#93000A] hover:bg-[#FFF4F3] disabled:opacity-50"
+                  >
+                    Tolak
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ── Foto galeri: dipisah antara upload admin & kiriman pengunjung ── */}
+      {(
+        [
+          {
+            judul: "Foto oleh Admin",
+            list: fotoAdmin,
+            kosong: "Belum ada foto. Klik “Upload Foto” untuk menambahkan.",
+          },
+          {
+            judul: "Foto dari Pengunjung",
+            list: fotoPengunjung,
+            kosong: "Belum ada kiriman pengunjung yang diterima.",
+          },
+        ] as const
+      ).map(({ judul, list, kosong }) => (
+        <section key={judul} aria-label={judul} className="flex flex-col gap-3">
+          <h2 className="font-body text-base font-bold text-[#2E2E2E]">
+            {judul} ({list.length})
+          </h2>
+          {list.length === 0 ? (
+            <p className="rounded-xl border border-[#D0D0D0] bg-white px-4 py-8 text-center font-body text-sm text-[#5A5A5A]">
+              {kosong}
+            </p>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {list.map((row) => (
+                <div key={row.id} className="rounded-xl border border-[#D0D0D0] bg-white p-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={row.image_url}
+                    alt={row.caption ?? "Foto galeri"}
+                    className="aspect-[4/3] w-full rounded-md border border-[#EEEEEE] object-cover"
+                    loading="lazy"
+                  />
+                  {row.file_id && (
+                    <p className="mt-1 font-body text-[11px] text-[#5A5A5A]">
+                      Dari: {row.submitted_by ?? "Anonim"}
+                    </p>
+                  )}
+                  <textarea
+                    rows={2}
+                    placeholder="Deskripsi singkat foto…"
+                    value={captions[row.id] ?? ""}
+                    onChange={(e) =>
+                      setCaptions((c) => ({ ...c, [row.id]: e.target.value }))
+                    }
+                    className="mt-2 w-full rounded-md border border-[#D0D0D0] px-2.5 py-1.5 font-body text-xs text-[#2E2E2E] outline-none focus:border-[#31577F]"
+                  />
+                  <div className="mt-2 flex gap-2">
+                    <button
+                      type="button"
+                      disabled={busy || (captions[row.id] ?? "") === (row.caption ?? "")}
+                      onClick={() => void handleSaveCaption(row)}
+                      className="flex-1 rounded-md border border-[#31577F] px-2 py-1.5 font-body text-xs font-semibold text-[#31577F] hover:bg-[#D9E4F1] disabled:opacity-40"
+                    >
+                      Simpan
+                    </button>
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => void handleDelete(row)}
+                      className="rounded-md border border-[#FFDAD6] px-3 py-1.5 font-body text-xs font-semibold text-[#93000A] hover:bg-[#FFF4F3] disabled:opacity-50"
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      ))}
     </div>
   );
 }

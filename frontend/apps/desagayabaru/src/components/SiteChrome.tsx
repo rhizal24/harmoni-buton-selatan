@@ -6,7 +6,7 @@ import { SmoothScroll } from "@/components/ui/SmoothScroll";
 
 /**
  * Chrome situs publik (smooth scroll + navbar).
- * Disembunyikan di area /admin — dashboard punya sidebar sendiri
+ * Disembunyikan di area /admin, dashboard punya sidebar sendiri
  * dan tidak boleh memakai smooth-scroll Lenis.
  */
 export function SiteChrome() {

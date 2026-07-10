@@ -7,7 +7,7 @@ import { loadAdminSession, signOutAdmin } from "@/lib/admin";
 import { SITE_NAME } from "@/lib/constants";
 
 /**
- * Halaman login admin — Supabase Auth (email + password).
+ * Halaman login admin, Supabase Auth (email + password).
  * Setelah kredensial valid, dicek juga bahwa akun terdaftar di
  * `admin_profiles` untuk desa ini; kalau bukan, sesi langsung ditutup.
  */
@@ -50,7 +50,7 @@ export default function AdminLoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#EEEEEE] px-5">
       <div className="w-full max-w-[400px] rounded-xl border border-[#D0D0D0] bg-white p-8">
-        <p className="font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#006572]">
+        <p className="font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#31577F]">
           Panel Admin
         </p>
         <h1 className="mt-2 font-body text-2xl font-bold text-[#2E2E2E]">{SITE_NAME}</h1>
@@ -67,7 +67,7 @@ export default function AdminLoginPage() {
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-11 rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20"
+              className="h-11 rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20"
             />
           </label>
 
@@ -79,7 +79,7 @@ export default function AdminLoginPage() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-11 rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#006572] focus:ring-2 focus:ring-[#006572]/20"
+              className="h-11 rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20"
             />
           </label>
 
@@ -95,7 +95,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={busy}
-            className="mt-1 h-11 rounded-md bg-[#006572] font-body text-sm font-semibold text-white motion-safe:transition-colors hover:bg-[#026F7D] disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-1 h-11 rounded-md bg-[#31577F] font-body text-sm font-semibold text-white motion-safe:transition-colors hover:bg-[#27466A] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {busy ? "Memproses…" : "Masuk"}
           </button>

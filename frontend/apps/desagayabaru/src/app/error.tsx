@@ -3,7 +3,7 @@
 import Link from "next/link";
 
 /**
- * Error Boundary — harus Client Component karena menggunakan useEffect & event
+ * Error Boundary, harus Client Component karena menggunakan useEffect & event
  * Menangkap runtime error di semua route
  */
 export default function ErrorPage({
