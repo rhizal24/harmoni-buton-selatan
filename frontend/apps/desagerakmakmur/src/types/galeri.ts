@@ -4,6 +4,6 @@
 export interface FotoGaleri {
   src: string;
   alt: string;
-  /** Ukuran tile bento; default "sm" (1×1). */
+  /** Ukuran tile masonry (rasio tinggi); default "sm" (4:3). */
   span?: "sm" | "md" | "lg";
 }
