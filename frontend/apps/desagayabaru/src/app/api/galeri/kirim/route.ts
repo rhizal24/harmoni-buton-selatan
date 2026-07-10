@@ -5,20 +5,20 @@ import { VILLAGE_SLUG } from "@/lib/desa";
 import type { VillageRow } from "@/lib/db-types";
 
 /**
- * POST /api/galeri/kirim — kiriman foto galeri dari WARGA (tanpa login).
+ * POST /api/galeri/kirim, kiriman foto galeri dari WARGA (tanpa login).
  *
  * Berbeda dengan /api/upload (khusus admin): endpoint ini publik, jadi
  * dijaga rate limit per IP + honeypot, hanya menerima gambar ≤ 5 MB, dan
  * row yang dibuat WAJIB berstatus 'pending' (dipaksa juga oleh RLS policy
- * "public submit pending gallery_images" — lihat
+ * "public submit pending gallery_images", lihat
  * docs/supabase-migration-galeri-kiriman.sql). Foto baru tampil di galeri
  * setelah admin memverifikasinya di /admin/galeri.
  *
- * Body: multipart/form-data — file (wajib), nama & keterangan (opsional),
+ * Body: multipart/form-data, file (wajib), nama & keterangan (opsional),
  * website (honeypot, wajib kosong).
  */
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB — lebih ketat dari admin
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB, lebih ketat dari admin
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
   "image/png",
@@ -31,7 +31,7 @@ const MAX_KETERANGAN = 200;
 /** Rate limit per IP: maksimal N kiriman per jendela waktu. */
 const RATE_LIMIT = 3;
 const RATE_WINDOW_MS = 10 * 60 * 1000; // 10 menit
-// In-memory — cukup untuk satu instance Next; reset saat server restart.
+// In-memory, cukup untuk satu instance Next; reset saat server restart.
 const submissions = new Map<string, number[]>();
 
 function isRateLimited(ip: string): boolean {
@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
     .trim()
     .slice(0, MAX_KETERANGAN);
 
-  // --- Cari desa (anon client — RLS berlaku) ---
+  // --- Cari desa (anon client, RLS berlaku) ---
   const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
