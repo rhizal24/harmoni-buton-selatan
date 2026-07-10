@@ -10,7 +10,16 @@ import { useAdmin } from "../admin-context";
  * CRUD Galeri — foto desa untuk section "Lensa" di beranda.
  * Upload multi-file ke ImageKit, caption (deskripsi singkat) bisa diedit
  * per foto, urutan mengikuti display_order (angka kecil tampil dulu).
+ *
+ * Kiriman warga (via /api/galeri/kirim) masuk berstatus 'pending' dan
+ * tampil di antrean "Menunggu Verifikasi": Terima → approved (tampil di
+ * galeri publik), Tolak → hapus. Lihat
+ * docs/supabase-migration-galeri-kiriman.sql.
  */
+
+/** Status default 'approved' — kompatibel sebelum migrasi kolom status. */
+const statusOf = (row: GalleryImageRow) => row.status ?? "approved";
+
 export default function AdminGaleriPage() {
   const admin = useAdmin();
   const [rows, setRows] = useState<GalleryImageRow[]>([]);
@@ -80,6 +89,45 @@ export default function AdminGaleriPage() {
     }
   }
 
+  /** Terima kiriman warga: status → approved, taruh di urutan paling akhir. */
+  async function handleApprove(row: GalleryImageRow) {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const approvedCount = rows.filter((r) => statusOf(r) === "approved").length;
+      const { error } = await getSupabase()
+        .from("gallery_images")
+        .update({ status: "approved", display_order: approvedCount })
+        .eq("id", row.id);
+      if (error) throw new Error(error.message);
+      setMsg({ kind: "ok", text: "Kiriman diterima — foto kini tampil di galeri." });
+      await refresh();
+    } catch (err) {
+      setMsg({ kind: "err", text: err instanceof Error ? err.message : "Gagal menerima kiriman." });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /** Tolak kiriman warga: hapus row.
+   * TODO(file): file ImageKit (row.file_id) belum ikut dihapus — sama
+   * dengan perilaku hapus foto admin; butuh endpoint delete berotorisasi. */
+  async function handleReject(row: GalleryImageRow) {
+    if (!window.confirm("Tolak dan hapus kiriman ini?")) return;
+    setBusy(true);
+    setMsg(null);
+    try {
+      const { error } = await getSupabase().from("gallery_images").delete().eq("id", row.id);
+      if (error) throw new Error(error.message);
+      setMsg({ kind: "ok", text: "Kiriman ditolak." });
+      await refresh();
+    } catch (err) {
+      setMsg({ kind: "err", text: err instanceof Error ? err.message : "Gagal menolak kiriman." });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleDelete(row: GalleryImageRow) {
     if (!window.confirm("Hapus foto ini dari galeri?")) return;
     setBusy(true);
@@ -95,6 +143,9 @@ export default function AdminGaleriPage() {
       setBusy(false);
     }
   }
+
+  const pending = rows.filter((r) => statusOf(r) === "pending");
+  const approved = rows.filter((r) => statusOf(r) === "approved");
 
   return (
     <div className="flex flex-col gap-6">
@@ -134,13 +185,71 @@ export default function AdminGaleriPage() {
         </p>
       )}
 
-      {rows.length === 0 ? (
+      {/* ── Antrean kiriman warga menunggu verifikasi ── */}
+      {pending.length > 0 && (
+        <section
+          aria-label="Kiriman menunggu verifikasi"
+          className="rounded-xl border border-[#CFF1F4] bg-[#EFFBFC] p-4"
+        >
+          <h2 className="font-body text-base font-bold text-[#00434B]">
+            Menunggu Verifikasi ({pending.length})
+          </h2>
+          <p className="mt-0.5 font-body text-xs text-[#00434B]/70">
+            Kiriman foto dari warga. Terima untuk menampilkannya di galeri,
+            atau tolak untuk menghapusnya.
+          </p>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {pending.map((row) => (
+              <div key={row.id} className="rounded-xl border border-[#D0D0D0] bg-white p-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={row.image_url}
+                  alt={row.caption ?? "Kiriman foto warga"}
+                  className="aspect-[4/3] w-full rounded-md border border-[#EEEEEE] object-cover"
+                  loading="lazy"
+                />
+                <p className="mt-2 font-body text-xs text-[#2E2E2E]">
+                  {row.caption ?? <span className="text-[#5A5A5A]">Tanpa keterangan</span>}
+                </p>
+                <p className="mt-1 font-body text-[11px] text-[#5A5A5A]">
+                  Dari: {row.submitted_by ?? "Anonim"} ·{" "}
+                  {new Date(row.created_at).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </p>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void handleApprove(row)}
+                    className="flex-1 rounded-md bg-[#006572] px-2 py-1.5 font-body text-xs font-semibold text-white hover:bg-[#026F7D] disabled:opacity-40"
+                  >
+                    Terima
+                  </button>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void handleReject(row)}
+                    className="rounded-md border border-[#FFDAD6] px-3 py-1.5 font-body text-xs font-semibold text-[#93000A] hover:bg-[#FFF4F3] disabled:opacity-50"
+                  >
+                    Tolak
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {approved.length === 0 ? (
         <p className="rounded-xl border border-[#D0D0D0] bg-white px-4 py-10 text-center font-body text-sm text-[#5A5A5A]">
           Belum ada foto. Klik “Upload Foto” untuk menambahkan.
         </p>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {rows.map((row) => (
+          {approved.map((row) => (
             <div key={row.id} className="rounded-xl border border-[#D0D0D0] bg-white p-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
