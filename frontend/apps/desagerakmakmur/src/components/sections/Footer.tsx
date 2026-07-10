@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   WhatsAppIcon,
   MailIcon,
@@ -7,17 +10,17 @@ import {
   FacebookIcon,
 } from "@/components/ui";
 
-/* ── Kolom navigasi (link internal) ───────────────────────────────── */
+/* ── Kolom navigasi (link internal) — mengikuti menu Navbar ─────────── */
 const NAV_COLS: {
   title: string;
-  links: { label: string; href: string; active?: boolean }[];
+  links: { label: string; href: string; exact?: boolean }[];
 }[] = [
   {
     title: "Jelajah",
     links: [
-      { label: "Beranda", href: "/", active: true },
-      { label: "Karamba", href: "/karamba" },
+      { label: "Beranda", href: "/", exact: true },
       { label: "Wisata", href: "/wisata" },
+      { label: "Peta Infografis", href: "/peta" },
       { label: "Galeri", href: "/galeri" },
     ],
   },
@@ -25,9 +28,7 @@ const NAV_COLS: {
     title: "Informasi",
     links: [
       { label: "Profil Desa", href: "/profil" },
-      { label: "Peta Infografis", href: "/peta" },
-      { label: "Berita", href: "/informasi/berita" },
-      { label: "UMKM", href: "/informasi/umkm" },
+      { label: "Berita & UMKM", href: "/informasi" },
     ],
   },
 ];
@@ -56,6 +57,8 @@ const SOSMED: { label: string; href: string; icon: React.ReactNode }[] = [
  * Tagline italik di tengah, divider, copyright. Background tosca solid.
  */
 export function Footer() {
+  const pathname = usePathname();
+
   return (
     <footer className="bg-[#006572] px-5 py-14 text-white sm:px-8 lg:px-16 lg:py-16">
       <div className="mx-auto flex w-full max-w-[1112px] flex-col gap-10">
@@ -87,17 +90,24 @@ export function Footer() {
                 <span className="font-body text-xl font-bold text-white">
                   {col.title}
                 </span>
-                {col.links.map((l) => (
-                  <Link
-                    key={l.label}
-                    href={l.href}
-                    className={`font-body text-sm no-underline motion-safe:transition-colors hover:text-white ${
-                      l.active ? "font-bold text-white" : "text-white/60"
-                    }`}
-                  >
-                    {l.label}
-                  </Link>
-                ))}
+                {col.links.map((l) => {
+                  // Tebal mengikuti halaman yang sedang dibuka (pola Navbar).
+                  const isActive = l.exact
+                    ? pathname === l.href
+                    : pathname.startsWith(l.href);
+                  return (
+                    <Link
+                      key={l.label}
+                      href={l.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={`font-body text-sm no-underline motion-safe:transition-colors hover:text-white ${
+                        isActive ? "font-bold text-white" : "text-white/60"
+                      }`}
+                    >
+                      {l.label}
+                    </Link>
+                  );
+                })}
               </nav>
             ))}
 
