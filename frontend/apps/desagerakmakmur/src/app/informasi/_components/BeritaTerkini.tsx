@@ -1,13 +1,17 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Reveal } from "@/components/ui/Reveal";
 import { Marquee, SearchIcon } from "@/components/ui";
 import { formatDate } from "@/lib/utils";
 import type { Article } from "@/types/article";
 import type { Umkm } from "@/types/umkm";
+
+gsap.registerPlugin(ScrollTrigger);
 
 /** Fallback cover saat artikel belum punya foto sampul. */
 const FALLBACK_COVER = "/images/hero-bg.jpg";
@@ -43,6 +47,8 @@ const blokVariants = {
  * item daftar / ticker mengganti isi panel tanpa pindah halaman. Route
  * detail `/informasi/berita/[slug]` tetap ada untuk tautan yang bisa
  * dibagikan. Di bawah lg daftar jadi kartu geser horizontal di atas panel.
+ * Header, toolbar, dan kolom konten masuk ber-stagger saat halaman dibuka
+ * (GSAP ScrollTrigger, pola HeroProfil) dengan guard reduced-motion.
  */
 export function BeritaTerkini({
   articles,
@@ -57,6 +63,52 @@ export function BeritaTerkini({
   const [halaman, setHalaman] = useState(1);
   const readerRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
+  const headerRef = useRef<HTMLDivElement>(null);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  const kontenRef = useRef<HTMLDivElement>(null);
+
+  // Animasi masuk saat halaman dibuka (GSAP ScrollTrigger, pola HeroProfil):
+  // header ber-stagger, toolbar menyusul, lalu kolom konten berurutan.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const ctx = gsap.context(() => {
+      const masuk = {
+        opacity: 0,
+        y: 28,
+        duration: 0.8,
+        ease: "power3.out",
+      } as const;
+
+      if (headerRef.current) {
+        gsap.from(headerRef.current.children, {
+          ...masuk,
+          stagger: 0.12,
+          scrollTrigger: { trigger: headerRef.current, start: "top 80%" },
+        });
+      }
+      if (toolbarRef.current) {
+        gsap.from(toolbarRef.current, {
+          ...masuk,
+          delay: 0.25,
+          scrollTrigger: { trigger: toolbarRef.current, start: "top 85%" },
+        });
+      }
+      if (kontenRef.current) {
+        gsap.from(kontenRef.current.children, {
+          ...masuk,
+          y: 36,
+          stagger: 0.15,
+          delay: 0.35,
+          scrollTrigger: { trigger: kontenRef.current, start: "top 85%" },
+        });
+      }
+    });
+
+    return () => ctx.revert();
+    // Jalankan sekali saat konten pertama tersedia.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [articles.length]);
 
   const q = query.trim().toLowerCase();
   const hasil = q
@@ -106,23 +158,21 @@ export function BeritaTerkini({
     >
       <div className="mx-auto flex w-full max-w-[1112px] flex-col gap-8">
         {/* Header editorial rata kiri — sekaligus pembuka halaman (tanpa
-            hero), pola sama dgn GaleriMasonry ber-header */}
-        <Reveal>
-          <div className="flex flex-col items-start gap-4">
-            <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#006572]">
-              <span className="h-[3px] w-[42px] bg-[#006572]" aria-hidden />
-              Kabar &amp; Karya Desa Gerak Makmur
-            </span>
-            <h1 className="font-body text-[clamp(2rem,4vw,3rem)] font-semibold text-[#006572]">
-              Berita Terkini
-            </h1>
-            <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#006572]/80">
-              Kabar terbaru seputar kegiatan, pembangunan, dan kehidupan warga
-              Desa Gerak Makmur — cari atau pilih judul, baca langsung di
-              halaman ini.
-            </p>
-          </div>
-        </Reveal>
+            hero), masuk ber-stagger via GSAP */}
+        <div ref={headerRef} className="flex flex-col items-start gap-4">
+          <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#006572]">
+            <span className="h-[3px] w-[42px] bg-[#006572]" aria-hidden />
+            Kabar &amp; Karya Desa Gerak Makmur
+          </span>
+          <h1 className="font-body text-[clamp(2rem,4vw,3rem)] font-semibold text-[#006572]">
+            Berita Terkini
+          </h1>
+          <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#006572]/80">
+            Kabar terbaru seputar kegiatan, pembangunan, dan kehidupan warga
+            Desa Gerak Makmur — cari atau pilih judul, baca langsung di
+            halaman ini.
+          </p>
+        </div>
 
         {articles.length === 0 ? (
           <Reveal>
@@ -137,7 +187,7 @@ export function BeritaTerkini({
           <>
             {/* ── Toolbar — ticker judul berjalan (kiri) + pencarian (kanan);
                    kolomnya mengikuti grid konten di bawah agar lurus ── */}
-            <Reveal>
+            <div ref={toolbarRef}>
               <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] lg:gap-8">
                 <Marquee
                   speed={0.4}
@@ -191,7 +241,7 @@ export function BeritaTerkini({
                   </button>
                 </p>
               )}
-            </Reveal>
+            </div>
 
             {!current ? (
               /* Pencarian tak menemukan apa pun */
@@ -205,8 +255,10 @@ export function BeritaTerkini({
                 </p>
               </div>
             ) : (
-              <Reveal>
-                <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]">
+              <div
+                ref={kontenRef}
+                className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]"
+              >
                   {/* ── Daftar berita — mobile: kartu geser horizontal ── */}
                   <nav
                     aria-label="Daftar berita"
@@ -485,8 +537,7 @@ export function BeritaTerkini({
                       </div>
                     </div>
                   </aside>
-                </div>
-              </Reveal>
+              </div>
             )}
           </>
         )}

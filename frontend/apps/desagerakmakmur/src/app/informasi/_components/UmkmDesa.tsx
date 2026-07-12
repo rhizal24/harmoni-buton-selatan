@@ -2,70 +2,100 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Reveal } from "@/components/ui/Reveal";
-import { MapPinIcon, Pagination, WhatsAppIcon } from "@/components/ui";
+import {
+  InstagramIcon,
+  MapPinIcon,
+  PhoneIcon,
+  TikTokIcon,
+  WhatsAppIcon,
+} from "@/components/ui";
 import type { Umkm } from "@/types/umkm";
 
+gsap.registerPlugin(ScrollTrigger);
+
+/** Ambil handle "@nama" dari URL profil sosmed untuk teks tautan. */
+function handleSosmed(url: string): string {
+  const segmen = url.split("/").filter(Boolean).pop() ?? url;
+  return segmen.startsWith("@") ? segmen : `@${segmen}`;
+}
+
+/** Varian stagger panel detail — tiap blok masuk berurutan (pola BeritaTerkini). */
+const panelVariants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08 } },
+};
+const blokVariants = {
+  hidden: { opacity: 0, y: 18 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const },
+  },
+};
+
 /**
- * UmkmDesa — etalase UMKM halaman Informasi, pola kartu produk/properti:
- * foto dengan badge kategori menindih tepi bawah, harga tebal tosca +
- * tombol WhatsApp bundar, nama, lokasi, dan footer jumlah produk. Deretan
- * kartu digeser horizontal (swipe, snap per kartu) dengan Pagination galeri
- * di bawahnya yang tersinkron posisi geser. Klik kartu membuka overlay
- * detail lengkap (pemilik, produk, harga, WA, toko daring). Data dari
- * `@/data/umkm` (artikel Supabase kategori `umkm`, fallback seed).
+ * UmkmDesa — etalase UMKM halaman Informasi, pola dua kolom BeritaTerkini
+ * dibalik: daftar teks bernomor tanpa gambar di KIRI (#1 nama + cuplikan
+ * deskripsi, semua usaha memanjang tanpa pagination) dan panel detail usaha
+ * terpilih di KANAN — nama di atas foto ber-scrim, lalu rata kiri pengelola,
+ * lokasi, deskripsi, produk, harga + aksi (WhatsApp, koordinat, telepon).
+ * Klik item daftar mengganti detail tanpa pindah halaman; di mobile daftar
+ * tampil di atas panel. Elemen section masuk ber-stagger saat di-scroll
+ * (GSAP ScrollTrigger, pola HeroProfil) dengan guard reduced-motion. Data
+ * dari `@/data/umkm` (artikel Supabase kategori `umkm`, fallback seed).
  */
 export function UmkmDesa({ umkm }: { umkm: Umkm[] }) {
-  const [aktif, setAktif] = useState<Umkm | null>(null);
-  const [halaman, setHalaman] = useState(1);
-  const [totalHalaman, setTotalHalaman] = useState(1);
-  const trackRef = useRef<HTMLDivElement>(null);
+  const [aktifIdx, setAktifIdx] = useState(0);
   const reduceMotion = useReducedMotion();
+  const headerRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLOListElement>(null);
+  const detailWrapRef = useRef<HTMLDivElement>(null);
 
-  // Sinkronkan pagination dengan posisi geser: satu "halaman" = satu lebar
-  // viewport deretan kartu.
+  const aktif = umkm[Math.min(aktifIdx, umkm.length - 1)];
+
+  // Animasi masuk saat di-scroll (GSAP ScrollTrigger, pola HeroProfil):
+  // header ber-stagger, item daftar berurutan, panel detail fade-up.
   useEffect(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    const update = () => {
-      const total = Math.max(1, Math.ceil(el.scrollWidth / el.clientWidth));
-      setTotalHalaman(total);
-      setHalaman(
-        Math.min(total, Math.round(el.scrollLeft / el.clientWidth) + 1),
-      );
-    };
-    update();
-    el.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      el.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, [umkm.length]);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-  const keHalaman = (p: number) => {
-    const el = trackRef.current;
-    if (!el) return;
-    el.scrollTo({
-      left: (p - 1) * el.clientWidth,
-      behavior: reduceMotion ? "auto" : "smooth",
+    const ctx = gsap.context(() => {
+      const masuk = {
+        opacity: 0,
+        y: 28,
+        duration: 0.8,
+        ease: "power3.out",
+      } as const;
+
+      if (headerRef.current) {
+        gsap.from(headerRef.current.children, {
+          ...masuk,
+          stagger: 0.12,
+          scrollTrigger: { trigger: headerRef.current, start: "top 80%" },
+        });
+      }
+      if (listRef.current) {
+        gsap.from(listRef.current.children, {
+          ...masuk,
+          y: 22,
+          duration: 0.6,
+          stagger: 0.08,
+          scrollTrigger: { trigger: listRef.current, start: "top 80%" },
+        });
+      }
+      if (detailWrapRef.current) {
+        gsap.from(detailWrapRef.current, {
+          ...masuk,
+          y: 36,
+          scrollTrigger: { trigger: detailWrapRef.current, start: "top 80%" },
+        });
+      }
     });
-  };
 
-  // Overlay terbuka: kunci scroll halaman + tutup dengan Esc.
-  useEffect(() => {
-    if (!aktif) return;
-    const sebelumnya = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setAktif(null);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = sebelumnya;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [aktif]);
+    return () => ctx.revert();
+  }, [umkm.length]);
 
   return (
     <section
@@ -74,25 +104,22 @@ export function UmkmDesa({ umkm }: { umkm: Umkm[] }) {
       className="scroll-mt-24 bg-[#f6fafb] px-5 py-16 sm:px-8 lg:py-24"
     >
       <div className="mx-auto flex w-full max-w-[1112px] flex-col gap-10">
-        {/* Header editorial rata kiri — pola sama dgn BeritaTerkini */}
-        <Reveal>
-          <div className="flex flex-col items-start gap-4">
-            <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#006572]">
-              <span className="h-[3px] w-[42px] bg-[#006572]" aria-hidden />
-              Karya Warga
-            </span>
-            <h2 className="font-body text-[clamp(2rem,4vw,3rem)] font-semibold text-[#006572]">
-              UMKM Desa
-            </h2>
-            <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#006572]/80">
-              Usaha mikro dan kecil warga Gerak Makmur — geser untuk
-              menjelajah, klik kartu untuk detail lengkap dan kontak
-              pemesanannya.
-            </p>
-          </div>
-        </Reveal>
+        {/* Header editorial rata kiri — masuk ber-stagger via GSAP */}
+        <div ref={headerRef} className="flex flex-col items-start gap-4">
+          <span className="flex items-center gap-3 font-body text-xs font-semibold uppercase tracking-[0.28em] text-[#006572]">
+            <span className="h-[3px] w-[42px] bg-[#006572]" aria-hidden />
+            Karya Warga
+          </span>
+          <h2 className="font-body text-[clamp(2rem,4vw,3rem)] font-semibold text-[#006572]">
+            UMKM Desa
+          </h2>
+          <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#006572]/80">
+            Usaha mikro dan kecil warga Gerak Makmur — pilih usaha dari daftar,
+            detail lengkap dan kontak pemesanannya tampil di sampingnya.
+          </p>
+        </div>
 
-        {umkm.length === 0 ? (
+        {umkm.length === 0 || !aktif ? (
           <Reveal>
             <div className="rounded-lg border border-dashed border-outline-variant bg-white px-6 py-14 text-center">
               <p className="font-body text-base text-on-surface-variant">
@@ -102,247 +129,242 @@ export function UmkmDesa({ umkm }: { umkm: Umkm[] }) {
             </div>
           </Reveal>
         ) : (
-          <Reveal>
-            {/* Deretan kartu — geser horizontal, snap per kartu, tanpa
-                scrollbar; bleed ke tepi layar agar terasa bisa digeser */}
-            <div
-              ref={trackRef}
-              className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 sm:-mx-8 sm:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            >
-              {umkm.map((usaha) => (
-                <div
-                  key={usaha.nama}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Lihat detail ${usaha.nama}`}
-                  onClick={() => setAktif(usaha)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      setAktif(usaha);
-                    }
-                  }}
-                  className="group flex w-[280px] shrink-0 cursor-pointer snap-start flex-col overflow-hidden rounded-lg border border-outline-variant bg-white text-left motion-safe:transition-[border-color,box-shadow,transform] motion-safe:duration-200 hover:-translate-y-1 hover:border-[#006572] hover:shadow-card-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006572]"
-                >
-                  {/* Foto + badge kategori menindih tepi bawah (ala "POPULAR") */}
-                  <div className="relative">
-                    <div className="overflow-hidden">
-                      <img
-                        src={usaha.foto}
-                        alt={`Produk ${usaha.nama}`}
-                        loading="lazy"
-                        className="aspect-[4/3] w-full object-cover motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-105"
-                      />
-                    </div>
-                    {usaha.kategori && (
-                      <span className="absolute bottom-0 left-4 translate-y-1/2 rounded-md bg-[#006572] px-3 py-1 font-body text-[11px] font-bold uppercase tracking-[0.08em] text-white">
-                        {usaha.kategori}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-1 flex-col gap-1.5 p-4 pt-6">
-                    {/* Harga tebal + aksi WhatsApp bundar (pola kartu properti) */}
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="font-body text-lg font-bold text-[#006572]">
-                        {usaha.harga ?? "Hubungi penjual"}
-                      </p>
-                      {usaha.wa && (
-                        <a
-                          href={`https://wa.me/${usaha.wa}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`WhatsApp ${usaha.nama}`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-outline-variant text-[#006572] motion-safe:transition-colors motion-safe:duration-200 hover:border-[#006572] hover:bg-[#006572]/10"
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,7fr)] lg:gap-10">
+            {/* ── Daftar kiri — teks bernomor tanpa gambar, pola daftar
+                     BeritaTerkini: #N nama + cuplikan deskripsi ── */}
+            <nav aria-label="Daftar UMKM">
+              <h3 className="font-body text-base font-bold text-[#006572]">
+                Daftar UMKM
+              </h3>
+              <ol ref={listRef} className="mt-4 flex flex-col gap-4">
+                {umkm.map((usaha, idx) => {
+                  const isActive = idx === aktifIdx;
+                  return (
+                    <li key={usaha.nama}>
+                      <button
+                        type="button"
+                        onClick={() => setAktifIdx(idx)}
+                        aria-current={isActive ? "true" : undefined}
+                        className="group flex w-full cursor-pointer gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006572]"
+                      >
+                        <span
+                          className={`shrink-0 font-body text-sm font-semibold ${
+                            isActive
+                              ? "text-[#006572]"
+                              : "text-on-surface-variant/60"
+                          }`}
                         >
-                          <WhatsAppIcon className="h-4 w-4" />
+                          #{idx + 1}
+                        </span>
+                        <span className="flex min-w-0 flex-col gap-0.5">
+                          <span
+                            className={`line-clamp-1 font-body text-sm font-bold leading-snug motion-safe:transition-colors motion-safe:duration-150 ${
+                              isActive
+                                ? "text-[#006572]"
+                                : "text-on-surface group-hover:text-[#006572]"
+                            }`}
+                          >
+                            {usaha.nama}
+                          </span>
+                          <span className="line-clamp-1 font-body text-xs text-on-surface-variant">
+                            {usaha.deskripsi}
+                          </span>
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </nav>
+
+            {/* ── Panel detail kanan — nama di atas foto ber-scrim lalu
+                     isi rata kiri (desain sebelumnya) ── */}
+            <div ref={detailWrapRef}>
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.article
+                  key={aktif.nama}
+                  variants={reduceMotion ? undefined : panelVariants}
+                  initial={reduceMotion ? false : "hidden"}
+                  animate="show"
+                  exit={
+                    reduceMotion
+                      ? undefined
+                      : { opacity: 0, transition: { duration: 0.15 } }
+                  }
+                  className="flex flex-col"
+                >
+                  {/* Headline — nama usaha di atas foto, ala panel berita */}
+                  <motion.div
+                    variants={reduceMotion ? undefined : blokVariants}
+                    className="group relative overflow-hidden rounded-lg"
+                  >
+                    <img
+                      src={aktif.foto}
+                      alt={`Produk ${aktif.nama}`}
+                      className="aspect-video w-full object-cover motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-105"
+                    />
+                    <div
+                      className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+                      aria-hidden
+                    />
+                    <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5 sm:p-7">
+                      <div className="flex flex-wrap items-center gap-2">
+                        {aktif.kategori && (
+                          <span className="rounded-full bg-[#006572] px-3 py-1 font-body text-xs font-semibold text-white">
+                            {aktif.kategori}
+                          </span>
+                        )}
+                        <span className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
+                          Karya Warga
+                        </span>
+                      </div>
+                      <h3 className="max-w-[36rem] font-body text-xl font-bold leading-snug text-white sm:text-2xl lg:text-3xl">
+                        {aktif.nama}
+                      </h3>
+                    </div>
+                  </motion.div>
+
+                  {/* Isi — satu kolom rata kiri, tanpa kartu/kotak */}
+                  <div className="flex flex-col gap-5 pt-6">
+                    {/* Pengelola & lokasi — highlight besar, polos */}
+                    <motion.div
+                      variants={reduceMotion ? undefined : blokVariants}
+                      className="flex flex-wrap gap-x-14 gap-y-4"
+                    >
+                      <div className="flex flex-col gap-1">
+                        <span className="font-body text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
+                          Dikelola Oleh
+                        </span>
+                        <p className="font-body text-lg font-bold leading-snug text-[#006572] sm:text-xl">
+                          {aktif.pemilik ?? "UMKM warga"}
+                        </p>
+                      </div>
+                      {aktif.lokasi && (
+                        <div className="flex flex-col gap-1">
+                          <span className="font-body text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
+                            Lokasi
+                          </span>
+                          <p className="flex items-start gap-2 font-body text-lg font-bold leading-snug text-on-surface sm:text-xl">
+                            <MapPinIcon className="mt-1.5 h-4 w-4 shrink-0 text-[#006572]" />
+                            {aktif.lokasi}
+                          </p>
+                        </div>
+                      )}
+                    </motion.div>
+
+                    <motion.p
+                      variants={reduceMotion ? undefined : blokVariants}
+                      className="max-w-[46rem] border-l-2 border-[#006572] pl-4 font-body text-base leading-relaxed text-on-surface-variant lg:text-lg"
+                    >
+                      {aktif.deskripsi}
+                    </motion.p>
+
+                    {/* Kisaran harga — di bawah deskripsi */}
+                    <motion.div
+                      variants={reduceMotion ? undefined : blokVariants}
+                      className="flex flex-col gap-1"
+                    >
+                      <span className="font-body text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
+                        Kisaran Harga
+                      </span>
+                      <p className="font-body text-2xl font-bold text-[#006572]">
+                        {aktif.harga ?? "Hubungi penjual"}
+                      </p>
+                    </motion.div>
+
+                    {aktif.produk && aktif.produk.length > 0 && (
+                      <motion.div
+                        variants={reduceMotion ? undefined : blokVariants}
+                        className="flex flex-col gap-3 border-t border-outline-variant pt-5"
+                      >
+                        <span className="font-body text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
+                          Produk Unggulan
+                        </span>
+                        <ul className="flex flex-wrap gap-2">
+                          {aktif.produk.map((p) => (
+                            <li
+                              key={p}
+                              className="rounded-full bg-[#006572]/10 px-3 py-1 font-body text-xs font-semibold text-[#006572]"
+                            >
+                              {p}
+                            </li>
+                          ))}
+                        </ul>
+                      </motion.div>
+                    )}
+
+                    {/* Ajakan & aksi — kalimat minat, telepon ber-ikon,
+                        lalu tombol Pesan via WA + Buka Lokasi di Gmaps */}
+                    <motion.div
+                      variants={reduceMotion ? undefined : blokVariants}
+                      className="flex flex-col items-start gap-3 border-t border-outline-variant pt-5"
+                    >
+                      <p className="font-body text-base font-semibold text-on-surface">
+                        Berminat? Hubungi langsung pelaku usahanya — sebutkan
+                        produk yang kamu mau.
+                      </p>
+                      {aktif.wa && (
+                        <a
+                          href={`tel:+${aktif.wa}`}
+                          className="inline-flex items-center gap-2 font-body text-lg font-bold text-[#006572] no-underline hover:underline"
+                        >
+                          <PhoneIcon className="h-5 w-5 shrink-0" />+{aktif.wa}
                         </a>
                       )}
-                    </div>
-
-                    <h3 className="line-clamp-1 font-body text-base font-bold text-on-surface">
-                      {usaha.nama}
-                    </h3>
-
-                    {usaha.lokasi && (
-                      <p className="flex items-center gap-1.5 font-body text-xs text-on-surface-variant">
-                        <MapPinIcon className="h-3.5 w-3.5 shrink-0 text-[#006572]" />
-                        <span className="line-clamp-1">{usaha.lokasi}</span>
-                      </p>
-                    )}
-
-                    {/* Footer spesifikasi — dipisah hairline (pola referensi) */}
-                    <div className="mt-auto flex items-center justify-between border-t border-outline-variant pt-3 font-body text-xs font-semibold text-on-surface-variant">
-                      <span>
-                        {usaha.produk?.length
-                          ? `${usaha.produk.length} produk unggulan`
-                          : (usaha.pemilik ?? "UMKM warga")}
-                      </span>
-                      <span className="text-[#006572]">
-                        Detail{" "}
-                        <span
-                          aria-hidden
-                          className="inline-block motion-safe:transition-transform motion-safe:duration-200 group-hover:translate-x-1"
+                      {aktif.instagram && (
+                        <a
+                          href={aktif.instagram}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 font-body text-lg font-bold text-[#006572] no-underline hover:underline"
                         >
-                          →
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Pagination — sinkron dengan posisi geser (komponen galeri) */}
-            {totalHalaman > 1 && (
-              <Pagination
-                page={halaman}
-                count={totalHalaman}
-                onChange={keHalaman}
-                className="mt-6"
-              />
-            )}
-          </Reveal>
-        )}
-      </div>
-
-      {/* ── Overlay detail UMKM ── */}
-      <AnimatePresence>
-        {aktif && (
-          <motion.div
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-            onClick={() => setAktif(null)}
-          >
-            <motion.div
-              role="dialog"
-              aria-modal="true"
-              aria-label={`Detail ${aktif.nama}`}
-              initial={reduceMotion ? false : { opacity: 0, y: 24, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={reduceMotion ? undefined : { opacity: 0, y: 16, scale: 0.98 }}
-              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative grid max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white md:grid-cols-[5fr_6fr]"
-            >
-              <button
-                type="button"
-                aria-label="Tutup detail"
-                onClick={() => setAktif(null)}
-                className="absolute right-3 top-3 z-10 grid h-9 w-9 cursor-pointer place-items-center rounded-full bg-white/90 font-body text-base font-bold text-on-surface shadow-sm hover:bg-white"
-              >
-                <span aria-hidden>✕</span>
-              </button>
-
-              <img
-                src={aktif.foto}
-                alt={`Produk ${aktif.nama}`}
-                className="aspect-video w-full object-cover md:aspect-auto md:h-full"
-              />
-
-              <div className="flex flex-col gap-4 p-6 md:p-7">
-                <div className="flex flex-col gap-1.5">
-                  {aktif.kategori && (
-                    <span className="self-start rounded-full bg-[#006572]/10 px-3 py-1 font-body text-xs font-semibold text-[#006572]">
-                      {aktif.kategori}
-                    </span>
-                  )}
-                  <h3 className="font-body text-2xl font-bold leading-snug text-on-surface">
-                    {aktif.nama}
-                  </h3>
-                  {aktif.pemilik && (
-                    <p className="font-body text-xs font-semibold text-on-surface-variant">
-                      oleh {aktif.pemilik}
-                    </p>
-                  )}
-                </div>
-
-                <p className="font-body text-sm leading-relaxed text-on-surface">
-                  {aktif.deskripsi}
-                </p>
-
-                {aktif.lokasi && (
-                  <p className="flex items-start gap-2 font-body text-sm text-on-surface-variant">
-                    <MapPinIcon className="mt-0.5 h-4 w-4 shrink-0 text-[#006572]" />
-                    <span>
-                      {aktif.lokasi}
-                      {aktif.mapsUrl && (
-                        <>
-                          {" · "}
+                          <InstagramIcon className="h-5 w-5 shrink-0" />
+                          {handleSosmed(aktif.instagram)}
+                        </a>
+                      )}
+                      {aktif.tiktok && (
+                        <a
+                          href={aktif.tiktok}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 font-body text-lg font-bold text-[#006572] no-underline hover:underline"
+                        >
+                          <TikTokIcon className="h-5 w-5 shrink-0" />
+                          {handleSosmed(aktif.tiktok)}
+                        </a>
+                      )}
+                      <div className="flex flex-wrap gap-3 pt-1">
+                        {aktif.wa && (
+                          <a
+                            href={`https://wa.me/${aktif.wa}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#006572] px-5 py-2 font-body text-sm font-semibold text-white no-underline motion-safe:transition-colors motion-safe:duration-200 hover:bg-[#00525c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006572]"
+                          >
+                            <WhatsAppIcon className="h-4 w-4" />
+                            Pesan via WhatsApp
+                          </a>
+                        )}
+                        {aktif.mapsUrl && (
                           <a
                             href={aktif.mapsUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-semibold text-[#006572] hover:underline"
+                            className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#006572]/10 px-5 py-2 font-body text-sm font-semibold text-[#006572] no-underline motion-safe:transition-colors motion-safe:duration-200 hover:bg-[#006572]/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006572]"
                           >
-                            Buka peta
+                            <MapPinIcon className="h-4 w-4" />
+                            Buka Lokasi di Gmaps
                           </a>
-                        </>
-                      )}
-                    </span>
-                  </p>
-                )}
-
-                {aktif.produk && aktif.produk.length > 0 && (
-                  <div className="flex flex-col gap-2">
-                    <span className="font-body text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
-                      Produk Unggulan
-                    </span>
-                    <ul className="flex flex-wrap gap-2">
-                      {aktif.produk.map((p) => (
-                        <li
-                          key={p}
-                          className="rounded-full bg-[#006572]/10 px-3 py-1 font-body text-xs font-semibold text-[#006572]"
-                        >
-                          {p}
-                        </li>
-                      ))}
-                    </ul>
+                        )}
+                      </div>
+                    </motion.div>
                   </div>
-                )}
-
-                {aktif.harga && (
-                  <p className="font-body text-sm text-on-surface-variant">
-                    Kisaran harga{" "}
-                    <span className="font-bold text-[#006572]">
-                      {aktif.harga}
-                    </span>
-                  </p>
-                )}
-
-                <div className="mt-auto flex flex-wrap gap-3 pt-2">
-                  {aktif.wa && (
-                    <a
-                      href={`https://wa.me/${aktif.wa}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[#006572] px-5 py-2 font-body text-sm font-semibold text-white no-underline motion-safe:transition-colors motion-safe:duration-200 hover:bg-[#00525c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006572]"
-                    >
-                      <WhatsAppIcon className="h-4 w-4" />
-                      Pesan via WhatsApp
-                    </a>
-                  )}
-                  {aktif.olshop && (
-                    <a
-                      href={aktif.olshop.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex min-h-11 items-center gap-2 rounded-md border-[1.5px] border-[#006572] px-5 py-2 font-body text-sm font-semibold text-[#006572] no-underline motion-safe:transition-colors motion-safe:duration-200 hover:bg-[#006572]/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#006572]"
-                    >
-                      Belanja di {aktif.olshop.label}{" "}
-                      <span aria-hidden>↗</span>
-                    </a>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
+                </motion.article>
+              </AnimatePresence>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
     </section>
   );
 }
