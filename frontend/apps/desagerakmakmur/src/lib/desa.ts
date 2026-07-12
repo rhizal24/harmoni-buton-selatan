@@ -5,6 +5,7 @@
  */
 import { getSupabase } from "./supabase";
 import type {
+  UmkmRow,
   ArticleRow,
   GalleryImageRow,
   OrganizationStructureRow,
@@ -136,4 +137,17 @@ export async function getPopulationData(year?: number): Promise<PopulationDataRo
   const { data, error } = await query;
   if (error) throw new Error(`Gagal memuat population_data: ${error.message}`);
   return (data ?? []) as PopulationDataRow[];
+}
+
+export async function getUmkmRows(): Promise<UmkmRow[]> {
+  const villageId = await requireVillageId();
+  if (!villageId) return [];
+  const { data, error } = await getSupabase()
+    .from("umkm")
+    .select("*")
+    .eq("village_id", villageId)
+    .eq("is_published", true)
+    .order("display_order", { ascending: true });
+  if (error) throw new Error(`Gagal memuat umkm: ${error.message}`);
+  return (data ?? []) as UmkmRow[];
 }

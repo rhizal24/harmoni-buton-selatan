@@ -25,7 +25,7 @@ const NAV_COLS: {
     links: [
       { label: "Profil Desa", href: "/profil" },
       { label: "Peta Infografis", href: "/peta" },
-      { label: "Berita", href: "/informasi/berita" },
+      { label: "Berita", href: "/informasi" },
     ],
   },
 ];
