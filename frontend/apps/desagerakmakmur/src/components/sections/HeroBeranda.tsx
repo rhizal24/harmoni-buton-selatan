@@ -65,7 +65,7 @@ export function HeroBeranda() {
             Jelajahi Karamba
           </Link>
           <Link
-            href="/informasi/umkm"
+            href="/informasi#umkm-desa"
             className="inline-flex items-center rounded-md bg-[#ae263a] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 active:translate-y-0 hover:[filter:drop-shadow(0_0_16px_rgba(174,38,58,0.55))_drop-shadow(0_0_44px_rgba(174,38,58,0.30))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
           >
             Lihat UMKM

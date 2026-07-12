@@ -183,3 +183,25 @@ export interface GalleryImageRow {
   /** Ukuran file (KB), kiriman warga; untuk kuota 500 MB. */
   file_size_kb?: number | null;
 }
+
+/** UMKM usaha warga — lihat docs/supabase-migration-umkm.sql. */
+export interface UmkmRow {
+  id: string;
+  village_id: string;
+  nama: string;
+  deskripsi: string | null;
+  foto_url: string | null;
+  kategori: string | null;
+  pemilik: string | null;
+  lokasi: string | null;
+  maps_url: string | null;
+  wa: string | null;
+  instagram_url: string | null;
+  tiktok_url: string | null;
+  produk: string[];
+  harga_label: string | null;
+  display_order: number;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+}
