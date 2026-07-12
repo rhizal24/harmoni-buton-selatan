@@ -19,6 +19,10 @@ export interface Umkm {
   mapsUrl?: string;
   /** Nomor WhatsApp (wa.me), tanpa "+"/spasi. Opsional. */
   wa?: string;
+  /** Link profil Instagram usaha. Opsional. */
+  instagram?: string;
+  /** Link profil TikTok usaha. Opsional. */
+  tiktok?: string;
   /** Toko daring (Shopee/Tokopedia/dsb). Opsional. */
   olshop?: { label: string; url: string };
   /** Produk unggulan untuk ditampilkan sebagai chip di detail. Opsional. */

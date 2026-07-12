@@ -9,19 +9,23 @@ interface MarqueeProps {
   speed?: number;
   /** Kelas jarak antar item (padding kanan tiap item), mis. "pr-6" */
   itemClassName?: string;
+  /** Jeda gerak otomatis selama pointer berada di atas pita. */
+  pauseOnHover?: boolean;
   className?: string;
 }
 
 /**
  * Marquee — satu baris berjalan otomatis kiri→kanan tanpa henti (infinite,
  * via transform + GSAP ticker) dengan tepi fade. Auto TIDAK berhenti saat
- * diinteraksi; pengguna hanya menggeser posisinya (drag pointer) sambil pita
- * tetap jalan. Item digandakan agar loop mulus. Hormati reduced-motion.
+ * diinteraksi (kecuali `pauseOnHover`); pengguna hanya menggeser posisinya
+ * (drag pointer) sambil pita tetap jalan. Item digandakan agar loop mulus.
+ * Hormati reduced-motion.
  */
 export function Marquee({
   children,
   speed = 0.5,
   itemClassName = "pr-6",
+  pauseOnHover = false,
   className = "",
 }: MarqueeProps) {
   const track = useRef<HTMLDivElement>(null);
@@ -65,6 +69,15 @@ export function Marquee({
     el.addEventListener("pointerup", onUp);
     el.addEventListener("pointercancel", onUp);
 
+    // Jeda saat hover (opsional) — hanya menahan gerak otomatis, drag tetap
+    let hovered = false;
+    const onEnter = () => (hovered = true);
+    const onLeave = () => (hovered = false);
+    if (pauseOnHover) {
+      el.addEventListener("pointerenter", onEnter);
+      el.addEventListener("pointerleave", onLeave);
+    }
+
     const onResize = () => {
       half = el.scrollWidth / 2;
     };
@@ -72,6 +85,7 @@ export function Marquee({
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const tick = () => {
+      if (hovered) return;
       x += speed; // konten bergerak ke kanan, terus-menerus
       apply();
     };
@@ -83,9 +97,13 @@ export function Marquee({
       el.removeEventListener("pointermove", onMove);
       el.removeEventListener("pointerup", onUp);
       el.removeEventListener("pointercancel", onUp);
+      if (pauseOnHover) {
+        el.removeEventListener("pointerenter", onEnter);
+        el.removeEventListener("pointerleave", onLeave);
+      }
       window.removeEventListener("resize", onResize);
     };
-  }, [speed]);
+  }, [speed, pauseOnHover]);
 
   return (
     <div
