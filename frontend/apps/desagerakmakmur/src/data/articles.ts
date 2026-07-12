@@ -1,69 +1,68 @@
 import { cache } from "react";
-import { apiFetch } from "@/lib/api/http";
-import { VILLAGE, DEFAULT_REVALIDATE } from "@/lib/api/config";
+import {
+  getPublishedArticles,
+  getArticleBySlug as getRowBySlug,
+} from "@/lib/desa";
+import type { ArticleRow } from "@/lib/db-types";
 import type { Article } from "@/types/article";
+import { ARTIKEL_SEED } from "./seeds/articles";
 
 /**
- * Data-access Berita/Artikel — LIVE dari backend (tabel `articles`).
+ * Data-access Artikel — LIVE dari Supabase (tabel `articles`, RLS hanya
+ * meloloskan baris published). Satu tabel menampung dua jenis konten yang
+ * dikelola dashboard admin: kategori `berita` (halaman Informasi § Berita)
+ * dan `umkm` (profil usaha warga).
  *
- * Endpoint publik hanya mengembalikan artikel `published`, di-scope per desa:
- *   GET /villages/:village/articles          → { articles: ArticleRow[] }
- *   GET /villages/:village/articles/:slug     → { article: ArticleRow }
+ * Berita punya fallback SEED dummy selama tabel masih kosong / Supabase tak
+ * terjangkau (pola `lib/konten.ts`) — otomatis tergantikan begitu admin
+ * menerbitkan berita asli.
  *
- * Semua fungsi dibungkus `React.cache` → memoize per-request (satu render tidak
- * memanggil endpoint yang sama dua kali).
+ * Semua fungsi dibungkus `React.cache` → memoize per-request (satu render
+ * tidak menjalankan query yang sama dua kali).
  */
 
-/** Bentuk mentah baris dari API (snake_case, sesuai kolom Postgres). */
-export interface ArticleRow {
-  id: number;
-  village: string;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string | null;
-  cover_image_url: string | null;
-  published: boolean;
-  author_id: number | null;
-  created_at: string;
-  updated_at: string;
-}
-
-/** Petakan baris API (snake_case) → tipe aplikasi (camelCase). */
+/** Petakan baris Supabase (snake_case) → tipe aplikasi (camelCase). */
 export function toArticle(row: ArticleRow): Article {
   return {
     id: row.id,
-    village: row.village,
     title: row.title,
     slug: row.slug,
     content: row.content,
     excerpt: row.excerpt,
     coverImageUrl: row.cover_image_url,
-    published: row.published,
-    authorId: row.author_id,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
+    category: row.category,
+    publishedAt: row.published_at ?? row.created_at,
   };
 }
 
-/** Semua artikel terbit untuk desa ini, terbaru dulu. */
+/** Berita terbit untuk desa ini, terbaru dulu; SEED bila belum ada. */
 export const getArticles = cache(async (): Promise<Article[]> => {
-  const { articles } = await apiFetch<{ articles: ArticleRow[] }>(
-    `/villages/${VILLAGE}/articles`,
-    { revalidate: DEFAULT_REVALIDATE },
-  );
-  return articles.map(toArticle);
-});
-
-/** Satu artikel terbit berdasarkan slug; `null` jika tidak ada. */
-export const getArticleBySlug = cache(async (slug: string): Promise<Article | null> => {
   try {
-    const { article } = await apiFetch<{ article: ArticleRow }>(
-      `/villages/${VILLAGE}/articles/${slug}`,
-      { revalidate: DEFAULT_REVALIDATE },
-    );
-    return toArticle(article);
+    const rows = await getPublishedArticles();
+    const berita = rows
+      .filter((row) => row.category === "berita")
+      .map(toArticle);
+    return berita.length > 0 ? berita : ARTIKEL_SEED;
   } catch {
-    return null;
+    return ARTIKEL_SEED;
   }
 });
+
+/** Artikel UMKM terbit (profil usaha warga), terbaru dulu. */
+export const getUmkmArticles = cache(async (): Promise<Article[]> => {
+  const rows = await getPublishedArticles();
+  return rows.filter((row) => row.category === "umkm").map(toArticle);
+});
+
+/** Satu artikel terbit berdasarkan slug; cek SEED juga; `null` jika tidak ada. */
+export const getArticleBySlug = cache(
+  async (slug: string): Promise<Article | null> => {
+    try {
+      const row = await getRowBySlug(slug);
+      if (row) return toArticle(row);
+    } catch {
+      /* Supabase tak terjangkau — coba seed di bawah */
+    }
+    return ARTIKEL_SEED.find((a) => a.slug === slug) ?? null;
+  },
+);

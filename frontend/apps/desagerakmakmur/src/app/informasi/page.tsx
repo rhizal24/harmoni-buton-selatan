@@ -1,37 +1,40 @@
 import type { Metadata } from "next";
 import { Footer } from "@/components/sections";
+import { BeritaTerkini } from "./_components/BeritaTerkini";
+import { UmkmDesa } from "./_components/UmkmDesa";
+import { getArticles } from "@/data/articles";
+import { getUmkm } from "@/data/umkm";
 
 export const metadata: Metadata = {
   title: "Informasi",
   description:
-    "Berita dan UMKM Desa Gerak Makmur, Buton Selatan.",
+    "Berita terkini dan UMKM Desa Gerak Makmur, Buton Selatan — kabar kegiatan desa dan usaha warga dalam satu halaman.",
 };
 
 /**
- * Halaman Informasi — PLACEHOLDER sementara.
- * Dibuat agar link "Informasi" di navbar (pengganti dropdown Berita/UMKM)
- * tidak 404; konten Berita & UMKM menyusul saat development halamannya.
+ * Halaman Informasi — Server Component (App Router). Gabungan dua konten
+ * dari tabel Supabase `articles` (dikelola dashboard admin): Berita Terkini
+ * (kategori `berita`) dan sorotan UMKM (kategori `umkm`, fallback seed saat
+ * kosong). Section route-spesifik dicolocate di `./_components`; Navbar
+ * sudah dirender di root layout.
  */
-export default function InformasiPage() {
+// ISR — konten Supabase disegarkan tiap 5 menit.
+export const revalidate = 300;
+
+export default async function InformasiPage() {
+  // Berita tidak boleh merobohkan halaman saat Supabase tak terjangkau —
+  // fallback [] → BeritaTerkini menampilkan pesan kosong yang ramah.
+  const [articles, umkm] = await Promise.all([
+    getArticles().catch(() => []),
+    getUmkm(),
+  ]);
+
   return (
     <main>
-      <section
-        aria-label="Informasi Desa Gerak Makmur"
-        className="flex min-h-[70vh] items-center bg-surface px-5 pt-32 pb-16 sm:px-8"
-      >
-        <div className="mx-auto w-full max-w-[1112px]">
-          <p className="font-body text-xs font-semibold uppercase tracking-[0.28em] text-on-surface-variant md:text-sm">
-            Informasi Desa
-          </p>
-          <h1 className="mt-3 font-display text-[clamp(2rem,4vw,2.75rem)] font-semibold text-primary">
-            Berita &amp; UMKM
-          </h1>
-          <p className="mt-4 max-w-[640px] font-body text-base leading-relaxed text-on-surface-variant">
-            Halaman ini masih dalam pengembangan. Kabar terbaru dan profil UMKM
-            Desa Gerak Makmur akan tampil di sini.
-          </p>
-        </div>
-      </section>
+      {/* Tanpa hero — header editorial BeritaTerkini jadi pembuka halaman
+          (pola Galeri) agar konten langsung terlihat tanpa scroll ekstra. */}
+      <BeritaTerkini articles={articles} umkm={umkm} />
+      <UmkmDesa umkm={umkm} />
       <Footer />
     </main>
   );
