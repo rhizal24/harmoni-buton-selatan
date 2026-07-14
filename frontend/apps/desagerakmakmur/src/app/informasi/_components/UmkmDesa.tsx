@@ -86,9 +86,14 @@ export function UmkmDesa({ umkm }: { umkm: Umkm[] }) {
         });
       }
       if (detailWrapRef.current) {
-        gsap.from(detailWrapRef.current, {
+        // Per-komponen: foto headline lalu tiap blok isi berurutan
+        const blok = detailWrapRef.current.querySelectorAll(
+          ":scope article > div:first-child, :scope article > div:last-child > *",
+        );
+        gsap.from(blok, {
           ...masuk,
-          y: 36,
+          y: 26,
+          stagger: 0.1,
           scrollTrigger: { trigger: detailWrapRef.current, start: "top 80%" },
         });
       }

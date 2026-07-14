@@ -95,13 +95,50 @@ export function BeritaTerkini({
         });
       }
       if (kontenRef.current) {
-        gsap.from(kontenRef.current.children, {
-          ...masuk,
-          y: 36,
-          stagger: 0.15,
-          delay: 0.35,
-          scrollTrigger: { trigger: kontenRef.current, start: "top 85%" },
-        });
+        const konten = kontenRef.current;
+        const trigger = { trigger: konten, start: "top 85%" } as const;
+
+        // Kartu daftar geser (mobile) — masuk berurutan
+        const kartuMobile = konten.querySelectorAll(":scope > nav > *");
+        if (kartuMobile.length) {
+          gsap.from(kartuMobile, {
+            ...masuk,
+            y: 22,
+            duration: 0.6,
+            stagger: 0.06,
+            delay: 0.2,
+            scrollTrigger: trigger,
+          });
+        }
+
+        // Panel baca — foto headline lalu tiap blok isi berurutan
+        const blokBaca = konten.querySelectorAll(
+          ":scope article > div:first-child, :scope article > div:last-child > *",
+        );
+        if (blokBaca.length) {
+          gsap.from(blokBaca, {
+            ...masuk,
+            y: 26,
+            stagger: 0.1,
+            delay: 0.2,
+            scrollTrigger: trigger,
+          });
+        }
+
+        // Kolom kanan — judul, tiap item daftar, lalu blok pengisi berurutan
+        const blokAside = konten.querySelectorAll(
+          ":scope aside > nav > h3, :scope aside > nav > ol > li, :scope aside > nav > div, :scope aside > div",
+        );
+        if (blokAside.length) {
+          gsap.from(blokAside, {
+            ...masuk,
+            y: 22,
+            duration: 0.6,
+            stagger: 0.07,
+            delay: 0.3,
+            scrollTrigger: trigger,
+          });
+        }
       }
     });
 
