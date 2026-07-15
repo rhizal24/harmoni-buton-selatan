@@ -24,6 +24,8 @@ export const getUmkm = cache(async (): Promise<Umkm[]> => {
       pemilik: row.pemilik ?? undefined,
       lokasi: row.lokasi ?? undefined,
       mapsUrl: row.maps_url ?? undefined,
+      latitude: row.latitude,
+      longitude: row.longitude,
       wa: row.wa ?? undefined,
       instagram: row.instagram_url ?? undefined,
       tiktok: row.tiktok_url ?? undefined,

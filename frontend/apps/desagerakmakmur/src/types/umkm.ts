@@ -17,6 +17,9 @@ export interface Umkm {
   lokasi?: string;
   /** Link Google Maps ke lokasi usaha. Opsional. */
   mapsUrl?: string;
+  /** Koordinat titik lokasi — dipakai marker di peta WebGIS (/peta). */
+  latitude?: number | null;
+  longitude?: number | null;
   /** Nomor WhatsApp (wa.me), tanpa "+"/spasi. Opsional. */
   wa?: string;
   /** Link profil Instagram usaha. Opsional. */

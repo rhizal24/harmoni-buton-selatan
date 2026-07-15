@@ -27,6 +27,19 @@ export interface VillageRow {
   about: string | null;
   vision: string | null;
   missions: string[];
+  /** Foto hero per halaman — lihat docs/supabase-migration-hero.sql.
+   *  null = pakai foto default bawaan (/images/*.jpg). */
+  hero_beranda_url: string | null;
+  hero_wisata_url: string | null;
+  hero_profil_url: string | null;
+  /** Gambar peta statis /peta — lihat docs/supabase-migration-peta.sql. */
+  peta_wisata_url: string | null;
+  peta_dusun_url: string | null;
+  /** Kontak & sosmed footer — lihat docs/supabase-migration-kontak.sql. */
+  email: string | null;
+  instagram_url: string | null;
+  tiktok_url: string | null;
+  facebook_url: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -37,6 +50,18 @@ export interface AdminProfileRow {
   full_name: string | null;
   role: AdminRole;
   village_id: string | null;
+  created_at: string;
+}
+
+/** Kontak WhatsApp cepat di footer — lihat docs/supabase-migration-kontak.sql. */
+export interface FooterContactRow {
+  id: string;
+  village_id: string;
+  name: string;
+  jabatan: string;
+  /** Nomor WhatsApp format internasional tanpa "+"/spasi, mis. 6281234567890. */
+  phone: string;
+  display_order: number;
   created_at: string;
 }
 
@@ -184,7 +209,10 @@ export interface GalleryImageRow {
   file_size_kb?: number | null;
 }
 
-/** UMKM usaha warga — lihat docs/supabase-migration-umkm.sql. */
+/**
+ * UMKM usaha warga — lihat docs/supabase-migration-umkm.sql.
+ * Kolom koordinat — lihat docs/supabase-migration-umkm-koordinat.sql.
+ */
 export interface UmkmRow {
   id: string;
   village_id: string;
@@ -195,6 +223,8 @@ export interface UmkmRow {
   pemilik: string | null;
   lokasi: string | null;
   maps_url: string | null;
+  latitude: number | null;
+  longitude: number | null;
   wa: string | null;
   instagram_url: string | null;
   tiktok_url: string | null;

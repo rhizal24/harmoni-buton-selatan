@@ -19,6 +19,8 @@ interface UmkmForm {
   instagram_url: string;
   tiktok_url: string;
   maps_url: string;
+  latitude: string;
+  longitude: string;
   foto_url: string;
   display_order: string;
   is_published: boolean;
@@ -37,6 +39,8 @@ const EMPTY_FORM: UmkmForm = {
   instagram_url: "",
   tiktok_url: "",
   maps_url: "",
+  latitude: "",
+  longitude: "",
   foto_url: "",
   display_order: "0",
   is_published: true,
@@ -98,6 +102,8 @@ export default function AdminUmkmPage() {
         instagram_url: form.instagram_url.trim() || null,
         tiktok_url: form.tiktok_url.trim() || null,
         maps_url: form.maps_url.trim() || null,
+        latitude: form.latitude.trim() ? Number(form.latitude) : null,
+        longitude: form.longitude.trim() ? Number(form.longitude) : null,
         foto_url: form.foto_url || null,
         display_order: Number(form.display_order) || 0,
         is_published: form.is_published,
@@ -263,6 +269,8 @@ export default function AdminUmkmPage() {
                           instagram_url: row.instagram_url ?? "",
                           tiktok_url: row.tiktok_url ?? "",
                           maps_url: row.maps_url ?? "",
+                          latitude: row.latitude != null ? String(row.latitude) : "",
+                          longitude: row.longitude != null ? String(row.longitude) : "",
                           foto_url: row.foto_url ?? "",
                           display_order: String(row.display_order),
                           is_published: row.is_published,
@@ -387,6 +395,32 @@ export default function AdminUmkmPage() {
                 />
               </label>
             </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1.5">
+                <span className={labelCls}>Latitude</span>
+                <input
+                  type="number"
+                  step="any"
+                  value={form.latitude}
+                  onChange={(e) => setForm((f) => ({ ...f, latitude: e.target.value }))}
+                  className={inputCls}
+                />
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className={labelCls}>Longitude</span>
+                <input
+                  type="number"
+                  step="any"
+                  value={form.longitude}
+                  onChange={(e) => setForm((f) => ({ ...f, longitude: e.target.value }))}
+                  className={inputCls}
+                />
+              </label>
+            </div>
+            <p className="-mt-2 font-body text-xs text-[#5A5A5A]">
+              Isi koordinat supaya usaha ini tampil sebagai titik di peta interaktif (/peta).
+            </p>
 
             <div className="grid grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5">

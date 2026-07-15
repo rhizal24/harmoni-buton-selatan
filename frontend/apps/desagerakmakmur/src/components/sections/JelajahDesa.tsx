@@ -88,7 +88,7 @@ function PaketCard({ paket }: { paket: Paket }) {
         href={`${WA_LINK}?text=${encodeURIComponent(`Halo, saya mau pesan ${paket.nama}`)}`}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex h-[46px] items-center justify-center rounded-md border-[1.5px] px-8 font-body text-sm font-semibold no-underline shadow-sm motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2 ${
+        className={`inline-flex h-[46px] items-center justify-center rounded-md border-[1.5px] px-8 font-body text-sm font-semibold no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 active:translate-y-0 hover:[filter:drop-shadow(0_0_16px_rgba(0,101,114,0.55))_drop-shadow(0_0_44px_rgba(0,101,114,0.30))] focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2 ${
           paket.highlight
             ? "border-white bg-[#006572] text-white"
             : "border-[#006572] bg-transparent text-[#006572]"
@@ -104,12 +104,22 @@ function PaketCard({ paket }: { paket: Paket }) {
  * Jelajah Desa — 3 kartu paket wisata Karamba.
  * Header rata kanan (paragraf • dash • judul). Figma node 92:1395.
  */
-export function JelajahDesa({ items = PAKET_DEFAULT }: { items?: Paket[] }) {
+export function JelajahDesa({
+  items = PAKET_DEFAULT,
+  compactBottom = false,
+}: {
+  items?: Paket[];
+  /** Rapatkan padding bawah — dipakai saat section lain (bukan Footer/galeri
+   * dengan padding besar sendiri) langsung menyusul, mis. GuidebookWisata. */
+  compactBottom?: boolean;
+}) {
   return (
     <section
       id="jelajah-desa"
       aria-label="Jelajah Desa — paket wisata Karamba"
-      className="bg-white px-5 pt-6 pb-16 sm:px-8 lg:pt-8 lg:pb-24"
+      className={`bg-white px-5 pt-6 sm:px-8 lg:pt-8 ${
+        compactBottom ? "pb-6 lg:pb-8" : "pb-16 lg:pb-24"
+      }`}
     >
       <div className="mx-auto flex w-full max-w-[1112px] flex-col gap-10">
         {/* Header rata kanan */}

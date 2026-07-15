@@ -3,10 +3,12 @@
  * Semua query otomatis ter-scope ke desa dengan slug VILLAGE_SLUG;
  * RLS di Supabase hanya mengizinkan read konten yang published.
  */
+import { cache } from "react";
 import { getSupabase } from "./supabase";
 import type {
   UmkmRow,
   ArticleRow,
+  FooterContactRow,
   GalleryImageRow,
   OrganizationStructureRow,
   PopulationDataRow,
@@ -18,7 +20,9 @@ import type {
 
 export const VILLAGE_SLUG = "gerakmakmur";
 
-export async function getVillage(): Promise<VillageRow | null> {
+/** Di-cache per-request (React `cache`) — Footer & tiap page sama-sama
+ * memanggil ini tanpa query Supabase berulang. */
+export const getVillage = cache(async (): Promise<VillageRow | null> => {
   const { data, error } = await getSupabase()
     .from("villages")
     .select("*")
@@ -27,7 +31,7 @@ export async function getVillage(): Promise<VillageRow | null> {
     .maybeSingle();
   if (error) throw new Error(`Gagal memuat data desa: ${error.message}`);
   return data as VillageRow | null;
-}
+});
 
 async function requireVillageId(): Promise<string | null> {
   const village = await getVillage();
@@ -110,6 +114,18 @@ export async function getOrganizationStructure(): Promise<OrganizationStructureR
     .order("display_order", { ascending: true });
   if (error) throw new Error(`Gagal memuat organization_structure: ${error.message}`);
   return (data ?? []) as OrganizationStructureRow[];
+}
+
+export async function getFooterContacts(): Promise<FooterContactRow[]> {
+  const villageId = await requireVillageId();
+  if (!villageId) return [];
+  const { data, error } = await getSupabase()
+    .from("footer_contacts")
+    .select("*")
+    .eq("village_id", villageId)
+    .order("display_order", { ascending: true });
+  if (error) throw new Error(`Gagal memuat footer_contacts: ${error.message}`);
+  return (data ?? []) as FooterContactRow[];
 }
 
 export async function getGalleryImages(): Promise<GalleryImageRow[]> {

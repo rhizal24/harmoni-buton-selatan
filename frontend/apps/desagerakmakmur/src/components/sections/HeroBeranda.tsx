@@ -7,8 +7,11 @@ import { StaggerIn } from "@/components/ui/StaggerIn";
  * Hero Beranda — full-bleed foto drone desa + overlay gelap + konten center.
  * Susunan: pill (identitas situs) → eyebrow → headline → deskripsi → CTA,
  * dengan indikator scroll-down di bawah. Sesuai Figma node 82:873.
+ *
+ * `imageUrl` bisa diatur admin lewat menu "Hero Section" (kolom
+ * `villages.hero_beranda_url`) — kosong berarti pakai foto default.
  */
-export function HeroBeranda() {
+export function HeroBeranda({ imageUrl }: { imageUrl?: string | null }) {
   return (
     <section
       id="hero"
@@ -17,7 +20,7 @@ export function HeroBeranda() {
     >
       {/* Background foto */}
       <img
-        src="/images/hero-bg.jpg"
+        src={imageUrl || "/images/hero-bg.jpg"}
         alt="Panorama Desa Gerak Makmur dari udara"
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden

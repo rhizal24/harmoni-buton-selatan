@@ -1,7 +1,3 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   WhatsAppIcon,
   MailIcon,
@@ -9,6 +5,8 @@ import {
   TikTokIcon,
   FacebookIcon,
 } from "@/components/ui";
+import { getFooterContacts, getVillage } from "@/lib/desa";
+import { FooterNavLink } from "./FooterNavLink";
 
 /* ── Kolom navigasi (link internal) — mengikuti menu Navbar ─────────── */
 const NAV_COLS: {
@@ -33,31 +31,43 @@ const NAV_COLS: {
   },
 ];
 
-/* ── Kontak langsung: perangkat desa (WA) + email desa ────────────────
- * TODO(data): ganti nama, jabatan, dan nomor WA dengan data asli.
- * `phone` format internasional tanpa "+" / spasi, mis. 6281234567890.  */
-const PERANGKAT: { name: string; jabatan: string; phone: string }[] = [
+/* ── Fallback — dipakai HANYA bila admin belum mengisi info kontak lewat
+ * dashboard (menu "Kontak Footer") atau Supabase tak terjangkau. ────── */
+const PERANGKAT_FALLBACK = [
   { name: "La Ode …", jabatan: "Kepala Desa", phone: "6281234567890" },
   { name: "Wa Ode …", jabatan: "Sekretaris Desa", phone: "6281234567890" },
 ];
-
-const EMAIL_DESA = "desagerakmakmur@butonselatan.go.id";
-
-/* ── Sosial media ─────────────────────────────────────────────────────
- * TODO(data): ganti href dengan link/username asli.                     */
-const SOSMED: { label: string; href: string; icon: React.ReactNode }[] = [
-  { label: "Instagram", href: "#", icon: <InstagramIcon /> },
-  { label: "TikTok", href: "#", icon: <TikTokIcon /> },
-  { label: "Facebook", href: "#", icon: <FacebookIcon /> },
-];
+const EMAIL_FALLBACK = "desagerakmakmur@butonselatan.go.id";
 
 /**
  * Footer — brand kiri lebar, kolom navigasi, kolom kontak perangkat desa
  * (direct WhatsApp + email), kolom sosmed. Semua kontak diberi icon.
  * Tagline italik di tengah, divider, copyright. Background tosca solid.
+ *
+ * Server Component: kontak & sosmed diambil dari `villages` +
+ * `footer_contacts` (dikelola admin di /admin/kontak), fallback ke data
+ * contoh bila belum diisi. Link navigasi (butuh usePathname) dipisah ke
+ * `FooterNavLink` (Client Component).
  */
-export function Footer() {
-  const pathname = usePathname();
+export async function Footer() {
+  const [village, contacts] = await Promise.all([
+    getVillage().catch(() => null),
+    getFooterContacts().catch(() => []),
+  ]);
+
+  const perangkat = contacts.length > 0 ? contacts : PERANGKAT_FALLBACK;
+  const email = village?.email || EMAIL_FALLBACK;
+
+  const sosmed: { label: string; href: string; icon: React.ReactNode }[] = [];
+  if (village?.instagram_url) {
+    sosmed.push({ label: "Instagram", href: village.instagram_url, icon: <InstagramIcon /> });
+  }
+  if (village?.tiktok_url) {
+    sosmed.push({ label: "TikTok", href: village.tiktok_url, icon: <TikTokIcon /> });
+  }
+  if (village?.facebook_url) {
+    sosmed.push({ label: "Facebook", href: village.facebook_url, icon: <FacebookIcon /> });
+  }
 
   return (
     <footer className="bg-[#006572] px-5 py-14 text-white sm:px-8 lg:px-16 lg:py-16">
@@ -90,24 +100,11 @@ export function Footer() {
                 <span className="font-body text-xl font-bold text-white">
                   {col.title}
                 </span>
-                {col.links.map((l) => {
-                  // Tebal mengikuti halaman yang sedang dibuka (pola Navbar).
-                  const isActive = l.exact
-                    ? pathname === l.href
-                    : pathname.startsWith(l.href);
-                  return (
-                    <Link
-                      key={l.label}
-                      href={l.href}
-                      aria-current={isActive ? "page" : undefined}
-                      className={`font-body text-sm no-underline motion-safe:transition-colors hover:text-white ${
-                        isActive ? "font-bold text-white" : "text-white/60"
-                      }`}
-                    >
-                      {l.label}
-                    </Link>
-                  );
-                })}
+                {col.links.map((l) => (
+                  <FooterNavLink key={l.label} href={l.href} exact={l.exact}>
+                    {l.label}
+                  </FooterNavLink>
+                ))}
               </nav>
             ))}
 
@@ -116,7 +113,7 @@ export function Footer() {
               <span className="font-body text-xl font-bold text-white">
                 Kontak
               </span>
-              {PERANGKAT.map((p) => (
+              {perangkat.map((p) => (
                 <a
                   key={p.name + p.jabatan}
                   href={`https://wa.me/${p.phone}`}
@@ -132,7 +129,7 @@ export function Footer() {
                 </a>
               ))}
               <a
-                href={`mailto:${EMAIL_DESA}`}
+                href={`mailto:${email}`}
                 className="group flex items-center gap-2.5 no-underline"
               >
                 <MailIcon className="shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white" />
@@ -142,28 +139,30 @@ export function Footer() {
               </a>
             </nav>
 
-            {/* Sosmed */}
-            <nav aria-label="Ikuti Kami" className="flex flex-col gap-3.5">
-              <span className="font-body text-xl font-bold text-white">
-                Ikuti Kami
-              </span>
-              {SOSMED.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-2.5 no-underline"
-                >
-                  <span className="shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white">
-                    {s.icon}
-                  </span>
-                  <span className="font-body text-sm text-white/60 motion-safe:transition-colors group-hover:text-white">
-                    {s.label}
-                  </span>
-                </a>
-              ))}
-            </nav>
+            {/* Sosmed — kosong sepenuhnya bila belum ada satu pun diisi admin */}
+            {sosmed.length > 0 && (
+              <nav aria-label="Ikuti Kami" className="flex flex-col gap-3.5">
+                <span className="font-body text-xl font-bold text-white">
+                  Ikuti Kami
+                </span>
+                {sosmed.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-2.5 no-underline"
+                  >
+                    <span className="shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white">
+                      {s.icon}
+                    </span>
+                    <span className="font-body text-sm text-white/60 motion-safe:transition-colors group-hover:text-white">
+                      {s.label}
+                    </span>
+                  </a>
+                ))}
+              </nav>
+            )}
           </div>
         </div>
 

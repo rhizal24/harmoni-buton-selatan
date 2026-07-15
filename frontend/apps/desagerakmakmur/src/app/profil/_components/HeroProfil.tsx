@@ -13,8 +13,11 @@ gsap.registerPlugin(ScrollTrigger);
  * teks terbaca. Konten (eyebrow, judul, deskripsi, CTA) masuk ber-stagger saat
  * halaman dibuka + parallax GSAP halus saat di-scroll. Menghormati
  * prefers-reduced-motion.
+ *
+ * `imageUrl` bisa diatur admin lewat menu "Hero Section" (kolom
+ * `villages.hero_profil_url`) — kosong berarti pakai foto default.
  */
-export function HeroProfil() {
+export function HeroProfil({ imageUrl }: { imageUrl?: string | null }) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -54,7 +57,7 @@ export function HeroProfil() {
     >
       {/* Background foto */}
       <img
-        src="/images/hero-bg.jpg"
+        src={imageUrl || "/images/hero-bg.jpg"}
         alt="Panorama Desa Gerak Makmur, Buton Selatan"
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden
