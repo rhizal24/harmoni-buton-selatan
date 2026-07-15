@@ -23,3 +23,11 @@ export const CONTACT_INFO = {
   phone:   process.env.NEXT_PUBLIC_DESA_PHONE   ?? "-",
   address: process.env.NEXT_PUBLIC_DESA_ADDRESS ?? "Desa Gerak Makmur, Buton Selatan, Sulawesi Tenggara",
 };
+
+/**
+ * Titik tengah default peta WebGIS (/peta) — perkiraan area Kecamatan
+ * Sampolawa, Buton Selatan. Hanya menentukan sudut pandang awal peta, bukan
+ * data presisi; marker sebenarnya memakai koordinat tiap `tourism_spots`.
+ */
+export const VILLAGE_MAP_CENTER: [number, number] = [-5.665, 122.722];
+export const VILLAGE_MAP_DEFAULT_ZOOM = 12;

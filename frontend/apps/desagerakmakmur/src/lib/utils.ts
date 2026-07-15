@@ -2,11 +2,15 @@
  * Utility functions — Desa Gerak Makmur
  */
 
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
 /**
- * Gabungkan class names, filter falsy values
+ * Gabungkan class names, filter falsy values, dan resolve konflik
+ * utility Tailwind (dipakai juga oleh komponen shadcn/ui)
  */
-export function cn(...classes: (string | undefined | null | false)[]): string {
-  return classes.filter(Boolean).join(" ");
+export function cn(...classes: ClassValue[]): string {
+  return twMerge(clsx(classes));
 }
 
 /**
@@ -27,4 +31,17 @@ export function formatDate(dateString: string): string {
 export function truncate(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
   return text.slice(0, maxLength).trimEnd() + "…";
+}
+
+/**
+ * Slug URL dari teks bebas (anchor section, deep-link)
+ * @example slugify("Karamba Resto") → "karamba-resto"
+ */
+export function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }

@@ -17,6 +17,9 @@ export interface Wisata {
   facebook?: string;
   /** Deep-link Google Maps ke titik lokasi. */
   maps: string;
+  /** Koordinat titik lokasi — dipakai marker di peta WebGIS (/peta). */
+  latitude?: number | null;
+  longitude?: number | null;
   /** Beberapa foto untuk slideshow auto-fade (loop). Foto pertama = thumbnail. */
   imgs: string[];
   alt: string;

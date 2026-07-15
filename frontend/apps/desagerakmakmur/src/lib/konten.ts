@@ -58,6 +58,8 @@ function toWisata(spot: TourismSpotWithImages): Wisata {
     tiktok: spot.tiktok_url ?? undefined,
     facebook: spot.facebook_url ?? undefined,
     maps,
+    latitude: spot.latitude,
+    longitude: spot.longitude,
     imgs: spotImages(spot),
     alt: spot.name,
   };

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 /* ============================================================
    DESIGN TOKENS — dideklarasikan di @theme supaya Tailwind v4
    men-generate utility classes otomatis (bg-*, text-*, border-*,
@@ -376,6 +378,17 @@
    ============================================================ */
 *, *::before, *::after { box-sizing: border-box; }
 
+/* Default border color — Tailwind v4 memakai currentColor (gelap) jika
+   utility `border` dipakai tanpa kelas warna; komponen shadcn mengandalkan
+   default hairline seperti ini (setara base layer bawaan setup shadcn). */
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
@@ -510,4 +523,84 @@ body {
   color: var(--color-neutral-500);
   margin-bottom: 2rem;
   max-width: 400px;
+}
+
+/* ============================================================
+   TOKEN SEMANTIK shadcn/ui — alias ke design tokens di atas
+   supaya komponen shadcn (sidebar, button, dropdown, dst.)
+   otomatis mengikuti palet tosca. Terang saja, tanpa dark mode.
+   ============================================================ */
+@theme {
+  --color-foreground: #2E2E2E;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #2E2E2E;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #2E2E2E;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary-foreground: #FFFFFF;
+  --color-muted: #F6F6F6;
+  --color-muted-foreground: #5A5A5A;
+  --color-accent: #CFF1F4;
+  --color-accent-foreground: #00434B;
+  --color-destructive: #BA1A1A;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #D0D0D0;
+  --color-input: #D0D0D0;
+  --color-ring: #006572;
+
+  /* Tosca gelap #006572 mengikuti warna tombol/aksi di halaman publik
+     (HeroBeranda, JelajahDesa, DaftarWisata memakai hex yang sama) */
+  --color-sidebar: #FFFFFF;
+  --color-sidebar-foreground: #2E2E2E;
+  --color-sidebar-primary: #006572;
+  --color-sidebar-primary-foreground: #FFFFFF;
+  --color-sidebar-accent: #CFF1F4;
+  --color-sidebar-accent-foreground: #00434B;
+  --color-sidebar-border: #D0D0D0;
+  --color-sidebar-ring: #006572;
+}
+
+/* ============================================================
+   POPUP PETA (Leaflet) — card bersih untuk marker Wisata/UMKM.
+   Leaflet membungkus konten popup dengan padding/shadow/tail bawaan
+   yang tidak bisa diubah lewat utility Tailwind biasa (bukan children
+   React, tapi node yang dikelola Leaflet sendiri), jadi di-override
+   lewat class `.map-popup` yang dipasang via prop `className` pada
+   <Popup> (react-leaflet meneruskannya ke container `.leaflet-popup`).
+   ============================================================ */
+.leaflet-popup.map-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-floating);
+}
+.leaflet-popup.map-popup .leaflet-popup-content {
+  margin: 0;
+  line-height: 1.5;
+}
+/* leaflet.css memberi `p { margin: 1.3em 0 }` bawaan (spesifisitas lebih
+   tinggi dari utility Tailwind di children), jadi di-nolkan di sini. */
+.leaflet-popup.map-popup .leaflet-popup-content p {
+  margin: 0;
+}
+.leaflet-popup.map-popup .leaflet-popup-tip {
+  box-shadow: var(--shadow-floating);
+}
+.leaflet-popup.map-popup .leaflet-popup-close-button {
+  top: 8px !important;
+  right: 8px !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: rgba(46, 46, 46, 0.55);
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: 400;
+  line-height: 1 !important;
+}
+.leaflet-popup.map-popup .leaflet-popup-close-button:hover {
+  background: rgba(46, 46, 46, 0.8);
 }
