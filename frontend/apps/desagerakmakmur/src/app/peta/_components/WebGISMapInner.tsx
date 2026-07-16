@@ -10,10 +10,11 @@ import {
   Marker,
   Popup,
   TileLayer,
+  ZoomControl,
   useMap,
 } from "react-leaflet";
 import Link from "next/link";
-import { Maximize2, Minimize2 } from "lucide-react";
+import { Layers, Maximize2, Minimize2, SlidersHorizontal } from "lucide-react";
 import { VILLAGE_MAP_CENTER, VILLAGE_MAP_DEFAULT_ZOOM } from "@/lib/constants";
 import { slugify } from "@/lib/utils";
 import type { Wisata } from "@/types/wisata";
@@ -23,6 +24,36 @@ import type { FeatureCollection } from "geojson";
 const WARNA_WISATA = "#006572";
 const WARNA_UMKM = "#F45B69";
 const WARNA_BATAS_WILAYAH = "#2E2E2E";
+const WARNA_BATAS_DESA = "#006572";
+const WARNA_BANGUNAN = "#5A5A5A";
+
+/**
+ * Dua pilihan basemap — jalan (OSM default) dan topografi (kontur
+ * OpenTopoMap) — cukup ditoggle langsung tanpa dropdown karena cuma 2 opsi.
+ */
+const BASEMAP_OPTIONS = {
+  jalan: {
+    label: "Jalan",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    // OSM masih punya tile asli sampai zoom 19.
+    maxNativeZoom: 19,
+  },
+  topografi: {
+    label: "Topografi",
+    url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+    attribution:
+      'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+    // OpenTopoMap cuma render tile asli sampai zoom 17 — di atas itu server
+    // balikin gambar placeholder "max zoom" alih-alih tile peta. Dengan
+    // `maxNativeZoom`, Leaflet upscale tile z17 alih-alih minta tile yang
+    // tidak ada.
+    maxNativeZoom: 17,
+  },
+} as const;
+
+type BasemapKey = keyof typeof BASEMAP_OPTIONS;
 
 /**
  * Pin marker kustom (divIcon SVG) — Leaflet default icon butuh berkas
@@ -46,6 +77,46 @@ function buatIkonPin(warna: string) {
 
 const ikonWisata = buatIkonPin(WARNA_WISATA);
 const ikonUmkm = buatIkonPin(WARNA_UMKM);
+
+/**
+ * Pill toggle filter layer — dipakai dobel: baris horizontal di desktop
+ * (selalu tampil) dan daftar vertikal di dalam dropdown mobile (`sm:hidden`
+ * toggle). Diekstrak jadi komponen supaya bentuk & warna tiap kategori tetap
+ * konsisten di kedua tampilan.
+ */
+function FilterPill({
+  label,
+  active,
+  onClick,
+  activeClassName,
+  inactiveDotColor,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  activeClassName: string;
+  inactiveDotColor: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`flex cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 font-body text-xs font-semibold whitespace-nowrap motion-safe:transition-all ${
+        active
+          ? activeClassName
+          : "border-[#D0D0D0] bg-white/95 text-[#5A5A5A] shadow-sm"
+      }`}
+    >
+      <span
+        className={`h-2.5 w-2.5 rounded-full ${active ? "bg-white" : ""}`}
+        style={active ? undefined : { backgroundColor: inactiveDotColor }}
+        aria-hidden
+      />
+      {label}
+    </button>
+  );
+}
 
 interface WebGISMapInnerProps {
   wisata: Wisata[];
@@ -80,15 +151,21 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
   const [tampilWisata, setTampilWisata] = useState(true);
   const [tampilUmkm, setTampilUmkm] = useState(true);
   const [tampilBatasWilayah, setTampilBatasWilayah] = useState(true);
+  const [tampilBatasDesa, setTampilBatasDesa] = useState(true);
+  const [tampilBangunan, setTampilBangunan] = useState(true);
+  const [basemap, setBasemap] = useState<BasemapKey>("jalan");
+  const [menuFilterTerbuka, setMenuFilterTerbuka] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [batasWilayah, setBatasWilayah] = useState<FeatureCollection | null>(
     null,
   );
+  const [batasDesa, setBatasDesa] = useState<FeatureCollection | null>(null);
+  const [bangunan, setBangunan] = useState<FeatureCollection | null>(null);
 
-  // Data batas administrasi (Kecamatan Sampolawa) dipisah jadi GeoJSON statis
-  // di /public/geo alih-alih di-hardcode di kode — koordinat sudah dalam
-  // WGS84 [lng, lat] (standar GeoJSON), jadi Leaflet bisa memproyeksikannya
-  // langsung tanpa transformasi tambahan.
+  // Data batas administrasi (Kecamatan Sampolawa), batas desa, dan bangunan
+  // dipisah jadi GeoJSON statis di /public/geo alih-alih di-hardcode di kode
+  // — koordinat sudah dalam WGS84 [lng, lat] (standar GeoJSON), jadi Leaflet
+  // bisa memproyeksikannya langsung tanpa transformasi tambahan.
   useEffect(() => {
     let batal = false;
     fetch("/geo/kecamatan-sampolawa.geojson")
@@ -98,6 +175,36 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
       })
       .catch(() => {
         if (!batal) setBatasWilayah(null);
+      });
+    return () => {
+      batal = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let batal = false;
+    fetch("/geo/batas-desa.geojson")
+      .then((res) => res.json())
+      .then((data: FeatureCollection) => {
+        if (!batal) setBatasDesa(data);
+      })
+      .catch(() => {
+        if (!batal) setBatasDesa(null);
+      });
+    return () => {
+      batal = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let batal = false;
+    fetch("/geo/bangunan.geojson")
+      .then((res) => res.json())
+      .then((data: FeatureCollection) => {
+        if (!batal) setBangunan(data);
+      })
+      .catch(() => {
+        if (!batal) setBangunan(null);
       });
     return () => {
       batal = true;
@@ -160,64 +267,82 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
         )}
       </button>
 
-      <div className="absolute top-3 right-3 z-[1000] flex gap-2">
-        {batasWilayah && (
-          <button
-            type="button"
-            onClick={() => setTampilBatasWilayah((v) => !v)}
-            aria-pressed={tampilBatasWilayah}
-            className={`flex cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 font-body text-xs font-semibold motion-safe:transition-all ${
-              tampilBatasWilayah
-                ? "border-[#2E2E2E] bg-[#2E2E2E] text-white shadow-[0_0_14px_rgba(46,46,46,0.45)]"
-                : "border-[#D0D0D0] bg-white/95 text-[#5A5A5A] shadow-sm"
-            }`}
-          >
-            <span
-              className={`h-2.5 w-2.5 rounded-full ${tampilBatasWilayah ? "bg-white" : ""}`}
-              style={
-                tampilBatasWilayah
-                  ? undefined
-                  : { backgroundColor: WARNA_BATAS_WILAYAH }
-              }
-              aria-hidden
+      <button
+        type="button"
+        onClick={() =>
+          setBasemap((v) => (v === "jalan" ? "topografi" : "jalan"))
+        }
+        aria-label={`Ganti ke peta ${
+          basemap === "jalan"
+            ? BASEMAP_OPTIONS.topografi.label
+            : BASEMAP_OPTIONS.jalan.label
+        }`}
+        title={`Peta ${BASEMAP_OPTIONS[basemap].label}`}
+        className="absolute top-14 left-3 z-[1000] flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-[1.5px] border-[#D0D0D0] bg-white/95 text-[#5A5A5A] shadow-sm motion-safe:transition-colors hover:border-[#006572] hover:text-[#006572]"
+      >
+        <Layers className="h-4 w-4" />
+      </button>
+
+      <div className="absolute top-3 right-3 z-[1000] flex flex-col items-end">
+        {/* Toggle dropdown filter — cuma tampil di mobile; di sm ke atas
+            baris pill selalu terbuka seperti biasa. */}
+        <button
+          type="button"
+          onClick={() => setMenuFilterTerbuka((v) => !v)}
+          aria-label="Tampilkan filter layer peta"
+          aria-expanded={menuFilterTerbuka}
+          className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-[1.5px] border-[#D0D0D0] bg-white/95 text-[#5A5A5A] shadow-sm motion-safe:transition-colors hover:border-[#006572] hover:text-[#006572] sm:hidden"
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+        </button>
+
+        <div
+          className={`flex-col items-end gap-2 ${
+            menuFilterTerbuka ? "mt-2 flex" : "hidden"
+          } sm:mt-0 sm:flex sm:flex-row sm:flex-wrap sm:justify-end sm:gap-2`}
+        >
+          {batasDesa && (
+            <FilterPill
+              label="Batas Desa"
+              active={tampilBatasDesa}
+              onClick={() => setTampilBatasDesa((v) => !v)}
+              activeClassName="border-[#006572] bg-[#006572] text-white shadow-[0_0_14px_rgba(0,101,114,0.55)]"
+              inactiveDotColor={WARNA_BATAS_DESA}
             />
-            Kec. Sampolawa
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={() => setTampilWisata((v) => !v)}
-          aria-pressed={tampilWisata}
-          className={`flex cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 font-body text-xs font-semibold motion-safe:transition-all ${
-            tampilWisata
-              ? "border-[#006572] bg-[#006572] text-white shadow-[0_0_14px_rgba(0,101,114,0.55)]"
-              : "border-[#D0D0D0] bg-white/95 text-[#5A5A5A] shadow-sm"
-          }`}
-        >
-          <span
-            className={`h-2.5 w-2.5 rounded-full ${tampilWisata ? "bg-white" : ""}`}
-            style={tampilWisata ? undefined : { backgroundColor: WARNA_WISATA }}
-            aria-hidden
+          )}
+          {bangunan && (
+            <FilterPill
+              label={`Bangunan (${bangunan.features.length})`}
+              active={tampilBangunan}
+              onClick={() => setTampilBangunan((v) => !v)}
+              activeClassName="border-[#5A5A5A] bg-[#5A5A5A] text-white shadow-[0_0_14px_rgba(90,90,90,0.45)]"
+              inactiveDotColor={WARNA_BANGUNAN}
+            />
+          )}
+          {batasWilayah && (
+            <FilterPill
+              label="Kec. Sampolawa"
+              active={tampilBatasWilayah}
+              onClick={() => setTampilBatasWilayah((v) => !v)}
+              activeClassName="border-[#2E2E2E] bg-[#2E2E2E] text-white shadow-[0_0_14px_rgba(46,46,46,0.45)]"
+              inactiveDotColor={WARNA_BATAS_WILAYAH}
+            />
+          )}
+          <FilterPill
+            label={`Wisata (${wisataBerkoordinat.length})`}
+            active={tampilWisata}
+            onClick={() => setTampilWisata((v) => !v)}
+            activeClassName="border-[#006572] bg-[#006572] text-white shadow-[0_0_14px_rgba(0,101,114,0.55)]"
+            inactiveDotColor={WARNA_WISATA}
           />
-          Wisata ({wisataBerkoordinat.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setTampilUmkm((v) => !v)}
-          aria-pressed={tampilUmkm}
-          className={`flex cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 font-body text-xs font-semibold motion-safe:transition-all ${
-            tampilUmkm
-              ? "border-[#F45B69] bg-[#F45B69] text-white shadow-[0_0_14px_rgba(244,91,105,0.55)]"
-              : "border-[#D0D0D0] bg-white/95 text-[#5A5A5A] shadow-sm"
-          }`}
-        >
-          <span
-            className={`h-2.5 w-2.5 rounded-full ${tampilUmkm ? "bg-white" : ""}`}
-            style={tampilUmkm ? undefined : { backgroundColor: WARNA_UMKM }}
-            aria-hidden
+          <FilterPill
+            label={`UMKM (${umkmBerkoordinat.length})`}
+            active={tampilUmkm}
+            onClick={() => setTampilUmkm((v) => !v)}
+            activeClassName="border-[#F45B69] bg-[#F45B69] text-white shadow-[0_0_14px_rgba(244,91,105,0.55)]"
+            inactiveDotColor={WARNA_UMKM}
           />
-          UMKM ({umkmBerkoordinat.length})
-        </button>
+        </div>
       </div>
 
       <MapContainer
@@ -225,12 +350,16 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
         zoom={VILLAGE_MAP_DEFAULT_ZOOM}
         scrollWheelZoom
         touchZoom
+        zoomControl={false}
         className="h-full w-full"
       >
         <SinkronkanUkuranPeta isExpanded={isExpanded} />
+        <ZoomControl position="bottomright" />
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          key={basemap}
+          attribution={BASEMAP_OPTIONS[basemap].attribution}
+          url={BASEMAP_OPTIONS[basemap].url}
+          maxNativeZoom={BASEMAP_OPTIONS[basemap].maxNativeZoom}
         />
         {tampilBatasWilayah && batasWilayah && (
           <GeoJSON
@@ -242,6 +371,34 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
               dashArray: "6 4",
               fillColor: WARNA_BATAS_WILAYAH,
               fillOpacity: 0.05,
+            }}
+          />
+        )}
+        {tampilBatasDesa && batasDesa && (
+          <GeoJSON
+            key="batas-desa-gerak-makmur"
+            data={batasDesa}
+            style={{
+              color: WARNA_BATAS_DESA,
+              weight: 2.5,
+              fillColor: WARNA_BATAS_DESA,
+              fillOpacity: 0.04,
+            }}
+            onEachFeature={(feature, layer) => {
+              const nama = feature.properties?.NAMOBJ ?? "Desa Gerak Makmur";
+              layer.bindTooltip(nama, { sticky: true });
+            }}
+          />
+        )}
+        {tampilBangunan && bangunan && (
+          <GeoJSON
+            key="bangunan-desa"
+            data={bangunan}
+            style={{
+              color: WARNA_BANGUNAN,
+              weight: 1,
+              fillColor: WARNA_BANGUNAN,
+              fillOpacity: 0.45,
             }}
           />
         )}
