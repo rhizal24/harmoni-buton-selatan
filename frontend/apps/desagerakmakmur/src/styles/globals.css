@@ -604,3 +604,11 @@ body {
 .leaflet-popup.map-popup .leaflet-popup-close-button:hover {
   background: rgba(46, 46, 46, 0.8);
 }
+
+/* Leaflet kasih tabindex ke layer GeoJSON (path) supaya bisa diakses
+   keyboard, tapi browser gambar kotak fokus biru bawaan di sekeliling
+   bounding box-nya tiap kali di-klik mouse — bukan cuma di outline
+   polygon-nya. Dimatikan di sini. */
+.leaflet-interactive:focus {
+  outline: none;
+}
