@@ -6,6 +6,7 @@ import type { FooterContactRow, VillageRow } from "@/lib/db-types";
 import { useAdmin } from "../admin-context";
 
 interface SosmedForm {
+  whatsapp: string; // nomor WA utama desa (dipakai seragam di /wisata)
   email: string;
   instagram_url: string;
   tiktok_url: string;
@@ -16,7 +17,8 @@ interface KontakForm {
   id: string | null;
   name: string;
   jabatan: string;
-  phone: string; // format internasional tanpa "+"/spasi
+  contact_type: "wa" | "email";
+  value: string; // nomor wa.me (tanpa "+"/spasi) atau alamat email
   display_order: string;
 }
 
@@ -24,7 +26,8 @@ const EMPTY_KONTAK: KontakForm = {
   id: null,
   name: "",
   jabatan: "",
-  phone: "",
+  contact_type: "wa",
+  value: "",
   display_order: "0",
 };
 
@@ -53,7 +56,7 @@ export default function AdminKontakPage() {
   const loadSosmed = useCallback(async () => {
     const { data, error } = await getSupabase()
       .from("villages")
-      .select("email, instagram_url, tiktok_url, facebook_url")
+      .select("whatsapp, email, instagram_url, tiktok_url, facebook_url")
       .eq("id", admin.village.id)
       .maybeSingle();
     if (error) {
@@ -62,6 +65,7 @@ export default function AdminKontakPage() {
     }
     const v = (data ?? {}) as Partial<VillageRow>;
     setSosmed({
+      whatsapp: v.whatsapp ?? "",
       email: v.email ?? "",
       instagram_url: v.instagram_url ?? "",
       tiktok_url: v.tiktok_url ?? "",
@@ -96,6 +100,7 @@ export default function AdminKontakPage() {
       const { error } = await getSupabase()
         .from("villages")
         .update({
+          whatsapp: sosmed.whatsapp.replace(/[^0-9]/g, "") || null,
           email: sosmed.email.trim() || null,
           instagram_url: sosmed.instagram_url.trim() || null,
           tiktok_url: sosmed.tiktok_url.trim() || null,
@@ -104,7 +109,7 @@ export default function AdminKontakPage() {
         })
         .eq("id", admin.village.id);
       if (error) throw new Error(error.message);
-      setMsg({ kind: "ok", text: "Email & sosmed disimpan." });
+      setMsg({ kind: "ok", text: "Kontak desa disimpan." });
     } catch (err) {
       setMsg({ kind: "err", text: err instanceof Error ? err.message : "Gagal menyimpan." });
     } finally {
@@ -121,7 +126,11 @@ export default function AdminKontakPage() {
         village_id: admin.village.id,
         name: form.name.trim(),
         jabatan: form.jabatan.trim(),
-        phone: form.phone.trim().replace(/[^\d]/g, ""),
+        contact_type: form.contact_type,
+        value:
+          form.contact_type === "wa"
+            ? form.value.trim().replace(/[^0-9]/g, "")
+            : form.value.trim(),
         display_order: Number(form.display_order) || 0,
       };
       const supabase = getSupabase();
@@ -195,6 +204,20 @@ export default function AdminKontakPage() {
           </h2>
 
           <label className="flex flex-col gap-1.5">
+            <span className={labelCls}>WhatsApp utama desa</span>
+            <input
+              placeholder="6281234567890"
+              value={sosmed.whatsapp}
+              onChange={(e) => setSosmed({ ...sosmed, whatsapp: e.target.value })}
+              className={inputCls}
+            />
+            <span className={hintCls}>
+              Tanpa &quot;+&quot;/spasi. Dipakai SERAGAM di seluruh halaman /wisata:
+              detail destinasi, paket wisata, dan guidebook.
+            </span>
+          </label>
+
+          <label className="flex flex-col gap-1.5">
             <span className={labelCls}>Email desa</span>
             <input
               type="email"
@@ -256,7 +279,7 @@ export default function AdminKontakPage() {
         <section className="overflow-hidden rounded-lg border bg-card">
           <div className="border-b px-4 py-3">
             <h2 className="font-body text-base font-bold tracking-tight text-[#006572]">
-              Kontak WhatsApp Perangkat Desa
+              Kontak Perangkat Desa (WhatsApp / Email)
             </h2>
           </div>
           <table className="w-full border-collapse">
@@ -266,7 +289,7 @@ export default function AdminKontakPage() {
                   Nama / Jabatan
                 </th>
                 <th className="px-4 py-3 font-body text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  WhatsApp
+                  Kontak
                 </th>
                 <th className="px-4 py-3" />
               </tr>
@@ -285,7 +308,12 @@ export default function AdminKontakPage() {
                     <p className="font-body text-sm font-semibold text-foreground">{row.name}</p>
                     <p className="font-body text-xs text-muted-foreground">{row.jabatan}</p>
                   </td>
-                  <td className="px-4 py-3 font-body text-sm text-foreground">+{row.phone}</td>
+                  <td className="px-4 py-3 font-body text-sm text-foreground">
+                    {row.contact_type === "email" ? row.value : `+${row.value}`}
+                    <span className="ml-1.5 rounded-full bg-surface-container-low px-2 py-0.5 font-body text-[10px] font-semibold uppercase text-muted-foreground">
+                      {row.contact_type === "email" ? "Email" : "WA"}
+                    </span>
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
                       <button
@@ -295,7 +323,8 @@ export default function AdminKontakPage() {
                             id: row.id,
                             name: row.name,
                             jabatan: row.jabatan,
-                            phone: row.phone,
+                            contact_type: row.contact_type ?? "wa",
+                            value: row.value,
                             display_order: String(row.display_order),
                           })
                         }
@@ -359,16 +388,49 @@ export default function AdminKontakPage() {
             />
           </label>
 
+          <fieldset className="flex flex-col gap-1.5">
+            <span className={labelCls}>Jenis kontak</span>
+            <div className="flex gap-4">
+              {(
+                [
+                  { val: "wa", label: "WhatsApp" },
+                  { val: "email", label: "Email" },
+                ] as const
+              ).map((opt) => (
+                <label
+                  key={opt.val}
+                  className="flex items-center gap-2 font-body text-sm text-foreground"
+                >
+                  <input
+                    type="radio"
+                    name="contact_type"
+                    checked={form.contact_type === opt.val}
+                    onChange={() => setForm({ ...form, contact_type: opt.val })}
+                    className="h-4 w-4 accent-[#006572]"
+                  />
+                  {opt.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
           <label className="flex flex-col gap-1.5">
-            <span className={labelCls}>Nomor WhatsApp</span>
+            <span className={labelCls}>
+              {form.contact_type === "wa" ? "Nomor WhatsApp" : "Alamat email"}
+            </span>
             <input
               required
-              placeholder="6281234567890"
-              value={form.phone}
-              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              type={form.contact_type === "email" ? "email" : "text"}
+              placeholder={
+                form.contact_type === "wa" ? "6281234567890" : "kades@contoh.desa.id"
+              }
+              value={form.value}
+              onChange={(e) => setForm({ ...form, value: e.target.value })}
               className={inputCls}
             />
-            <span className={hintCls}>Format internasional tanpa &quot;+&quot;/spasi.</span>
+            {form.contact_type === "wa" && (
+              <span className={hintCls}>Format internasional tanpa &quot;+&quot;/spasi.</span>
+            )}
           </label>
 
           <label className="flex flex-col gap-1.5">

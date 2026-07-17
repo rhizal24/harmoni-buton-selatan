@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS public.umkm (
   pemilik       text,
   lokasi        text,
   maps_url      text,
+  latitude      numeric,
+  longitude     numeric,
   wa            text,           -- nomor wa.me tanpa "+"/spasi, mis. 6281234567890
   instagram_url text,
   tiktok_url    text,
@@ -27,6 +29,11 @@ CREATE TABLE IF NOT EXISTS public.umkm (
   created_at    timestamp with time zone NOT NULL DEFAULT now(),
   updated_at    timestamp with time zone NOT NULL DEFAULT now()
 );
+
+-- Untuk yang sudah telanjur membuat tabel versi tanpa koordinat:
+ALTER TABLE public.umkm
+  ADD COLUMN IF NOT EXISTS latitude  numeric,
+  ADD COLUMN IF NOT EXISTS longitude numeric;
 
 CREATE INDEX IF NOT EXISTS idx_umkm_village_published
   ON public.umkm (village_id, is_published, display_order);

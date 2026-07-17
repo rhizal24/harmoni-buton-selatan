@@ -9,6 +9,7 @@ import {
 } from "@/components/sections";
 import { getWisata } from "@/data/wisata";
 import { fetchGaleri, fetchPaket } from "@/lib/konten";
+import { getVillage } from "@/lib/desa";
 
 export const metadata: Metadata = {
   title: "Beranda",
@@ -27,17 +28,20 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [wisata, paket, galeri] = await Promise.all([
+  const [wisata, paket, galeri, village] = await Promise.all([
     getWisata(),
     fetchPaket(),
     fetchGaleri(),
+    getVillage().catch(() => null),
   ]);
+
+  const waDesa = village?.whatsapp?.replace(/[^0-9]/g, "") || undefined;
 
   return (
     <main>
-      <HeroBeranda />
+      <HeroBeranda imageUrl={village?.hero_beranda_url} />
       <WisataUnggulan data={wisata} />
-      <JelajahDesa items={paket ?? undefined} />
+      <JelajahDesa items={paket ?? undefined} wa={waDesa} />
       <LensaGayaBaru images={galeri ?? undefined} />
       <MitraKolaborasi />
       <Footer />

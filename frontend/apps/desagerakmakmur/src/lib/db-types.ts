@@ -35,6 +35,10 @@ export interface VillageRow {
   /** Gambar peta statis /peta — lihat docs/supabase-migration-peta.sql. */
   peta_wisata_url: string | null;
   peta_dusun_url: string | null;
+  /** Nomor WA utama desa (wa.me, tanpa "+"/spasi), dipakai seragam di /wisata. */
+  whatsapp: string | null;
+  /** PDF guidebook wisata (upload /admin/wisata). */
+  guidebook_url: string | null;
   /** Kontak & sosmed footer — lihat docs/supabase-migration-kontak.sql. */
   email: string | null;
   instagram_url: string | null;
@@ -48,6 +52,8 @@ export interface VillageRow {
 export interface AdminProfileRow {
   id: string;
   full_name: string | null;
+  /** Username login (bisa diganti admin di /admin/akun); null = belum diset. */
+  username?: string | null;
   role: AdminRole;
   village_id: string | null;
   created_at: string;
@@ -59,8 +65,10 @@ export interface FooterContactRow {
   village_id: string;
   name: string;
   jabatan: string;
-  /** Nomor WhatsApp format internasional tanpa "+"/spasi, mis. 6281234567890. */
-  phone: string;
+  /** Jenis kontak: WhatsApp atau email. */
+  contact_type: "wa" | "email";
+  /** Nomor wa.me (tanpa "+"/spasi) atau alamat email, sesuai jenisnya. */
+  value: string;
   display_order: number;
   created_at: string;
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 import { TiltScene, TiltLayer } from "@/components/ui/TiltScene";
+import { slugify } from "@/lib/utils";
 import type { Wisata } from "@/types/wisata";
 
 /**
@@ -44,7 +45,7 @@ export function WisataUnggulan({ data }: { data: Wisata[] }) {
              , {current.deskripsi}
             </p>
             <Link
-              href="/wisata#daftar-wisata"
+              href={`/wisata#wisata-${slugify(current.nama)}`}
               className="inline-flex items-center rounded-md border border-white bg-[#31577F] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-200 hover:-translate-y-0.5 hover:[filter:drop-shadow(0_0_16px_rgba(49,87,127,0.55))_drop-shadow(0_0_44px_rgba(49,87,127,0.30))] focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2"
             >
               Lihat Detail

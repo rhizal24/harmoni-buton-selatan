@@ -50,9 +50,9 @@ function CheckIcon() {
   );
 }
 
-const WA_LINK = "https://wa.me/6281234567890";
+const WA_DEFAULT = "6281234567890";
 
-function PaketCard({ paket }: { paket: Paket }) {
+function PaketCard({ paket, waLink }: { paket: Paket; waLink: string }) {
   return (
     <article className="flex flex-col justify-between gap-8 rounded-xl border border-[#006572]/30 bg-[#f6fafb] p-5 motion-safe:transition-shadow motion-safe:duration-200 hover:shadow-card-hover">
       <div className="flex flex-col gap-6">
@@ -85,7 +85,7 @@ function PaketCard({ paket }: { paket: Paket }) {
       </div>
 
       <a
-        href={`${WA_LINK}?text=${encodeURIComponent(`Halo, saya mau pesan ${paket.nama}`)}`}
+        href={`${waLink}?text=${encodeURIComponent(`Halo, saya mau pesan ${paket.nama}`)}`}
         target="_blank"
         rel="noopener noreferrer"
         className={`inline-flex h-[46px] items-center justify-center rounded-md border-[1.5px] px-8 font-body text-sm font-semibold no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 active:translate-y-0 hover:[filter:drop-shadow(0_0_16px_rgba(0,101,114,0.55))_drop-shadow(0_0_44px_rgba(0,101,114,0.30))] focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2 ${
@@ -107,12 +107,16 @@ function PaketCard({ paket }: { paket: Paket }) {
 export function JelajahDesa({
   items = PAKET_DEFAULT,
   compactBottom = false,
+  wa,
 }: {
   items?: Paket[];
+  /** Nomor WA tujuan pemesanan (wa.me); default nomor contoh. */
+  wa?: string;
   /** Rapatkan padding bawah — dipakai saat section lain (bukan Footer/galeri
    * dengan padding besar sendiri) langsung menyusul, mis. GuidebookWisata. */
   compactBottom?: boolean;
 }) {
+  const waLink = `https://wa.me/${wa ?? WA_DEFAULT}`;
   return (
     <section
       id="jelajah-desa"
@@ -138,7 +142,7 @@ export function JelajahDesa({
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {items.map((paket, i) => (
             <Reveal key={paket.nama} delay={i * 90}>
-              <PaketCard paket={paket} />
+              <PaketCard paket={paket} waLink={waLink} />
             </Reveal>
           ))}
         </div>

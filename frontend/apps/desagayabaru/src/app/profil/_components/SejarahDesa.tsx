@@ -48,7 +48,7 @@ export async function SejarahDesa() {
               <div className="aspect-[4/5] w-full">
                 <img
                   src="/images/hero-bg.jpg"
-                  alt="Panorama pesisir Desa Gaya Baru"
+                  alt="Panorama pesisir desa, Desa Gaya Baru"
                   className="h-full w-full object-cover"
                 />
               </div>

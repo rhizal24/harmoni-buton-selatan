@@ -10,7 +10,7 @@ import type { AdminProfileRow, VillageRow } from "./db-types";
 export interface AdminSession {
   accessToken: string;
   email: string | null;
-  profile: Pick<AdminProfileRow, "id" | "full_name" | "role" | "village_id">;
+  profile: Pick<AdminProfileRow, "id" | "full_name" | "role" | "village_id" | "username">;
   /** Baris desa milik app INI (dari VILLAGE_SLUG). */
   village: VillageRow;
 }
@@ -29,7 +29,7 @@ export async function loadAdminSession(): Promise<AdminSession | null> {
 
   const { data: profile } = await supabase
     .from("admin_profiles")
-    .select("id, full_name, role, village_id")
+    .select("id, full_name, role, village_id, username")
     .eq("id", session.user.id)
     .maybeSingle();
   if (!profile) return null;

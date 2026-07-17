@@ -50,9 +50,9 @@ function CheckIcon() {
   );
 }
 
-const WA_LINK = "https://wa.me/6281234567890";
+const WA_DEFAULT = "6281234567890";
 
-function PaketCard({ paket }: { paket: Paket }) {
+function PaketCard({ paket, waLink }: { paket: Paket; waLink: string }) {
   return (
     <article className="flex flex-col justify-between gap-8 rounded-xl border border-[#31577F]/30 bg-[#f7f9fc] p-5 motion-safe:transition-shadow motion-safe:duration-200 hover:shadow-card-hover">
       <div className="flex flex-col gap-6">
@@ -85,10 +85,10 @@ function PaketCard({ paket }: { paket: Paket }) {
       </div>
 
       <a
-        href={`${WA_LINK}?text=${encodeURIComponent(`Halo, saya mau pesan ${paket.nama}`)}`}
+        href={`${waLink}?text=${encodeURIComponent(`Halo, saya mau pesan ${paket.nama}`)}`}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex h-[46px] items-center justify-center rounded-md border-[1.5px] px-8 font-body text-sm font-semibold no-underline shadow-sm motion-safe:transition-transform motion-safe:duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2 ${
+        className={`inline-flex h-[46px] items-center justify-center rounded-md border-[1.5px] px-8 font-body text-sm font-semibold no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 active:translate-y-0 hover:[filter:drop-shadow(0_0_16px_rgba(49,87,127,0.55))_drop-shadow(0_0_44px_rgba(49,87,127,0.30))] focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2 ${
           paket.highlight
             ? "border-white bg-[#31577F] text-white"
             : "border-[#31577F] bg-transparent text-[#31577F]"
@@ -104,12 +104,26 @@ function PaketCard({ paket }: { paket: Paket }) {
  * Jelajah Desa, 3 kartu paket wisata desa.
  * Header rata kanan (paragraf • dash • judul). Figma node 92:1395.
  */
-export function JelajahDesa({ items = PAKET_DEFAULT }: { items?: Paket[] }) {
+export function JelajahDesa({
+  items = PAKET_DEFAULT,
+  compactBottom = false,
+  wa,
+}: {
+  items?: Paket[];
+  /** Nomor WA tujuan pemesanan (wa.me); default nomor contoh. */
+  wa?: string;
+  /** Rapatkan padding bawah, dipakai saat section lain (bukan Footer/galeri
+   * dengan padding besar sendiri) langsung menyusul, mis. GuidebookWisata. */
+  compactBottom?: boolean;
+}) {
+  const waLink = `https://wa.me/${wa ?? WA_DEFAULT}`;
   return (
     <section
       id="jelajah-desa"
       aria-label="Jelajah Desa, paket wisata desa"
-      className="bg-white px-5 pt-6 pb-16 sm:px-8 lg:pt-8 lg:pb-24"
+      className={`bg-white px-5 pt-6 sm:px-8 lg:pt-8 ${
+        compactBottom ? "pb-6 lg:pb-8" : "pb-16 lg:pb-24"
+      }`}
     >
       <div className="mx-auto flex w-full max-w-[1112px] flex-col gap-10">
         {/* Header rata kanan */}
@@ -128,7 +142,7 @@ export function JelajahDesa({ items = PAKET_DEFAULT }: { items?: Paket[] }) {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {items.map((paket, i) => (
             <Reveal key={paket.nama} delay={i * 90}>
-              <PaketCard paket={paket} />
+              <PaketCard paket={paket} waLink={waLink} />
             </Reveal>
           ))}
         </div>

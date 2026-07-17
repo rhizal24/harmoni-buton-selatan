@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   WhatsAppIcon,
   MailIcon,
@@ -6,17 +5,20 @@ import {
   TikTokIcon,
   FacebookIcon,
 } from "@/components/ui";
+import { getFooterContacts, getVillage } from "@/lib/desa";
+import { FooterNavLink } from "./FooterNavLink";
 
-/* ── Kolom navigasi (link internal) ───────────────────────────────── */
+/* ── Kolom navigasi (link internal), mengikuti menu Navbar ─────────── */
 const NAV_COLS: {
   title: string;
-  links: { label: string; href: string; active?: boolean }[];
+  links: { label: string; href: string; exact?: boolean }[];
 }[] = [
   {
     title: "Jelajah",
     links: [
-      { label: "Beranda", href: "/", active: true },
+      { label: "Beranda", href: "/", exact: true },
       { label: "Wisata", href: "/wisata" },
+      { label: "Peta Infografis", href: "/peta" },
       { label: "Galeri", href: "/galeri" },
     ],
   },
@@ -24,36 +26,49 @@ const NAV_COLS: {
     title: "Informasi",
     links: [
       { label: "Profil Desa", href: "/profil" },
-      { label: "Peta Infografis", href: "/peta" },
       { label: "Berita", href: "/informasi" },
     ],
   },
 ];
 
-/* ── Kontak langsung: perangkat desa (WA) + email desa ────────────────
- * TODO(data): ganti nama, jabatan, dan nomor WA dengan data asli.
- * `phone` format internasional tanpa "+" / spasi, mis. 6281234567890.  */
-const PERANGKAT: { name: string; jabatan: string; phone: string }[] = [
-  { name: "La Ode …", jabatan: "Kepala Desa", phone: "6281234567890" },
-  { name: "Wa Ode …", jabatan: "Sekretaris Desa", phone: "6281234567890" },
+/* ── Fallback, dipakai HANYA bila admin belum mengisi info kontak lewat
+ * dashboard (menu "Kontak Footer") atau Supabase tak terjangkau. ────── */
+const PERANGKAT_FALLBACK = [
+  { name: "La Ode …", jabatan: "Kepala Desa", contact_type: "wa" as const, value: "6281234567890" },
+  { name: "Wa Ode …", jabatan: "Sekretaris Desa", contact_type: "wa" as const, value: "6281234567890" },
 ];
-
-const EMAIL_DESA = "desagayabaru@butonselatan.go.id";
-
-/* ── Sosial media ─────────────────────────────────────────────────────
- * TODO(data): ganti href dengan link/username asli.                     */
-const SOSMED: { label: string; href: string; icon: React.ReactNode }[] = [
-  { label: "Instagram", href: "#", icon: <InstagramIcon /> },
-  { label: "TikTok", href: "#", icon: <TikTokIcon /> },
-  { label: "Facebook", href: "#", icon: <FacebookIcon /> },
-];
+const EMAIL_FALLBACK = "desagayabaru@butonselatan.go.id";
 
 /**
  * Footer, brand kiri lebar, kolom navigasi, kolom kontak perangkat desa
  * (direct WhatsApp + email), kolom sosmed. Semua kontak diberi icon.
  * Tagline italik di tengah, divider, copyright. Background tosca solid.
+ *
+ * Server Component: kontak & sosmed diambil dari `villages` +
+ * `footer_contacts` (dikelola admin di /admin/kontak), fallback ke data
+ * contoh bila belum diisi. Link navigasi (butuh usePathname) dipisah ke
+ * `FooterNavLink` (Client Component).
  */
-export function Footer() {
+export async function Footer() {
+  const [village, contacts] = await Promise.all([
+    getVillage().catch(() => null),
+    getFooterContacts().catch(() => []),
+  ]);
+
+  const perangkat = contacts.length > 0 ? contacts : PERANGKAT_FALLBACK;
+  const email = village?.email || EMAIL_FALLBACK;
+
+  const sosmed: { label: string; href: string; icon: React.ReactNode }[] = [];
+  if (village?.instagram_url) {
+    sosmed.push({ label: "Instagram", href: village.instagram_url, icon: <InstagramIcon /> });
+  }
+  if (village?.tiktok_url) {
+    sosmed.push({ label: "TikTok", href: village.tiktok_url, icon: <TikTokIcon /> });
+  }
+  if (village?.facebook_url) {
+    sosmed.push({ label: "Facebook", href: village.facebook_url, icon: <FacebookIcon /> });
+  }
+
   return (
     <footer className="bg-[#31577F] px-5 py-14 text-white sm:px-8 lg:px-16 lg:py-16">
       <div className="mx-auto flex w-full max-w-[1112px] flex-col gap-10">
@@ -68,8 +83,8 @@ export function Footer() {
               loading="lazy"
             />
             <p className="font-body text-base leading-relaxed text-white">
-              Bergerak bersama menuju kemakmuran, Kabupaten Buton
-              Selatan, Sulawesi Tenggara. Dikembangkan bersama KKN-PPM UGM.
+              Bergerak bersama menuju kemakmuran, Kabupaten Buton Selatan,
+              Sulawesi Tenggara. Dikembangkan bersama KKN-PPM UGM.
             </p>
           </div>
 
@@ -86,15 +101,9 @@ export function Footer() {
                   {col.title}
                 </span>
                 {col.links.map((l) => (
-                  <Link
-                    key={l.label}
-                    href={l.href}
-                    className={`font-body text-sm no-underline motion-safe:transition-colors hover:text-white ${
-                      l.active ? "font-bold text-white" : "text-white/60"
-                    }`}
-                  >
+                  <FooterNavLink key={l.label} href={l.href} exact={l.exact}>
                     {l.label}
-                  </Link>
+                  </FooterNavLink>
                 ))}
               </nav>
             ))}
@@ -104,15 +113,23 @@ export function Footer() {
               <span className="font-body text-xl font-bold text-white">
                 Kontak
               </span>
-              {PERANGKAT.map((p) => (
+              {perangkat.map((p) => (
                 <a
                   key={p.name + p.jabatan}
-                  href={`https://wa.me/${p.phone}`}
-                  target="_blank"
+                  href={
+                    p.contact_type === "email"
+                      ? `mailto:${p.value}`
+                      : `https://wa.me/${p.value}`
+                  }
+                  target={p.contact_type === "email" ? undefined : "_blank"}
                   rel="noopener noreferrer"
                   className="group flex items-start gap-2.5 no-underline"
                 >
-                  <WhatsAppIcon className="mt-0.5 shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white" />
+                  {p.contact_type === "email" ? (
+                    <MailIcon className="mt-0.5 shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white" />
+                  ) : (
+                    <WhatsAppIcon className="mt-0.5 shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white" />
+                  )}
                   <span className="font-body text-sm leading-tight text-white/60 motion-safe:transition-colors group-hover:text-white">
                     <span className="block font-bold text-white">{p.name}</span>
                     {p.jabatan}
@@ -120,7 +137,7 @@ export function Footer() {
                 </a>
               ))}
               <a
-                href={`mailto:${EMAIL_DESA}`}
+                href={`mailto:${email}`}
                 className="group flex items-center gap-2.5 no-underline"
               >
                 <MailIcon className="shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white" />
@@ -130,28 +147,30 @@ export function Footer() {
               </a>
             </nav>
 
-            {/* Sosmed */}
-            <nav aria-label="Ikuti Kami" className="flex flex-col gap-3.5">
-              <span className="font-body text-xl font-bold text-white">
-                Ikuti Kami
-              </span>
-              {SOSMED.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-2.5 no-underline"
-                >
-                  <span className="shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white">
-                    {s.icon}
-                  </span>
-                  <span className="font-body text-sm text-white/60 motion-safe:transition-colors group-hover:text-white">
-                    {s.label}
-                  </span>
-                </a>
-              ))}
-            </nav>
+            {/* Sosmed, kosong sepenuhnya bila belum ada satu pun diisi admin */}
+            {sosmed.length > 0 && (
+              <nav aria-label="Ikuti Kami" className="flex flex-col gap-3.5">
+                <span className="font-body text-xl font-bold text-white">
+                  Ikuti Kami
+                </span>
+                {sosmed.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-2.5 no-underline"
+                  >
+                    <span className="shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white">
+                      {s.icon}
+                    </span>
+                    <span className="font-body text-sm text-white/60 motion-safe:transition-colors group-hover:text-white">
+                      {s.label}
+                    </span>
+                  </a>
+                ))}
+              </nav>
+            )}
           </div>
         </div>
 

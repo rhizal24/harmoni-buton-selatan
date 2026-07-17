@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 /**
@@ -17,11 +18,14 @@ const BUTTON_MOTION =
   "motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 active:translate-y-0";
 
 const INPUT_CLASS =
-  "w-full rounded-md border border-outline-variant px-3 py-2.5 font-body text-sm text-on-surface outline-none motion-safe:transition-colors focus:border-[#31577F]";
+  "w-full rounded-md border border-outline-variant bg-white px-3.5 py-2.5 font-body text-sm text-on-surface outline-none placeholder:text-on-surface-variant/60 motion-safe:transition-[border-color,box-shadow] focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/15";
 
 export function UnggahFoto() {
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
+  // Portal butuh document, baru tersedia setelah mount di client.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [nama, setNama] = useState("");
@@ -116,8 +120,10 @@ export function UnggahFoto() {
         Unggah Foto
       </button>
 
-      <AnimatePresence>
-        {open && (
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
           <motion.div
             role="dialog"
             aria-modal="true"
@@ -127,7 +133,7 @@ export function UnggahFoto() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduceMotion ? 0 : 0.2 }}
-            className="fixed inset-0 z-100 flex items-center justify-center bg-[#0b1d20]/70 p-5 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0b1d20]/70 p-4 backdrop-blur-sm sm:p-6"
             onClick={() => setOpen(false)}
           >
             <motion.div
@@ -135,7 +141,7 @@ export function UnggahFoto() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={reduceMotion ? undefined : { opacity: 0, y: 16, scale: 0.98 }}
               transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-              className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg border border-outline-variant bg-white p-6"
+              className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white p-6 text-left shadow-floating sm:p-7"
               onClick={(e) => e.stopPropagation()}
             >
               {done ? (
@@ -186,7 +192,7 @@ export function UnggahFoto() {
                       type="button"
                       aria-label="Tutup"
                       onClick={() => setOpen(false)}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-outline-variant text-on-surface-variant hover:border-[#31577F] hover:text-[#31577F] motion-safe:transition-colors"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-on-surface-variant hover:bg-surface-container-low hover:text-[#31577F] motion-safe:transition-colors"
                     >
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
                         <path
@@ -210,27 +216,39 @@ export function UnggahFoto() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="group relative flex min-h-40 w-full items-center justify-center overflow-hidden rounded-md border-[1.5px] border-dashed border-outline-variant bg-surface-container-low hover:border-[#31577F] motion-safe:transition-colors"
+                    className="group relative flex min-h-44 w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border-[1.5px] border-dashed border-outline-variant bg-surface-container-low hover:border-[#31577F] hover:bg-[#D9E4F1]/25 motion-safe:transition-colors"
                   >
                     {preview ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={preview}
-                        alt="Pratinjau foto yang dipilih"
-                        className="max-h-64 w-full object-contain"
-                      />
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={preview}
+                          alt="Pratinjau foto yang dipilih"
+                          className="max-h-64 w-full object-contain"
+                        />
+                        <span className="absolute inset-x-0 bottom-0 bg-[#0b1d20]/60 px-3 py-1.5 text-center font-body text-xs font-semibold text-white opacity-0 backdrop-blur-sm group-hover:opacity-100 motion-safe:transition-opacity">
+                          Klik untuk mengganti foto
+                        </span>
+                      </>
                     ) : (
-                      <span className="flex flex-col items-center gap-2 p-6 font-body text-sm text-on-surface-variant group-hover:text-[#31577F] motion-safe:transition-colors">
-                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden>
-                          <path
-                            d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                        Pilih foto (JPG/PNG/WebP, maks 5 MB)
+                      <span className="flex flex-col items-center gap-3 p-6 text-center">
+                        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#D9E4F1] text-[#31577F] group-hover:scale-105 motion-safe:transition-transform">
+                          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+                            <path
+                              d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        </span>
+                        <span className="font-body text-sm font-semibold text-on-surface group-hover:text-[#31577F] motion-safe:transition-colors">
+                          Pilih foto dari perangkatmu
+                        </span>
+                        <span className="font-body text-xs text-on-surface-variant">
+                          JPG · PNG · WebP, maksimal 5 MB
+                        </span>
                       </span>
                     )}
                   </button>
@@ -256,7 +274,7 @@ export function UnggahFoto() {
                       maxLength={200}
                       rows={2}
                       onChange={(e) => setKeterangan(e.target.value)}
-                      placeholder="Misal: Senja di dermaga Karamba"
+                      placeholder="Misal: Senja di Pantai Gaya Baru"
                       className={`${INPUT_CLASS} resize-none`}
                     />
                   </label>
@@ -283,7 +301,7 @@ export function UnggahFoto() {
                   <button
                     type="submit"
                     disabled={!file || busy}
-                    className="min-h-11 rounded-md bg-[#31577F] px-6 py-3 font-body text-sm font-semibold text-white hover:bg-[#00525c] disabled:cursor-not-allowed disabled:opacity-40 motion-safe:transition-colors"
+                    className="min-h-11 w-full rounded-md bg-[#31577F] px-6 py-3 font-body text-sm font-semibold text-white shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] disabled:cursor-not-allowed disabled:opacity-40 enabled:hover:-translate-y-0.5 enabled:active:translate-y-0 enabled:hover:[filter:drop-shadow(0_0_16px_rgba(49,87,127,0.55))_drop-shadow(0_0_44px_rgba(49,87,127,0.30))]"
                   >
                     {busy ? "Mengirim…" : "Kirim Foto"}
                   </button>
@@ -291,8 +309,10 @@ export function UnggahFoto() {
               )}
             </motion.div>
           </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
         )}
-      </AnimatePresence>
     </>
   );
 }

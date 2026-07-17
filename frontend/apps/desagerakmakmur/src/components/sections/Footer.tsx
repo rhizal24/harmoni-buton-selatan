@@ -34,8 +34,8 @@ const NAV_COLS: {
 /* ── Fallback — dipakai HANYA bila admin belum mengisi info kontak lewat
  * dashboard (menu "Kontak Footer") atau Supabase tak terjangkau. ────── */
 const PERANGKAT_FALLBACK = [
-  { name: "La Ode …", jabatan: "Kepala Desa", phone: "6281234567890" },
-  { name: "Wa Ode …", jabatan: "Sekretaris Desa", phone: "6281234567890" },
+  { name: "La Ode …", jabatan: "Kepala Desa", contact_type: "wa" as const, value: "6281234567890" },
+  { name: "Wa Ode …", jabatan: "Sekretaris Desa", contact_type: "wa" as const, value: "6281234567890" },
 ];
 const EMAIL_FALLBACK = "desagerakmakmur@butonselatan.go.id";
 
@@ -116,12 +116,20 @@ export async function Footer() {
               {perangkat.map((p) => (
                 <a
                   key={p.name + p.jabatan}
-                  href={`https://wa.me/${p.phone}`}
-                  target="_blank"
+                  href={
+                    p.contact_type === "email"
+                      ? `mailto:${p.value}`
+                      : `https://wa.me/${p.value}`
+                  }
+                  target={p.contact_type === "email" ? undefined : "_blank"}
                   rel="noopener noreferrer"
                   className="group flex items-start gap-2.5 no-underline"
                 >
-                  <WhatsAppIcon className="mt-0.5 shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white" />
+                  {p.contact_type === "email" ? (
+                    <MailIcon className="mt-0.5 shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white" />
+                  ) : (
+                    <WhatsAppIcon className="mt-0.5 shrink-0 text-white/60 motion-safe:transition-colors group-hover:text-white" />
+                  )}
                   <span className="font-body text-sm leading-tight text-white/60 motion-safe:transition-colors group-hover:text-white">
                     <span className="block font-bold text-white">{p.name}</span>
                     {p.jabatan}
