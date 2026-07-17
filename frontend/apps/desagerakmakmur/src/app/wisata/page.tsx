@@ -30,6 +30,9 @@ export default async function WisataPage() {
     getVillage().catch(() => null),
   ]);
 
+  // Nomor WA seragam untuk seluruh halaman (villages.whatsapp).
+  const waDesa = village?.whatsapp?.replace(/[^0-9]/g, "") || undefined;
+
   return (
     <main>
       {/* Hero di-pin; panel di bawahnya (asset tepi atas + section) naik
@@ -43,8 +46,8 @@ export default async function WisataPage() {
         hideDistance={0}
       >
         <DaftarWisata data={wisata} />
-        <JelajahDesa items={paket ?? undefined} compactBottom />
-        <GuidebookWisata />
+        <JelajahDesa items={paket ?? undefined} compactBottom wa={waDesa} />
+        <GuidebookWisata wa={waDesa} fileUrl={village?.guidebook_url ?? undefined} />
         <Footer />
       </ScrollCoverReveal>
     </main>

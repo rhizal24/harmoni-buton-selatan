@@ -22,10 +22,20 @@ const ISI_GUIDEBOOK = [
   "Tips berkunjung, etika wisata, dan kontak penting",
 ];
 
-const FILE_GUIDEBOOK = "/docs/guidebook-wisata-gerakmakmur.pdf";
-const WA_LINK = "https://wa.me/6281234567890";
+const FILE_GUIDEBOOK_DEFAULT = "/docs/guidebook-wisata-gerakmakmur.pdf";
+const WA_DEFAULT = "6281234567890";
 
-export function GuidebookWisata() {
+export function GuidebookWisata({
+  wa,
+  fileUrl,
+}: {
+  /** Nomor WA tujuan (wa.me) - seragam dengan bagian lain halaman wisata. */
+  wa?: string;
+  /** URL PDF guidebook dari admin (villages.guidebook_url); default file statis. */
+  fileUrl?: string;
+}) {
+  const FILE_GUIDEBOOK = fileUrl ?? FILE_GUIDEBOOK_DEFAULT;
+  const WA_LINK = `https://wa.me/${wa ?? WA_DEFAULT}`;
   const leftRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLAnchorElement>(null);
 

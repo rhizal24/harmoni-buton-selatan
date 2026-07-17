@@ -13,7 +13,7 @@ import { SITE_NAME } from "@/lib/constants";
  */
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [identitas, setIdentitas] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -23,12 +23,26 @@ export default function AdminLoginPage() {
     setError(null);
     setBusy(true);
     try {
+      // Boleh login pakai username ATAU email. Username dipetakan ke email
+      // lewat RPC email_untuk_username (SECURITY DEFINER).
+      let email = identitas.trim();
+      if (!email.includes("@")) {
+        const { data: hasil } = await getSupabase().rpc("email_untuk_username", {
+          u: email,
+        });
+        if (!hasil) {
+          setError("Username tidak ditemukan.");
+          return;
+        }
+        email = hasil as string;
+      }
+
       const { error: authError } = await getSupabase().auth.signInWithPassword({
         email,
         password,
       });
       if (authError) {
-        setError("Email atau password salah.");
+        setError("Username/email atau password salah.");
         return;
       }
 
@@ -55,18 +69,18 @@ export default function AdminLoginPage() {
         </p>
         <h1 className="mt-2 font-body text-2xl font-bold text-[#2E2E2E]">{SITE_NAME}</h1>
         <p className="mt-1 font-body text-sm text-[#5A5A5A]">
-          Masuk dengan akun admin Supabase Anda.
+          Masuk dengan username atau email admin Anda.
         </p>
 
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <label className="flex flex-col gap-1.5">
-            <span className="font-body text-sm font-semibold text-[#2E2E2E]">Email</span>
+            <span className="font-body text-sm font-semibold text-[#2E2E2E]">Username atau Email</span>
             <input
-              type="email"
+              type="text"
               required
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="username"
+              value={identitas}
+              onChange={(e) => setIdentitas(e.target.value)}
               className="h-11 rounded-md border border-[#D0D0D0] px-3 font-body text-sm text-[#2E2E2E] outline-none focus:border-[#31577F] focus:ring-2 focus:ring-[#31577F]/20"
             />
           </label>

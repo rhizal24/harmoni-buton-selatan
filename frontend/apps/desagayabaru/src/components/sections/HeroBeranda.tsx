@@ -7,8 +7,11 @@ import { StaggerIn } from "@/components/ui/StaggerIn";
  * Hero Beranda, full-bleed foto drone desa + overlay gelap + konten center.
  * Susunan: pill (identitas situs) → eyebrow → headline → deskripsi → CTA,
  * dengan indikator scroll-down di bawah. Sesuai Figma node 82:873.
+ *
+ * `imageUrl` bisa diatur admin lewat menu "Hero Section" (kolom
+ * `villages.hero_beranda_url`), kosong berarti pakai foto default.
  */
-export function HeroBeranda() {
+export function HeroBeranda({ imageUrl }: { imageUrl?: string | null }) {
   return (
     <section
       id="hero"
@@ -17,7 +20,7 @@ export function HeroBeranda() {
     >
       {/* Background foto */}
       <img
-        src="/images/hero-bg.jpg"
+        src={imageUrl || "/images/hero-bg.jpg"}
         alt="Panorama Desa Gaya Baru dari udara"
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden
@@ -60,7 +63,7 @@ export function HeroBeranda() {
         <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
           <Link
             href="/wisata#daftar-wisata"
-            className="inline-flex items-center rounded-md bg-[#31577F] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-200 hover:-translate-y-0.5 hover:[filter:drop-shadow(0_0_16px_rgba(49,87,127,0.55))_drop-shadow(0_0_44px_rgba(49,87,127,0.30))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+            className="inline-flex items-center rounded-md bg-[#31577F] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 active:translate-y-0 hover:[filter:drop-shadow(0_0_16px_rgba(49,87,127,0.55))_drop-shadow(0_0_44px_rgba(49,87,127,0.30))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
           >
             Jelajahi Wisata
           </Link>

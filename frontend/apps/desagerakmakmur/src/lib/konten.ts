@@ -7,7 +7,7 @@
  * Supabase, data DB otomatis menggantikan placeholder (ISR, lihat
  * `export const revalidate` di tiap page).
  */
-import { getGalleryImages, getTourismPackages, getTourismSpots } from "./desa";
+import { getGalleryImages, getTourismPackages, getTourismSpots, getVillage } from "./desa";
 import { CONTACT_INFO } from "./constants";
 import type { TourismPackageRow, TourismSpotWithImages } from "./db-types";
 import { WISATA as WISATA_PLACEHOLDER, type Wisata } from "@/app/wisata/_data/wisata";
@@ -37,7 +37,7 @@ function spotImages(spot: TourismSpotWithImages): string[] {
   return imgs.length > 0 ? imgs : PLACEHOLDER_IMGS;
 }
 
-function toWisata(spot: TourismSpotWithImages): Wisata {
+function toWisata(spot: TourismSpotWithImages, waDesa: string | null): Wisata {
   // Prioritas link maps: maps_url dari admin → koordinat → pencarian nama.
   const maps =
     spot.maps_url ??
@@ -52,8 +52,10 @@ function toWisata(spot: TourismSpotWithImages): Wisata {
     tagline: spot.tagline ?? spot.address ?? "",
     deskripsi: spot.description ?? "",
     tags: spot.tags ?? [],
-    telepon: spot.phone ?? CONTACT_INFO.phone,
-    wa: spot.whatsapp ?? "",
+    // Nomor WA & telepon SERAGAM se-halaman wisata: pakai WA utama desa
+    // (villages.whatsapp, diatur di /admin/kontak); fallback nomor per-spot.
+    telepon: waDesa ? `+${waDesa}` : (spot.phone ?? CONTACT_INFO.phone),
+    wa: waDesa ?? spot.whatsapp ?? "",
     instagram: spot.instagram_url ?? undefined,
     tiktok: spot.tiktok_url ?? undefined,
     facebook: spot.facebook_url ?? undefined,
@@ -68,9 +70,9 @@ function toWisata(spot: TourismSpotWithImages): Wisata {
 /** Daftar wisata untuk halaman /wisata. Fallback: placeholder statis. */
 export async function fetchWisata(): Promise<Wisata[]> {
   try {
-    const spots = await getTourismSpots();
+    const [spots, waDesa] = await Promise.all([getTourismSpots(), fetchWaDesa()]);
     if (spots.length === 0) return WISATA_PLACEHOLDER;
-    return spots.map(toWisata);
+    return spots.map((spot) => toWisata(spot, waDesa));
   } catch (err) {
     console.warn("[konten] Gagal memuat tourism_spots, pakai placeholder:", err);
     return WISATA_PLACEHOLDER;
@@ -133,6 +135,17 @@ export async function fetchPaket(): Promise<Paket[] | null> {
     );
   } catch (err) {
     console.warn("[konten] Gagal memuat tourism_packages, pakai placeholder:", err);
+    return null;
+  }
+}
+
+/** Nomor WA utama desa (wa.me, tanpa "+"/spasi) dari villages.whatsapp. */
+export async function fetchWaDesa(): Promise<string | null> {
+  try {
+    const village = await getVillage();
+    const bersih = village?.whatsapp?.replace(/[^0-9]/g, "") ?? "";
+    return bersih.length > 0 ? bersih : null;
+  } catch {
     return null;
   }
 }

@@ -1,7 +1,7 @@
 /**
  * NavDropdown, UI Atom
  *
- * Dropdown disclosure untuk menu Informasi (Berita).
+ * Dropdown disclosure untuk menu Informasi (Berita + UMKM).
  * Menggunakan Popover API (HTML-native) untuk positioning dan overlay handling.
  * Fallback: CSS-only approach via :focus-within jika Popover belum didukung.
  *

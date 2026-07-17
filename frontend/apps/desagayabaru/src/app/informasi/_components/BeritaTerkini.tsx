@@ -95,13 +95,50 @@ export function BeritaTerkini({
         });
       }
       if (kontenRef.current) {
-        gsap.from(kontenRef.current.children, {
-          ...masuk,
-          y: 36,
-          stagger: 0.15,
-          delay: 0.35,
-          scrollTrigger: { trigger: kontenRef.current, start: "top 85%" },
-        });
+        const konten = kontenRef.current;
+        const trigger = { trigger: konten, start: "top 85%" } as const;
+
+        // Kartu daftar geser (mobile), masuk berurutan
+        const kartuMobile = konten.querySelectorAll(":scope > nav > *");
+        if (kartuMobile.length) {
+          gsap.from(kartuMobile, {
+            ...masuk,
+            y: 22,
+            duration: 0.6,
+            stagger: 0.06,
+            delay: 0.2,
+            scrollTrigger: trigger,
+          });
+        }
+
+        // Panel baca, foto headline lalu tiap blok isi berurutan
+        const blokBaca = konten.querySelectorAll(
+          ":scope article > div:first-child, :scope article > div:last-child > *",
+        );
+        if (blokBaca.length) {
+          gsap.from(blokBaca, {
+            ...masuk,
+            y: 26,
+            stagger: 0.1,
+            delay: 0.2,
+            scrollTrigger: trigger,
+          });
+        }
+
+        // Kolom kanan, judul, tiap item daftar, lalu blok pengisi berurutan
+        const blokAside = konten.querySelectorAll(
+          ":scope aside > nav > h3, :scope aside > nav > ol > li, :scope aside > nav > div, :scope aside > div",
+        );
+        if (blokAside.length) {
+          gsap.from(blokAside, {
+            ...masuk,
+            y: 22,
+            duration: 0.6,
+            stagger: 0.07,
+            delay: 0.3,
+            scrollTrigger: trigger,
+          });
+        }
       }
     });
 
@@ -169,8 +206,8 @@ export function BeritaTerkini({
           </h1>
           <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#31577F]/80">
             Kabar terbaru seputar kegiatan, pembangunan, dan kehidupan warga
-            Desa Gaya Baru, cari atau pilih judul, baca langsung di
-            halaman ini.
+            Desa Gaya Baru, cari atau pilih judul, baca langsung di halaman
+            ini.
           </p>
         </div>
 
@@ -259,284 +296,284 @@ export function BeritaTerkini({
                 ref={kontenRef}
                 className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]"
               >
-                  {/* ── Daftar berita, mobile: kartu geser horizontal ── */}
-                  <nav
-                    aria-label="Daftar berita"
-                    className="-mx-5 flex snap-x gap-3 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:px-8 lg:hidden"
-                  >
-                    {hasil.map((artikel, i) => (
-                      <button
-                        key={artikel.id}
-                        type="button"
-                        onClick={() => pilih(artikel)}
-                        aria-current={
-                          current.id === artikel.id ? "true" : undefined
-                        }
-                        className={`group flex w-[248px] shrink-0 snap-start flex-col overflow-hidden rounded-lg border text-left motion-safe:transition-colors motion-safe:duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#31577F] ${
-                          current.id === artikel.id
-                            ? "border-[1.5px] border-[#31577F] bg-[#31577F]/5"
-                            : "border-outline-variant bg-white"
-                        }`}
-                      >
-                        <span className="relative block overflow-hidden">
-                          <img
-                            src={artikel.coverImageUrl ?? FALLBACK_COVER}
-                            alt=""
-                            loading="lazy"
-                            className="h-24 w-full object-cover motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-105"
-                          />
-                          <span className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-[#31577F] font-body text-[11px] font-bold text-white">
-                            {i + 1}
-                          </span>
+                {/* ── Daftar berita, mobile: kartu geser horizontal ── */}
+                <nav
+                  aria-label="Daftar berita"
+                  className="-mx-5 flex snap-x gap-3 overflow-x-auto px-5 pb-2 sm:-mx-8 sm:px-8 lg:hidden"
+                >
+                  {hasil.map((artikel, i) => (
+                    <button
+                      key={artikel.id}
+                      type="button"
+                      onClick={() => pilih(artikel)}
+                      aria-current={
+                        current.id === artikel.id ? "true" : undefined
+                      }
+                      className={`group flex w-[248px] shrink-0 snap-start flex-col overflow-hidden rounded-lg border text-left motion-safe:transition-colors motion-safe:duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#31577F] ${
+                        current.id === artikel.id
+                          ? "border-[1.5px] border-[#31577F] bg-[#31577F]/5"
+                          : "border-outline-variant bg-white"
+                      }`}
+                    >
+                      <span className="relative block overflow-hidden">
+                        <img
+                          src={artikel.coverImageUrl ?? FALLBACK_COVER}
+                          alt=""
+                          loading="lazy"
+                          className="h-24 w-full object-cover motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-105"
+                        />
+                        <span className="absolute left-2 top-2 grid h-6 w-6 place-items-center rounded-full bg-[#31577F] font-body text-[11px] font-bold text-white">
+                          {i + 1}
                         </span>
-                        <span className="flex flex-col gap-1 p-3">
-                          <span className="line-clamp-2 font-body text-sm font-semibold leading-snug text-on-surface">
-                            {artikel.title}
-                          </span>
-                          <time
-                            dateTime={artikel.publishedAt}
-                            className="font-body text-xs text-on-surface-variant"
-                          >
-                            {formatDate(artikel.publishedAt)}
-                          </time>
+                      </span>
+                      <span className="flex flex-col gap-1 p-3">
+                        <span className="line-clamp-2 font-body text-sm font-semibold leading-snug text-on-surface">
+                          {artikel.title}
                         </span>
-                      </button>
-                    ))}
-                  </nav>
+                        <time
+                          dateTime={artikel.publishedAt}
+                          className="font-body text-xs text-on-surface-variant"
+                        >
+                          {formatDate(artikel.publishedAt)}
+                        </time>
+                      </span>
+                    </button>
+                  ))}
+                </nav>
 
-                  {/* ── Panel baca, artikel aktif utuh ── */}
-                  <div ref={readerRef} className="scroll-mt-28">
-                    <AnimatePresence mode="wait" initial={false}>
-                      <motion.article
-                        key={current.id}
-                        variants={reduceMotion ? undefined : panelVariants}
-                        initial={reduceMotion ? false : "hidden"}
-                        animate="show"
-                        exit={
-                          reduceMotion
-                            ? undefined
-                            : { opacity: 0, transition: { duration: 0.15 } }
-                        }
-                        className="flex flex-col"
+                {/* ── Panel baca, artikel aktif utuh ── */}
+                <div ref={readerRef} className="scroll-mt-28">
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.article
+                      key={current.id}
+                      variants={reduceMotion ? undefined : panelVariants}
+                      initial={reduceMotion ? false : "hidden"}
+                      animate="show"
+                      exit={
+                        reduceMotion
+                          ? undefined
+                          : { opacity: 0, transition: { duration: 0.15 } }
+                      }
+                      className="flex flex-col"
+                    >
+                      {/* Headline, judul di atas foto, ala portal berita */}
+                      <motion.div
+                        variants={reduceMotion ? undefined : blokVariants}
+                        className="group relative overflow-hidden rounded-lg"
                       >
-                        {/* Headline, judul di atas foto, ala portal berita */}
+                        <img
+                          src={current.coverImageUrl ?? FALLBACK_COVER}
+                          alt=""
+                          className="aspect-video w-full object-cover motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-105"
+                        />
+                        <div
+                          className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
+                          aria-hidden
+                        />
+                        <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5 sm:p-7">
+                          <div className="flex flex-wrap items-center gap-2">
+                            {current.id === articles[0].id && (
+                              <span className="rounded-full bg-[#31577F] px-3 py-1 font-body text-xs font-semibold text-white">
+                                Terbaru
+                              </span>
+                            )}
+                            <span className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
+                              Kabar Desa
+                            </span>
+                          </div>
+                          <h3 className="max-w-[36rem] font-body text-xl font-bold leading-snug text-white sm:text-2xl lg:text-3xl">
+                            {current.title}
+                          </h3>
+                        </div>
+                      </motion.div>
+
+                      <div className="flex flex-col gap-4 pt-6">
+                        {/* Meta, tanggal • lama baca • penulis */}
                         <motion.div
                           variants={reduceMotion ? undefined : blokVariants}
-                          className="group relative overflow-hidden rounded-lg"
+                          className="flex flex-wrap items-center gap-x-2 gap-y-1 font-body text-xs font-semibold text-on-surface-variant"
                         >
-                          <img
-                            src={current.coverImageUrl ?? FALLBACK_COVER}
-                            alt=""
-                            className="aspect-video w-full object-cover motion-safe:transition-transform motion-safe:duration-700 group-hover:scale-105"
-                          />
-                          <div
-                            className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"
-                            aria-hidden
-                          />
-                          <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5 sm:p-7">
-                            <div className="flex flex-wrap items-center gap-2">
-                              {current.id === articles[0].id && (
-                                <span className="rounded-full bg-[#31577F] px-3 py-1 font-body text-xs font-semibold text-white">
-                                  Terbaru
-                                </span>
-                              )}
-                              <span className="font-body text-xs font-semibold uppercase tracking-[0.2em] text-white/80">
-                                Kabar Desa
-                              </span>
-                            </div>
-                            <h3 className="max-w-[36rem] font-body text-xl font-bold leading-snug text-white sm:text-2xl lg:text-3xl">
-                              {current.title}
-                            </h3>
-                          </div>
+                          <time dateTime={current.publishedAt}>
+                            {formatDate(current.publishedAt)}
+                          </time>
+                          <span aria-hidden>•</span>
+                          <span>{menitBaca(current.content)} menit baca</span>
+                          <span aria-hidden>•</span>
+                          <span>Pemerintah Desa Gaya Baru</span>
                         </motion.div>
 
-                        <div className="flex flex-col gap-4 pt-6">
-                          {/* Meta, tanggal • lama baca • penulis */}
-                          <motion.div
+                        {current.excerpt && (
+                          <motion.p
                             variants={reduceMotion ? undefined : blokVariants}
-                            className="flex flex-wrap items-center gap-x-2 gap-y-1 font-body text-xs font-semibold text-on-surface-variant"
+                            className="border-l-2 border-[#31577F] pl-4 font-body text-base leading-relaxed text-on-surface-variant lg:text-lg"
                           >
-                            <time dateTime={current.publishedAt}>
-                              {formatDate(current.publishedAt)}
-                            </time>
-                            <span aria-hidden>•</span>
-                            <span>{menitBaca(current.content)} menit baca</span>
-                            <span aria-hidden>•</span>
-                            <span>Pemerintah Desa Gaya Baru</span>
-                          </motion.div>
+                            {current.excerpt}
+                          </motion.p>
+                        )}
 
-                          {current.excerpt && (
-                            <motion.p
-                              variants={reduceMotion ? undefined : blokVariants}
-                              className="border-l-2 border-[#31577F] pl-4 font-body text-base leading-relaxed text-on-surface-variant lg:text-lg"
-                            >
-                              {current.excerpt}
-                            </motion.p>
-                          )}
+                        <motion.div
+                          variants={reduceMotion ? undefined : blokVariants}
+                          className="flex flex-col gap-4 border-t border-outline-variant pt-4"
+                        >
+                          {current.content
+                            .split(/\n+/)
+                            .map((p) => p.trim())
+                            .filter(Boolean)
+                            .map((p, i) => (
+                              <p
+                                key={i}
+                                className="font-body text-base leading-relaxed text-on-surface"
+                              >
+                                {p}
+                              </p>
+                            ))}
+                        </motion.div>
 
-                          <motion.div
-                            variants={reduceMotion ? undefined : blokVariants}
-                            className="flex flex-col gap-4 border-t border-outline-variant pt-4"
+                        <motion.div
+                          variants={reduceMotion ? undefined : blokVariants}
+                          className="flex justify-end border-t border-outline-variant pt-4"
+                        >
+                          <Link
+                            href={`/informasi/berita/${current.slug}`}
+                            className="font-body text-sm font-semibold text-[#31577F] no-underline hover:underline"
                           >
-                            {current.content
-                              .split(/\n+/)
-                              .map((p) => p.trim())
-                              .filter(Boolean)
-                              .map((p, i) => (
-                                <p
-                                  key={i}
-                                  className="font-body text-base leading-relaxed text-on-surface"
-                                >
-                                  {p}
-                                </p>
-                              ))}
-                          </motion.div>
+                            Buka halaman berita ini <span aria-hidden>→</span>
+                          </Link>
+                        </motion.div>
+                      </div>
+                    </motion.article>
+                  </AnimatePresence>
+                </div>
 
-                          <motion.div
-                            variants={reduceMotion ? undefined : blokVariants}
-                            className="flex justify-end border-t border-outline-variant pt-4"
-                          >
-                            <Link
-                              href={`/informasi/berita/${current.slug}`}
-                              className="font-body text-sm font-semibold text-[#31577F] no-underline hover:underline"
-                            >
-                              Buka halaman berita ini <span aria-hidden>→</span>
-                            </Link>
-                          </motion.div>
-                        </div>
-                      </motion.article>
-                    </AnimatePresence>
-                  </div>
-
-                  {/* ── Kolom kanan, daftar polos gaya portal (tanpa kartu,
+                {/* ── Kolom kanan, daftar polos gaya portal (tanpa kartu,
                          tidak sticky) + blok pengisi: tag, UMKM, ajakan ── */}
-                  <aside className="hidden lg:flex lg:flex-col lg:gap-6">
-                    {/* Daftar berita bernomor #1 #2 … */}
-                    <nav aria-label="Daftar berita">
-                      <h3 className="font-body text-base font-bold text-[#31577F]">
-                        {q ? "Hasil Pencarian" : "Berita Terkini"}
-                      </h3>
-                      <ol className="mt-4 flex flex-col gap-4">
-                        {tampil.map((artikel, i) => (
-                          <li key={artikel.id}>
-                            <button
-                              type="button"
-                              onClick={() => pilih(artikel)}
-                              aria-current={
-                                current.id === artikel.id ? "true" : undefined
-                              }
-                              className="group flex w-full gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#31577F]"
+                <aside className="hidden lg:flex lg:flex-col lg:gap-6">
+                  {/* Daftar berita bernomor #1 #2 … */}
+                  <nav aria-label="Daftar berita">
+                    <h3 className="font-body text-base font-bold text-[#31577F]">
+                      {q ? "Hasil Pencarian" : "Berita Terkini"}
+                    </h3>
+                    <ol className="mt-4 flex flex-col gap-4">
+                      {tampil.map((artikel, i) => (
+                        <li key={artikel.id}>
+                          <button
+                            type="button"
+                            onClick={() => pilih(artikel)}
+                            aria-current={
+                              current.id === artikel.id ? "true" : undefined
+                            }
+                            className="group flex w-full gap-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#31577F]"
+                          >
+                            <span
+                              className={`shrink-0 font-body text-sm font-semibold ${
+                                current.id === artikel.id
+                                  ? "text-[#31577F]"
+                                  : "text-on-surface-variant/60"
+                              }`}
                             >
+                              #{(hal - 1) * PER_HALAMAN + i + 1}
+                            </span>
+                            <span className="flex min-w-0 flex-col gap-0.5">
                               <span
-                                className={`shrink-0 font-body text-sm font-semibold ${
+                                className={`line-clamp-2 font-body text-sm font-bold leading-snug motion-safe:transition-colors motion-safe:duration-150 ${
                                   current.id === artikel.id
                                     ? "text-[#31577F]"
-                                    : "text-on-surface-variant/60"
+                                    : "text-on-surface group-hover:text-[#31577F]"
                                 }`}
                               >
-                                #{(hal - 1) * PER_HALAMAN + i + 1}
+                                {artikel.title}
                               </span>
-                              <span className="flex min-w-0 flex-col gap-0.5">
-                                <span
-                                  className={`line-clamp-2 font-body text-sm font-bold leading-snug motion-safe:transition-colors motion-safe:duration-150 ${
-                                    current.id === artikel.id
-                                      ? "text-[#31577F]"
-                                      : "text-on-surface group-hover:text-[#31577F]"
-                                  }`}
-                                >
-                                  {artikel.title}
-                                </span>
-                                <time
-                                  dateTime={artikel.publishedAt}
-                                  className="font-body text-xs text-on-surface-variant"
-                                >
-                                  {formatDate(artikel.publishedAt)}
-                                </time>
-                              </span>
-                            </button>
-                          </li>
-                        ))}
-                      </ol>
-
-                      {/* Pager mini, daftar tetap 5 item berapa pun beritanya */}
-                      {totalHalaman > 1 && (
-                        <div className="mt-4 flex items-center justify-between border-t border-outline-variant pt-3">
-                          <button
-                            type="button"
-                            aria-label="Berita sebelumnya"
-                            onClick={() => setHalaman(hal - 1)}
-                            disabled={hal <= 1}
-                            className="grid h-8 w-8 cursor-pointer place-items-center rounded-md bg-[#31577F]/10 font-body text-base font-bold text-[#31577F] motion-safe:transition-colors hover:bg-[#31577F]/20 disabled:pointer-events-none disabled:opacity-40"
-                          >
-                            <span aria-hidden>‹</span>
-                          </button>
-                          <span className="font-body text-xs font-semibold text-on-surface-variant">
-                            Halaman {hal} dari {totalHalaman}
-                          </span>
-                          <button
-                            type="button"
-                            aria-label="Berita berikutnya"
-                            onClick={() => setHalaman(hal + 1)}
-                            disabled={hal >= totalHalaman}
-                            className="grid h-8 w-8 cursor-pointer place-items-center rounded-md bg-[#31577F]/10 font-body text-base font-bold text-[#31577F] motion-safe:transition-colors hover:bg-[#31577F]/20 disabled:pointer-events-none disabled:opacity-40"
-                          >
-                            <span aria-hidden>›</span>
-                          </button>
-                        </div>
-                      )}
-                    </nav>
-
-                    {/* Sorotan UMKM, pengisi kolom, menaut ke section UMKM */}
-                    {umkm.length > 0 && (
-                      <div className="border-t border-outline-variant pt-5">
-                        <h3 className="font-body text-base font-bold text-[#31577F]">
-                          UMKM Desa
-                        </h3>
-                        <ul className="mt-4 flex flex-col gap-4">
-                          {umkm.slice(0, 4).map((usaha) => (
-                            <li key={usaha.nama}>
-                              <a
-                                href="#umkm-desa"
-                                className="group flex flex-col gap-0.5 no-underline"
+                              <time
+                                dateTime={artikel.publishedAt}
+                                className="font-body text-xs text-on-surface-variant"
                               >
-                                <span className="line-clamp-1 font-body text-sm font-bold text-on-surface group-hover:text-[#31577F]">
-                                  {usaha.nama}
-                                </span>
-                                <span className="line-clamp-1 font-body text-xs text-on-surface-variant">
-                                  {usaha.deskripsi}
-                                </span>
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                        <a
-                          href="#umkm-desa"
-                          className="mt-4 inline-block rounded-md bg-surface-container-low px-4 py-2 font-body text-sm font-semibold text-[#31577F] no-underline hover:bg-[#31577F]/10"
+                                {formatDate(artikel.publishedAt)}
+                              </time>
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ol>
+
+                    {/* Pager mini, daftar tetap 5 item berapa pun beritanya */}
+                    {totalHalaman > 1 && (
+                      <div className="mt-4 flex items-center justify-between border-t border-outline-variant pt-3">
+                        <button
+                          type="button"
+                          aria-label="Berita sebelumnya"
+                          onClick={() => setHalaman(hal - 1)}
+                          disabled={hal <= 1}
+                          className="grid h-8 w-8 cursor-pointer place-items-center rounded-md bg-[#31577F]/10 font-body text-base font-bold text-[#31577F] motion-safe:transition-colors hover:bg-[#31577F]/20 disabled:pointer-events-none disabled:opacity-40"
                         >
-                          Lihat Selengkapnya <span aria-hidden>→</span>
-                        </a>
+                          <span aria-hidden>‹</span>
+                        </button>
+                        <span className="font-body text-xs font-semibold text-on-surface-variant">
+                          Halaman {hal} dari {totalHalaman}
+                        </span>
+                        <button
+                          type="button"
+                          aria-label="Berita berikutnya"
+                          onClick={() => setHalaman(hal + 1)}
+                          disabled={hal >= totalHalaman}
+                          className="grid h-8 w-8 cursor-pointer place-items-center rounded-md bg-[#31577F]/10 font-body text-base font-bold text-[#31577F] motion-safe:transition-colors hover:bg-[#31577F]/20 disabled:pointer-events-none disabled:opacity-40"
+                        >
+                          <span aria-hidden>›</span>
+                        </button>
                       </div>
                     )}
+                  </nav>
 
-                    {/* Ajakan warga, pengisi penutup kolom */}
+                  {/* Sorotan UMKM, pengisi kolom, menaut ke section UMKM */}
+                  {umkm.length > 0 && (
                     <div className="border-t border-outline-variant pt-5">
-                      <div className="rounded-lg bg-surface-container-low p-5">
-                        <h3 className="font-body text-base font-bold text-[#31577F]">
-                          Punya Momen Menarik?
-                        </h3>
-                        <p className="mt-2 font-body text-sm leading-relaxed text-on-surface-variant">
-                          Kirimkan foto kegiatan atau keseharianmu di desa -
-                          momen terbaik tampil di galeri Lensa Gaya Baru.
-                        </p>
-                        <Link
-                          href="/galeri"
-                          className="mt-3 inline-block font-body text-sm font-semibold text-[#31577F] no-underline hover:underline"
-                        >
-                          Buka Galeri <span aria-hidden>→</span>
-                        </Link>
-                      </div>
+                      <h3 className="font-body text-base font-bold text-[#31577F]">
+                        UMKM Desa
+                      </h3>
+                      <ul className="mt-4 flex flex-col gap-4">
+                        {umkm.slice(0, 4).map((usaha) => (
+                          <li key={usaha.nama}>
+                            <a
+                              href="#umkm-desa"
+                              className="group flex flex-col gap-0.5 no-underline"
+                            >
+                              <span className="line-clamp-1 font-body text-sm font-bold text-on-surface group-hover:text-[#31577F]">
+                                {usaha.nama}
+                              </span>
+                              <span className="line-clamp-1 font-body text-xs text-on-surface-variant">
+                                {usaha.deskripsi}
+                              </span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                      <a
+                        href="#umkm-desa"
+                        className="mt-4 inline-block rounded-md bg-surface-container-low px-4 py-2 font-body text-sm font-semibold text-[#31577F] no-underline hover:bg-[#31577F]/10"
+                      >
+                        Lihat Selengkapnya <span aria-hidden>→</span>
+                      </a>
                     </div>
-                  </aside>
+                  )}
+
+                  {/* Ajakan warga, pengisi penutup kolom */}
+                  <div className="border-t border-outline-variant pt-5">
+                    <div className="rounded-lg bg-surface-container-low p-5">
+                      <h3 className="font-body text-base font-bold text-[#31577F]">
+                        Punya Momen Menarik?
+                      </h3>
+                      <p className="mt-2 font-body text-sm leading-relaxed text-on-surface-variant">
+                        Kirimkan foto kegiatan atau keseharianmu di desa, momen
+                        terbaik tampil di galeri Lensa Gaya Baru.
+                      </p>
+                      <Link
+                        href="/galeri"
+                        className="mt-3 inline-block font-body text-sm font-semibold text-[#31577F] no-underline hover:underline"
+                      >
+                        Buka Galeri <span aria-hidden>→</span>
+                      </Link>
+                    </div>
+                  </div>
+                </aside>
               </div>
             )}
           </>

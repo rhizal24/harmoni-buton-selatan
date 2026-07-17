@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { ExpandingGallery } from "@/components/ui/ExpandingGallery";
 import { Pagination } from "@/components/ui/Pagination";
 import type { GaleriFoto } from "@/lib/konten";
@@ -106,6 +107,16 @@ export function LensaGayaBaru({ images }: { images?: GaleriFoto[] }) {
           onChange={changePage}
           className="mt-10"
         />
+
+        {/* CTA ke halaman galeri lengkap */}
+        <div className="mt-8 flex justify-center">
+          <Link
+            href="/galeri#galeri-masonry"
+            className="inline-flex items-center rounded-md bg-[#31577F] px-8 py-3 font-body text-sm font-semibold text-white no-underline shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 active:translate-y-0 hover:[filter:drop-shadow(0_0_16px_rgba(49,87,127,0.55))_drop-shadow(0_0_44px_rgba(49,87,127,0.30))] focus-visible:outline-2 focus-visible:outline-[#31577F] focus-visible:outline-offset-2"
+          >
+            Jelajahi Galeri Lengkap
+          </Link>
+        </div>
       </div>
     </section>
   );

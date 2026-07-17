@@ -19,11 +19,28 @@ CREATE TABLE IF NOT EXISTS public.footer_contacts (
   village_id    uuid NOT NULL REFERENCES public.villages(id) ON DELETE CASCADE,
   name          text NOT NULL,
   jabatan       text NOT NULL,
-  /** Nomor WhatsApp format internasional tanpa "+"/spasi, mis. 6281234567890. */
-  phone         text NOT NULL,
+  -- Jenis kontak: 'wa' (nomor wa.me tanpa "+"/spasi, mis. 6281234567890)
+  -- atau 'email' (alamat email). Nilainya disimpan di kolom `value`.
+  contact_type  text NOT NULL DEFAULT 'wa' CHECK (contact_type IN ('wa', 'email')),
+  value         text NOT NULL,
   display_order integer NOT NULL DEFAULT 0,
   created_at    timestamptz NOT NULL DEFAULT now()
 );
+
+-- Untuk yang telanjur membuat tabel versi lama (kolom `phone`):
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'footer_contacts' AND column_name = 'phone'
+  ) THEN
+    ALTER TABLE public.footer_contacts ADD COLUMN IF NOT EXISTS contact_type text NOT NULL DEFAULT 'wa';
+    ALTER TABLE public.footer_contacts ADD COLUMN IF NOT EXISTS value text;
+    UPDATE public.footer_contacts SET value = phone WHERE value IS NULL;
+    ALTER TABLE public.footer_contacts ALTER COLUMN value SET NOT NULL;
+    ALTER TABLE public.footer_contacts DROP COLUMN phone;
+  END IF;
+END $$;
 
 ALTER TABLE public.footer_contacts ENABLE ROW LEVEL SECURITY;
 

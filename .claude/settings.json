@@ -16,7 +16,10 @@
       "Bash(curl -s -o /dev/null -w \"/admin: %{http_code}\\\\n\" http://localhost:3000/admin)",
       "Bash(curl -s -w \"\\\\nHTTP %{http_code}\\\\n\" -X POST \"https://nrfstzwjvqkndmzhdlgc.supabase.co/auth/v1/token?grant_type=password\" -H \"apikey: sb_publishable_MFMdQ-ZS5X4FGUYtMwhAPA_rm0K_9h_\" -H \"Content-Type: application/json\" -d '{\"email\":\"tes@contoh.com\",\"password\":\"salah\"}')",
       "WebFetch(domain:gayabaru-desa.com)",
-      "Bash(exit 1)"
+      "Bash(exit 1)",
+      "Bash(perl -0pi -e 's/\\(export interface AdminProfileRow \\\\{\\\\r?\\\\n  id: string;\\\\r?\\\\n  full_name: string \\\\| null;\\)/$1\\\\n  \\\\/** Username login \\(bisa diganti admin di \\\\/admin\\\\/akun\\); null = belum diset. *\\\\/\\\\n  username?: string \\\\| null;/' src/lib/db-types.ts)",
+      "Bash(perl -0pi -e 's/\\(  \\\\/\\\\*\\\\* Kontak & sosmed footer[^\\\\n]*\\\\n  email: string \\\\| null;\\)/  \\\\/** Nomor WA utama desa \\(wa.me, tanpa \"+\"\\\\/spasi\\), dipakai seragam di \\\\/wisata. *\\\\/\\\\n  whatsapp: string \\\\| null;\\\\n  \\\\/** PDF guidebook wisata \\(upload \\\\/admin\\\\/wisata\\). *\\\\/\\\\n  guidebook_url: string \\\\| null;\\\\n$1/' src/lib/db-types.ts)",
+      "Bash(perl -0pi -e 's/  jabatan: string;\\\\r?\\\\n  \\\\/\\\\*\\\\* Nomor WhatsApp format internasional tanpa \"\\\\+\"\\\\/spasi, mis\\\\. 6281234567890\\\\. \\\\*\\\\/\\\\r?\\\\n  phone: string;/  jabatan: string;\\\\n  \\\\/** Jenis kontak: WhatsApp atau email. *\\\\/\\\\n  contact_type: \"wa\" | \"email\";\\\\n  \\\\/** Nomor wa.me \\(tanpa \"+\"\\\\/spasi\\) atau alamat email, sesuai jenisnya. *\\\\/\\\\n  value: string;/' src/lib/db-types.ts)"
     ],
     "defaultMode": "bypassPermissions",
     "additionalDirectories": [

@@ -1,5 +1,5 @@
 /**
- * Tipe baris tabel Supabase (schema `public`) — lihat
+ * Tipe baris tabel Supabase (schema `public`), lihat
  * `arsitektur-deployment-vercel-supabase-imagekit.md` dan SQL schema di Supabase.
  * Kolom timestamp dikembalikan supabase-js sebagai string ISO.
  */
@@ -22,11 +22,28 @@ export interface VillageRow {
   video_url: string | null;
   logo_url: string | null;
   cover_image_url: string | null;
-  /** Konten profil — lihat docs/supabase-migration-profil.sql.
+  /** Konten profil, lihat docs/supabase-migration-profil.sql.
    *  about/history = paragraf dipisah baris kosong. */
   about: string | null;
   vision: string | null;
   missions: string[];
+  /** Foto hero per halaman, lihat docs/supabase-migration-hero.sql.
+   *  null = pakai foto default bawaan (/images/*.jpg). */
+  hero_beranda_url: string | null;
+  hero_wisata_url: string | null;
+  hero_profil_url: string | null;
+  /** Gambar peta statis /peta, lihat docs/supabase-migration-peta.sql. */
+  peta_wisata_url: string | null;
+  peta_dusun_url: string | null;
+  /** Nomor WA utama desa (wa.me, tanpa "+"/spasi), dipakai seragam di /wisata. */
+  whatsapp: string | null;
+  /** PDF guidebook wisata (upload /admin/wisata). */
+  guidebook_url: string | null;
+  /** Kontak & sosmed footer, lihat docs/supabase-migration-kontak.sql. */
+  email: string | null;
+  instagram_url: string | null;
+  tiktok_url: string | null;
+  facebook_url: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -35,8 +52,24 @@ export interface VillageRow {
 export interface AdminProfileRow {
   id: string;
   full_name: string | null;
+  /** Username login (bisa diganti admin di /admin/akun); null = belum diset. */
+  username?: string | null;
   role: AdminRole;
   village_id: string | null;
+  created_at: string;
+}
+
+/** Kontak WhatsApp cepat di footer, lihat docs/supabase-migration-kontak.sql. */
+export interface FooterContactRow {
+  id: string;
+  village_id: string;
+  name: string;
+  jabatan: string;
+  /** Jenis kontak: WhatsApp atau email. */
+  contact_type: "wa" | "email";
+  /** Nomor wa.me (tanpa "+"/spasi) atau alamat email, sesuai jenisnya. */
+  value: string;
+  display_order: number;
   created_at: string;
 }
 
@@ -49,7 +82,7 @@ export interface OrganizationStructureRow {
   short_bio: string | null;
   period_start: string | null;
   period_end: string | null;
-  /** id atasan langsung (bagan hierarki) — null = puncak struktur. */
+  /** id atasan langsung (bagan hierarki), null = puncak struktur. */
   parent_id: string | null;
   display_order: number;
   created_at: string;
@@ -65,7 +98,7 @@ export interface PopulationDataRow {
   value: number;
   unit: string | null;
   notes: string | null;
-  /** Teks tampilan bebas (mis. "±2.500", "12,4 km²") + urutan tampil —
+  /** Teks tampilan bebas (mis. "±2.500", "12,4 km²") + urutan tampil -
    *  lihat docs/supabase-migration-profil.sql */
   value_label: string | null;
   display_order: number;
@@ -97,7 +130,7 @@ export interface TourismSpotRow {
   latitude: number | null;
   longitude: number | null;
   cover_image_url: string | null;
-  /** Kolom detail — lihat docs/supabase-migration-wisata-detail.sql */
+  /** Kolom detail, lihat docs/supabase-migration-wisata-detail.sql */
   tagline: string | null;
   tags: string[];
   phone: string | null;
@@ -154,7 +187,7 @@ export interface ArticleRow {
   content: string;
   excerpt: string | null;
   author_id: string | null;
-  /** Kolom tambahan — lihat docs/supabase-migration-galeri-artikel.sql */
+  /** Kolom tambahan, lihat docs/supabase-migration-galeri-artikel.sql */
   category: ArticleCategory;
   is_published: boolean;
   published_at: string | null;
@@ -163,7 +196,7 @@ export interface ArticleRow {
 }
 
 /**
- * Galeri foto desa — lihat docs/supabase-migration-galeri-artikel.sql dan
+ * Galeri foto desa, lihat docs/supabase-migration-galeri-artikel.sql dan
  * docs/supabase-migration-galeri-kiriman.sql (kolom moderasi kiriman warga).
  * Kolom moderasi opsional (`?`) agar kompatibel sebelum migrasi dijalankan.
  */
@@ -178,13 +211,16 @@ export interface GalleryImageRow {
   status?: "pending" | "approved";
   /** Nama pengirim (kiriman warga), null untuk upload admin. */
   submitted_by?: string | null;
-  /** fileId ImageKit — untuk menghapus file saat kiriman ditolak. */
+  /** fileId ImageKit, untuk menghapus file saat kiriman ditolak. */
   file_id?: string | null;
   /** Ukuran file (KB), kiriman warga; untuk kuota 500 MB. */
   file_size_kb?: number | null;
 }
 
-/** UMKM usaha warga — lihat docs/supabase-migration-umkm.sql. */
+/**
+ * UMKM usaha warga, lihat docs/supabase-migration-umkm.sql.
+ * Kolom koordinat, lihat docs/supabase-migration-umkm-koordinat.sql.
+ */
 export interface UmkmRow {
   id: string;
   village_id: string;
@@ -195,6 +231,8 @@ export interface UmkmRow {
   pemilik: string | null;
   lokasi: string | null;
   maps_url: string | null;
+  latitude: number | null;
+  longitude: number | null;
   wa: string | null;
   instagram_url: string | null;
   tiktok_url: string | null;

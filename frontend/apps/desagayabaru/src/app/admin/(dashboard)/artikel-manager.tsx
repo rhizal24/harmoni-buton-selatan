@@ -39,7 +39,7 @@ function slugify(input: string): string {
 }
 
 /**
- * CRUD artikel (halaman Berita,
+ * CRUD artikel (dipakai halaman Berita & UMKM, kategori berbeda,
  * tabel sama: articles). Slug dibuat otomatis dari judul, unik per desa;
  * published_at terisi saat pertama kali ditayangkan.
  */

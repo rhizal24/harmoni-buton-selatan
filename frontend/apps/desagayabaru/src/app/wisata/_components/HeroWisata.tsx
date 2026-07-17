@@ -17,8 +17,11 @@ gsap.registerPlugin(ScrollTrigger);
  * (GSAP, naik saat di-scroll). Dua CTA: "Mulai Eksplorasi" & "Pesan Paket".
  * Colocated di `app/wisata/_components`. (Pembatas parallax `bawah.avif`
  * dipasang di section berikutnya, DaftarWisata, agar menempel ke sana.)
+ *
+ * `imageUrl` bisa diatur admin lewat menu "Hero Section" (kolom
+ * `villages.hero_wisata_url`), kosong berarti pakai foto default.
  */
-export function HeroWisata() {
+export function HeroWisata({ imageUrl }: { imageUrl?: string | null }) {
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -58,7 +61,7 @@ export function HeroWisata() {
     >
       {/* Background foto */}
       <img
-        src="/images/wisata-pantai.jpg"
+        src={imageUrl || "/images/wisata-pantai.jpg"}
         alt="Panorama wisata bahari Desa Gaya Baru"
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden
@@ -97,9 +100,10 @@ export function HeroWisata() {
             >
               Mulai Eksplorasi
             </Link>
-            {/* Secondary, Pesan Paket Wisata (ghost/glass) */}
+            {/* Secondary, Pesan Paket Wisata (ghost/glass) → section paket
+                "Jelajah Desa" di beranda */}
             <Link
-              href="#paket-wisata"
+              href="/#jelajah-desa"
               className="inline-flex items-center rounded-md border border-white/70 bg-white/10 px-8 py-3 font-body text-sm font-semibold text-white no-underline backdrop-blur-sm shadow-sm motion-safe:transition-[transform,filter,background-color] motion-safe:duration-200 hover:-translate-y-0.5 hover:bg-white/20 hover:[filter:drop-shadow(0_0_16px_rgba(255,255,255,0.45))_drop-shadow(0_0_44px_rgba(255,255,255,0.25))] focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
             >
               Pesan Paket Wisata

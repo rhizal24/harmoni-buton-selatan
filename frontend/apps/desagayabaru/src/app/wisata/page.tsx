@@ -3,8 +3,10 @@ import { JelajahDesa, Footer } from "@/components/sections";
 import { ScrollCoverReveal } from "@/components/ui/ScrollCoverReveal";
 import { HeroWisata } from "./_components/HeroWisata";
 import { DaftarWisata } from "./_components/DaftarWisata";
+import { GuidebookWisata } from "./_components/GuidebookWisata";
 import { getWisata } from "@/data/wisata";
 import { fetchPaket } from "@/lib/konten";
+import { getVillage } from "@/lib/desa";
 
 export const metadata: Metadata = {
   title: "Wisata",
@@ -22,14 +24,21 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function WisataPage() {
-  const [wisata, paket] = await Promise.all([getWisata(), fetchPaket()]);
+  const [wisata, paket, village] = await Promise.all([
+    getWisata(),
+    fetchPaket(),
+    getVillage().catch(() => null),
+  ]);
+
+  // Nomor WA seragam untuk seluruh halaman (villages.whatsapp).
+  const waDesa = village?.whatsapp?.replace(/[^0-9]/g, "") || undefined;
 
   return (
     <main>
       {/* Hero di-pin; panel di bawahnya (asset tepi atas + section) naik
           menutupi hero sebagai satu kesatuan, dari utuh (0) sampai tertutup. */}
       <ScrollCoverReveal
-        cover={<HeroWisata />}
+        cover={<HeroWisata imageUrl={village?.hero_wisata_url} />}
         capSrc="/assets/bawah.avif"
         capClassName="mix-blend-screen [filter:drop-shadow(0_0_16px_rgba(150,230,240,0.55))_drop-shadow(0_0_44px_rgba(90,200,220,0.35))]"
         capOverlap={1}
@@ -37,7 +46,8 @@ export default async function WisataPage() {
         hideDistance={0}
       >
         <DaftarWisata data={wisata} />
-        <JelajahDesa items={paket ?? undefined} />
+        <JelajahDesa items={paket ?? undefined} compactBottom wa={waDesa} />
+        <GuidebookWisata wa={waDesa} fileUrl={village?.guidebook_url ?? undefined} />
         <Footer />
       </ScrollCoverReveal>
     </main>

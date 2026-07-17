@@ -10,10 +10,10 @@ export const metadata: Metadata = {
 };
 
 /**
- * Halaman Informasi, Server Component (App Router). Berita Terkini dari
- * tabel Supabase `articles` kategori `berita` (dikelola dashboard admin).
- * Section route-spesifik dicolocate di `./_components`; Navbar sudah
- * dirender di root layout.
+ * Halaman Informasi, Server Component (App Router). Gabungan dua konten
+ * dari tabel Supabase `articles` (dikelola dashboard admin): Berita Terkini
+(kategori `berita`). Section route-spesifik dicolocate di `./_components`; Navbar
+ * sudah dirender di root layout.
  */
 // ISR, konten Supabase disegarkan tiap 5 menit.
 export const revalidate = 300;

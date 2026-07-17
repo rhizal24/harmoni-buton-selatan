@@ -22,6 +22,7 @@ import {
   SearchIcon,
   StoreIcon,
   TicketIcon,
+  UserRoundIcon,
   WavesIcon,
   type LucideIcon,
 } from "lucide-react";
@@ -70,7 +71,10 @@ interface NavGroup {
 const NAV_GROUPS: NavGroup[] = [
   {
     label: null,
-    items: [{ label: "Ringkasan", href: "/admin", icon: LayoutDashboardIcon }],
+    items: [
+      { label: "Ringkasan", href: "/admin", icon: LayoutDashboardIcon },
+      { label: "Akun Admin", href: "/admin/akun", icon: UserRoundIcon },
+    ],
   },
   {
     label: "Kelembagaan",

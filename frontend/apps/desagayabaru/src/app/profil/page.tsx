@@ -8,6 +8,7 @@ import { StatistikDesa } from "./_components/StatistikDesa";
 import { StrukturOrganisasi } from "./_components/StrukturOrganisasi";
 import { DokumenDesa } from "./_components/DokumenDesa";
 import { getStruktur, getDokumen } from "@/data/profil";
+import { getVillage } from "@/lib/desa";
 
 export const metadata: Metadata = {
   title: "Profil",
@@ -31,16 +32,20 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function ProfilPage() {
-  const [struktur, dokumen] = await Promise.all([getStruktur(), getDokumen()]);
+  const [struktur, dokumen, village] = await Promise.all([
+    getStruktur(),
+    getDokumen(),
+    getVillage().catch(() => null),
+  ]);
 
   return (
     <main>
-      <HeroProfil />
+      <HeroProfil imageUrl={village?.hero_profil_url} />
       <TentangDesa />
       <SejarahDesa />
       <VisiMisi />
-      <StrukturOrganisasi data={struktur} />
       <StatistikDesa />
+      <StrukturOrganisasi data={struktur} />
       <DokumenDesa data={dokumen} />
       <Footer />
     </main>

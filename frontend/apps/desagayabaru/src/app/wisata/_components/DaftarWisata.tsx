@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Reveal } from "@/components/ui/Reveal";
+import { slugify } from "@/lib/utils";
 import {
   PhotoSlideshow,
   WhatsAppIcon,
@@ -27,6 +28,21 @@ import type { Wisata } from "@/types/wisata";
 export function DaftarWisata({ data }: { data: Wisata[] }) {
   const [active, setActive] = useState(0); // item pertama terbuka default
   const current = data[active];
+
+  // Deep-link dari halaman lain: hash `#wisata-<slug-nama>` (mis. tombol
+  // "Lihat Detail" di beranda) membuka destinasi itu lalu scroll ke section.
+  useEffect(() => {
+    const hash = decodeURIComponent(window.location.hash.slice(1));
+    if (!hash.startsWith("wisata-")) return;
+    const idx = data.findIndex((w) => `wisata-${slugify(w.nama)}` === hash);
+    if (idx < 0) return;
+    setActive(idx);
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.getElementById("daftar-wisata")?.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  }, [data]);
 
   return (
     <section

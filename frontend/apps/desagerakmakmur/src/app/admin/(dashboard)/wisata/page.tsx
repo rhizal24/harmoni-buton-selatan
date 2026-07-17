@@ -80,6 +80,42 @@ export default function AdminWisataPage() {
     void refresh();
   }, [refresh]);
 
+  // ── Guidebook wisata (PDF), tersimpan di villages.guidebook_url ──
+  const [guidebook, setGuidebook] = useState<string | null>(null);
+
+  useEffect(() => {
+    void getSupabase()
+      .from("villages")
+      .select("guidebook_url")
+      .eq("id", admin.village.id)
+      .maybeSingle()
+      .then(({ data }) =>
+        setGuidebook((data as { guidebook_url: string | null } | null)?.guidebook_url ?? null),
+      );
+  }, [admin.village.id]);
+
+  async function handleGuidebookUpload(file: File) {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const url = await uploadFile(file, admin.accessToken);
+      const { error } = await getSupabase()
+        .from("villages")
+        .update({ guidebook_url: url, updated_at: new Date().toISOString() })
+        .eq("id", admin.village.id);
+      if (error) throw new Error(error.message);
+      if (guidebook && guidebook !== url) {
+        void deleteUploadedFile(guidebook, admin.accessToken);
+      }
+      setGuidebook(url);
+      setMsg({ kind: "ok", text: "Guidebook diperbarui, langsung dipakai halaman /wisata." });
+    } catch (err) {
+      setMsg({ kind: "err", text: err instanceof Error ? err.message : "Upload gagal." });
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function startEdit(spot: TourismSpotWithImages) {
     setForm({
       id: spot.id,
@@ -234,6 +270,49 @@ export default function AdminWisataPage() {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* ── Guidebook wisata (PDF), tampil paling atas ── */}
+      <section
+        aria-label="Guidebook wisata"
+        className="rounded-xl border border-[#D0D0D0] bg-white p-4"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-body text-base font-bold text-[#2E2E2E]">
+              Guidebook Wisata (PDF)
+            </h2>
+            <p className="mt-0.5 font-body text-xs text-[#5A5A5A]">
+              Diunduh pengunjung dari section Guidebook di halaman /wisata.{" "}
+              {guidebook ? (
+                <a
+                  href={guidebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-[#006572] underline"
+                >
+                  Lihat file saat ini
+                </a>
+              ) : (
+                "Belum ada file; halaman memakai PDF contoh bawaan."
+              )}
+            </p>
+          </div>
+          <label className="cursor-pointer rounded-md border border-[#006572] px-4 py-2 font-body text-sm font-semibold text-[#006572] hover:bg-[#CFF1F4]">
+            {guidebook ? "Ganti PDF" : "Upload PDF"}
+            <input
+              type="file"
+              accept="application/pdf"
+              className="hidden"
+              disabled={busy}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void handleGuidebookUpload(file);
+                e.target.value = "";
+              }}
+            />
+          </label>
+        </div>
+      </section>
+
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="font-body text-2xl font-bold text-[#2E2E2E]">Destinasi Wisata</h1>
