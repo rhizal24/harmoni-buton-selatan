@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -19,13 +19,31 @@ import { VILLAGE_MAP_CENTER, VILLAGE_MAP_DEFAULT_ZOOM } from "@/lib/constants";
 import { slugify } from "@/lib/utils";
 import type { Wisata } from "@/types/wisata";
 import type { Umkm } from "@/types/umkm";
-import type { FeatureCollection } from "geojson";
+import type { Feature, FeatureCollection } from "geojson";
 
 const WARNA_WISATA = "#006572";
 const WARNA_UMKM = "#F45B69";
 const WARNA_BATAS_WILAYAH = "#2E2E2E";
 const WARNA_BATAS_DESA = "#006572";
 const WARNA_BANGUNAN = "#5A5A5A";
+const WARNA_FASILITAS = "#C9A227";
+
+/**
+ * Warna bangunan dibedakan per dusun supaya sebaran tiap dusun gampang
+ * dibaca sekilas di peta, alih-alih satu warna abu-abu rata untuk semua
+ * bangunan. Dusun di luar 4 nama ini (kalau ada data baru) jatuh ke
+ * `WARNA_BANGUNAN` sebagai warna default.
+ */
+const WARNA_BANGUNAN_PER_DUSUN: Record<string, string> = {
+  "Lande 1": "#4A7C59",
+  "Lande 2": "#7C5C9C",
+  "Lande 3": "#C77B3B",
+  "Lande 4": "#4472A8",
+};
+
+// Urutan tampil pill filter dusun — dusun di luar daftar ini (kalau ada
+// data baru) tetap dirender, ditaruh di akhir lewat sisa hasil `.sort()`.
+const URUTAN_DUSUN = ["Lande 1", "Lande 2", "Lande 3", "Lande 4"];
 
 /**
  * Dua pilihan basemap — jalan (OSM default) dan topografi (kontur
@@ -90,12 +108,19 @@ function FilterPill({
   onClick,
   activeClassName,
   inactiveDotColor,
+  warna,
 }: {
   label: string;
   active: boolean;
   onClick: () => void;
-  activeClassName: string;
+  // Kategori dengan warna tetap (dikenal saat nulis kode) pakai kelas
+  // Tailwind statis lewat `activeClassName`. Kategori dengan warna dinamis
+  // (mis. per dusun, ditentukan dari data) pakai `warna` + inline style,
+  // karena Tailwind JIT tidak bisa men-scan class arbitrary-value yang
+  // dirakit lewat template literal saat runtime.
+  activeClassName?: string;
   inactiveDotColor: string;
+  warna?: string;
 }) {
   return (
     <button
@@ -104,9 +129,14 @@ function FilterPill({
       aria-pressed={active}
       className={`flex cursor-pointer items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 font-body text-xs font-semibold whitespace-nowrap motion-safe:transition-all ${
         active
-          ? activeClassName
+          ? (activeClassName ?? "text-white shadow-sm")
           : "border-[#D0D0D0] bg-white/95 text-[#5A5A5A] shadow-sm"
       }`}
+      style={
+        active && warna
+          ? { borderColor: warna, backgroundColor: warna }
+          : undefined
+      }
     >
       <span
         className={`h-2.5 w-2.5 rounded-full ${active ? "bg-white" : ""}`}
@@ -152,7 +182,10 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
   const [tampilUmkm, setTampilUmkm] = useState(true);
   const [tampilBatasWilayah, setTampilBatasWilayah] = useState(true);
   const [tampilBatasDesa, setTampilBatasDesa] = useState(true);
-  const [tampilBangunan, setTampilBangunan] = useState(true);
+  const [dusunTersembunyi, setDusunTersembunyi] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [tampilFasilitas, setTampilFasilitas] = useState(true);
   const [basemap, setBasemap] = useState<BasemapKey>("jalan");
   const [menuFilterTerbuka, setMenuFilterTerbuka] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -161,6 +194,9 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
   );
   const [batasDesa, setBatasDesa] = useState<FeatureCollection | null>(null);
   const [bangunan, setBangunan] = useState<FeatureCollection | null>(null);
+  const [fasilitasUmum, setFasilitasUmum] = useState<FeatureCollection | null>(
+    null,
+  );
 
   // Data batas administrasi (Kecamatan Sampolawa), batas desa, dan bangunan
   // dipisah jadi GeoJSON statis di /public/geo alih-alih di-hardcode di kode
@@ -211,6 +247,21 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
     };
   }, []);
 
+  useEffect(() => {
+    let batal = false;
+    fetch("/geo/tambahan-attribute.geojson")
+      .then((res) => res.json())
+      .then((data: FeatureCollection) => {
+        if (!batal) setFasilitasUmum(data);
+      })
+      .catch(() => {
+        if (!batal) setFasilitasUmum(null);
+      });
+    return () => {
+      batal = true;
+    };
+  }, []);
+
   // Fullscreen API browser (`requestFullscreen`) sering diblok Permissions
   // Policy di dalam iframe preview, jadi "layar penuh" di sini dibuat murni
   // lewat CSS (`fixed inset-0`). `Reveal` (ancestor section peta) memberi
@@ -243,6 +294,47 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
     (u): u is Umkm & { latitude: number; longitude: number } =>
       u.latitude != null && u.longitude != null,
   );
+
+  // Bangunan dikelompokkan per dusun supaya tiap dusun bisa punya pill
+  // filter + warna sendiri — react-leaflet's GeoJSON tidak reaktif ke
+  // perubahan `data`/`filter` (cuma `style`), jadi tiap dusun dirender jadi
+  // GeoJSON terpisah yang di-mount/unmount lewat kondisi, bukan lewat satu
+  // GeoJSON besar yang di-filter di dalam.
+  const bangunanPerDusun = useMemo(() => {
+    if (!bangunan) return [];
+    const kelompok = new Map<string, Feature[]>();
+    for (const feature of bangunan.features) {
+      const dusun = (feature.properties?.Dusun as string | undefined) ?? "Lainnya";
+      if (!kelompok.has(dusun)) kelompok.set(dusun, []);
+      kelompok.get(dusun)!.push(feature);
+    }
+    return [...kelompok.entries()]
+      .sort(([a], [b]) => {
+        const ia = URUTAN_DUSUN.indexOf(a);
+        const ib = URUTAN_DUSUN.indexOf(b);
+        if (ia === -1 && ib === -1) return a.localeCompare(b);
+        if (ia === -1) return 1;
+        if (ib === -1) return -1;
+        return ia - ib;
+      })
+      .map(([dusun, features]) => ({
+        dusun,
+        warna: WARNA_BANGUNAN_PER_DUSUN[dusun] ?? WARNA_BANGUNAN,
+        data: { type: "FeatureCollection", features } as FeatureCollection,
+      }));
+  }, [bangunan]);
+
+  const toggleDusun = (dusun: string) => {
+    setDusunTersembunyi((prev) => {
+      const next = new Set(prev);
+      if (next.has(dusun)) {
+        next.delete(dusun);
+      } else {
+        next.add(dusun);
+      }
+      return next;
+    });
+  };
 
   const peta = (
     <div
@@ -283,7 +375,7 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
         <Layers className="h-4 w-4" />
       </button>
 
-      <div className="absolute top-3 right-3 z-[1000] flex flex-col items-end">
+      <div className="absolute top-3 right-3 z-[1000] flex max-w-[calc(100%-1.5rem)] flex-col items-end">
         {/* Toggle dropdown filter — cuma tampil di mobile; di sm ke atas
             baris pill selalu terbuka seperti biasa. */}
         <button
@@ -299,7 +391,7 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
         <div
           className={`flex-col items-end gap-2 ${
             menuFilterTerbuka ? "mt-2 flex" : "hidden"
-          } sm:mt-0 sm:flex sm:flex-row sm:flex-wrap sm:justify-end sm:gap-2`}
+          } sm:mt-0 sm:flex sm:flex-col sm:items-end sm:gap-2`}
         >
           {batasDesa && (
             <FilterPill
@@ -310,13 +402,23 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
               inactiveDotColor={WARNA_BATAS_DESA}
             />
           )}
-          {bangunan && (
+          {bangunanPerDusun.map(({ dusun, warna, data }) => (
             <FilterPill
-              label={`Bangunan (${bangunan.features.length})`}
-              active={tampilBangunan}
-              onClick={() => setTampilBangunan((v) => !v)}
-              activeClassName="border-[#5A5A5A] bg-[#5A5A5A] text-white shadow-[0_0_14px_rgba(90,90,90,0.45)]"
-              inactiveDotColor={WARNA_BANGUNAN}
+              key={dusun}
+              label={`${dusun} (${data.features.length})`}
+              active={!dusunTersembunyi.has(dusun)}
+              onClick={() => toggleDusun(dusun)}
+              warna={warna}
+              inactiveDotColor={warna}
+            />
+          ))}
+          {fasilitasUmum && (
+            <FilterPill
+              label={`Fasilitas Umum (${fasilitasUmum.features.length})`}
+              active={tampilFasilitas}
+              onClick={() => setTampilFasilitas((v) => !v)}
+              activeClassName="border-[#C9A227] bg-[#C9A227] text-white shadow-[0_0_14px_rgba(201,162,39,0.5)]"
+              inactiveDotColor={WARNA_FASILITAS}
             />
           )}
           {batasWilayah && (
@@ -390,15 +492,37 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
             }}
           />
         )}
-        {tampilBangunan && bangunan && (
+        {bangunanPerDusun.map(
+          ({ dusun, warna, data }) =>
+            !dusunTersembunyi.has(dusun) && (
+              <GeoJSON
+                key={`bangunan-${dusun}`}
+                data={data}
+                style={{
+                  color: warna,
+                  weight: 1,
+                  fillColor: warna,
+                  fillOpacity: 0.45,
+                }}
+                onEachFeature={(_feature, layer) => {
+                  layer.bindTooltip(dusun, { sticky: true });
+                }}
+              />
+            ),
+        )}
+        {tampilFasilitas && fasilitasUmum && (
           <GeoJSON
-            key="bangunan-desa"
-            data={bangunan}
+            key="fasilitas-umum-desa"
+            data={fasilitasUmum}
             style={{
-              color: WARNA_BANGUNAN,
-              weight: 1,
-              fillColor: WARNA_BANGUNAN,
-              fillOpacity: 0.45,
+              color: WARNA_FASILITAS,
+              weight: 1.5,
+              fillColor: WARNA_FASILITAS,
+              fillOpacity: 0.4,
+            }}
+            onEachFeature={(feature, layer) => {
+              const keterangan = feature.properties?.Keterangan ?? "Fasilitas Umum";
+              layer.bindTooltip(keterangan, { sticky: true });
             }}
           />
         )}
