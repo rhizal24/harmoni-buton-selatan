@@ -13,6 +13,8 @@ interface ArtikelForm {
   content: string;
   cover_image_url: string;
   is_published: boolean;
+  /** Tanggal terbit (yyyy-mm-dd), bisa diubah admin. */
+  published_at: string;
 }
 
 const EMPTY_FORM: ArtikelForm = {
@@ -22,6 +24,7 @@ const EMPTY_FORM: ArtikelForm = {
   content: "",
   cover_image_url: "",
   is_published: false,
+  published_at: new Date().toISOString().slice(0, 10),
 };
 
 const inputCls =
@@ -41,7 +44,7 @@ function slugify(input: string): string {
 /**
  * CRUD artikel (dipakai halaman Berita & UMKM — kategori berbeda,
  * tabel sama: articles). Slug dibuat otomatis dari judul, unik per desa;
- * published_at terisi saat pertama kali ditayangkan.
+ * tanggal terbit bisa diubah admin (default hari ini).
  */
 export function ArtikelManager({
   category,
@@ -105,7 +108,6 @@ export function ArtikelManager({
     try {
       const supabase = getSupabase();
       const slug = await uniqueSlug(form.title, form.id);
-      const wasPublished = editing?.published_at != null;
       const payload = {
         village_id: admin.village.id,
         category,
@@ -116,11 +118,10 @@ export function ArtikelManager({
         cover_image_url: form.cover_image_url || null,
         author_id: admin.profile.id,
         is_published: form.is_published,
-        // published_at terisi sekali, saat pertama kali tayang
-        published_at:
-          form.is_published && !wasPublished
-            ? new Date().toISOString()
-            : (editing?.published_at ?? null),
+        // Tanggal terbit diatur admin lewat form (default: hari ini).
+        published_at: form.published_at
+          ? new Date(`${form.published_at}T08:00:00+08:00`).toISOString()
+          : new Date().toISOString(),
         updated_at: new Date().toISOString(),
       };
       const { error } = form.id
@@ -260,6 +261,7 @@ export function ArtikelManager({
                           content: row.content,
                           cover_image_url: row.cover_image_url ?? "",
                           is_published: row.is_published,
+                          published_at: (row.published_at ?? row.created_at).slice(0, 10),
                         });
                         setMsg(null);
                       }}
@@ -352,6 +354,19 @@ export function ArtikelManager({
                 className="h-4 w-4 accent-[#006572]"
               />
               <span className="font-body text-sm text-[#2E2E2E]">Tayangkan di situs</span>
+            </label>
+
+            <label className="flex flex-col gap-1.5">
+              <span className={labelCls}>Tanggal terbit</span>
+              <input
+                type="date"
+                value={form.published_at}
+                onChange={(e) => setForm((f) => ({ ...f, published_at: e.target.value }))}
+                className={inputCls}
+              />
+              <span className="font-body text-xs text-[#5A5A5A]">
+                Tampil di kartu berita dan menentukan urutan (terbaru dulu).
+              </span>
             </label>
 
             <div className="flex gap-2">

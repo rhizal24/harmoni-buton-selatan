@@ -2,6 +2,7 @@ import ImageKit from "imagekit";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { VILLAGE_SLUG } from "@/lib/desa";
+import { kompresGambarWeb } from "@/lib/kompres-gambar";
 import type { VillageRow } from "@/lib/db-types";
 
 /**
@@ -119,10 +120,14 @@ export async function POST(request: NextRequest) {
     privateKey: ikPrivateKey,
     urlEndpoint: ikUrlEndpoint,
   });
-  const buffer = Buffer.from(await file.arrayBuffer());
+  // Kiriman pengunjung SELALU dikompres (resize 1920px + WebP q80) supaya
+  // hemat kuota 500 MB dan cepat dimuat.
+  const asli = Buffer.from(await file.arrayBuffer());
+  const hasil = await kompresGambarWeb(asli, file.type, file.name);
+  const buffer = hasil.buffer;
   const uploaded = await imagekit.upload({
     file: buffer,
-    fileName: file.name,
+    fileName: hasil.fileName,
     folder: `/villages/${VILLAGE_SLUG}/kiriman`,
   });
 
@@ -135,7 +140,7 @@ export async function POST(request: NextRequest) {
     submitted_by: nama || null,
     status: "pending",
     display_order: 0,
-    file_size_kb: Math.ceil(file.size / 1024),
+    file_size_kb: Math.ceil(buffer.length / 1024),
   });
   if (insertError) {
     await imagekit.deleteFile(uploaded.fileId).catch(() => {});

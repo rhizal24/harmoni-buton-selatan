@@ -72,7 +72,7 @@ export default function AdminHeroPage() {
     setBusyField(field);
     setMsg(null);
     try {
-      const url = await uploadFile(file, admin.accessToken);
+      const url = await uploadFile(file, admin.accessToken, { asli: true });
       setForm((f) => (f ? { ...f, [field]: url } : f));
       setMsg({ kind: "ok", text: "Foto ter-upload. Jangan lupa klik Simpan." });
     } catch (err) {
@@ -222,7 +222,7 @@ export default function AdminHeroPage() {
         type="button"
         onClick={handleSave}
         disabled={saving || busyField !== null}
-        className="self-start rounded-md bg-[#31577F] px-6 py-2.5 font-body text-sm font-semibold text-white shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] disabled:cursor-not-allowed disabled:opacity-50 enabled:hover:-translate-y-0.5 enabled:hover:[filter:drop-shadow(0_0_16px_rgba(49,87,127,0.55))_drop-shadow(0_0_44px_rgba(49,87,127,0.30))]"
+        className="self-start rounded-md bg-[#31577F] px-6 py-2.5 font-body text-sm font-semibold text-white shadow-sm motion-safe:transition-[transform,filter] motion-safe:duration-300 motion-safe:ease-[cubic-bezier(0.22,1,0.36,1)] disabled:cursor-not-allowed disabled:opacity-50 enabled:hover:-translate-y-0.5 enabled:hover:[filter:drop-shadow(0_0_16px_rgba(0,101,114,0.55))_drop-shadow(0_0_44px_rgba(0,101,114,0.30))]"
       >
         {saving ? "Menyimpan…" : "Simpan Hero Section"}
       </button>

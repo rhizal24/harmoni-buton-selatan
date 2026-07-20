@@ -2,6 +2,7 @@ import ImageKit from "imagekit";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { VILLAGE_SLUG } from "@/lib/desa";
+import { kompresGambarWeb } from "@/lib/kompres-gambar";
 import type { AdminProfileRow, VillageRow } from "@/lib/db-types";
 
 /**
@@ -131,10 +132,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `Tipe file tidak didukung: ${file.type}` }, { status: 415 });
   }
 
-  const buffer = Buffer.from(await file.arrayBuffer());
+  // Kompres gambar untuk web (resize 1920px + WebP q80, target < 1 MB).
+  // Kecuali mode "asli" (foto utama: hero/background) dan non-gambar (PDF).
+  let buffer: Buffer = Buffer.from(await file.arrayBuffer());
+  let uploadName = file.name;
+  if (formData.get("mode") !== "asli") {
+    const hasil = await kompresGambarWeb(buffer, file.type, file.name);
+    buffer = hasil.buffer;
+    uploadName = hasil.fileName;
+  }
+
   const result = await createImageKit(env).upload({
     file: buffer,
-    fileName: file.name,
+    fileName: uploadName,
     folder: `/villages/${VILLAGE_SLUG}`,
   });
 
