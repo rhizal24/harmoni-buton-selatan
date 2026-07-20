@@ -58,6 +58,23 @@ export async function signOutAdmin(): Promise<void> {
 }
 
 /** Upload file ke ImageKit lewat /api/upload; balikan URL publiknya. */
+/**
+ * Token akses TERBARU dari sesi Supabase. Jangan pakai token yang disimpan
+ * saat halaman dibuka: token kedaluwarsa setelah +-1 jam, sehingga upload
+ * dari tab yang lama terbuka akan ditolak 401. getSession() otomatis
+ * me-refresh token bila sudah kedaluwarsa.
+ */
+async function tokenSegar(fallback: string): Promise<string> {
+  try {
+    const {
+      data: { session },
+    } = await getSupabase().auth.getSession();
+    return session?.access_token ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export async function uploadFile(
   file: File,
   accessToken: string,
@@ -71,7 +88,7 @@ export async function uploadFile(
   if (opsi?.asli) body.append("mode", "asli");
   const res = await fetch("/api/upload", {
     method: "POST",
-    headers: { Authorization: `Bearer ${accessToken}` },
+    headers: { Authorization: `Bearer ${await tokenSegar(accessToken)}` },
     body,
   });
   const json = (await res.json()) as { url?: string; error?: string };
@@ -95,7 +112,7 @@ export async function deleteUploadedFile(
     await fetch("/api/upload", {
       method: "DELETE",
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${await tokenSegar(accessToken)}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ url }),
