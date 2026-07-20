@@ -72,7 +72,7 @@ export default function AdminHeroPage() {
     setBusyField(field);
     setMsg(null);
     try {
-      const url = await uploadFile(file, admin.accessToken);
+      const url = await uploadFile(file, admin.accessToken, { asli: true });
       setForm((f) => (f ? { ...f, [field]: url } : f));
       setMsg({ kind: "ok", text: "Foto ter-upload. Jangan lupa klik Simpan." });
     } catch (err) {

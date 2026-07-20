@@ -58,9 +58,17 @@ export async function signOutAdmin(): Promise<void> {
 }
 
 /** Upload file ke ImageKit lewat /api/upload; balikan URL publiknya. */
-export async function uploadFile(file: File, accessToken: string): Promise<string> {
+export async function uploadFile(
+  file: File,
+  accessToken: string,
+  opsi?: {
+    /** true = JANGAN kompres (foto utama: hero/background halaman). */
+    asli?: boolean;
+  },
+): Promise<string> {
   const body = new FormData();
   body.append("file", file);
+  if (opsi?.asli) body.append("mode", "asli");
   const res = await fetch("/api/upload", {
     method: "POST",
     headers: { Authorization: `Bearer ${accessToken}` },
