@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { Reveal } from "@/components/ui/Reveal";
 import { slugify } from "@/lib/utils";
 import {
@@ -223,18 +224,29 @@ export function DaftarWisata({ data }: { data: Wisata[] }) {
                     ↗
                   </span>
                 </a>
-                {/* Peta Desa — halaman menyusul */}
-                <span
-                  aria-disabled="true"
-                  title="Halaman Peta Desa segera hadir"
-                  className="inline-flex cursor-not-allowed items-center gap-2 rounded-md border-[1.5px] border-[#006572]/25 bg-white px-4 py-2.5 font-body text-sm font-semibold text-[#006572]/50"
-                >
-                  <MapIcon />
-                  Lihat di Peta Desa
-                  <span className="rounded-full bg-[#006572]/10 px-2 py-0.5 font-body text-[11px] font-semibold uppercase tracking-wide text-[#006572]">
-                    Segera
+                {/* Peta Desa — aktif kalau titik koordinatnya sudah diisi
+                    admin; kalau belum, tetap tampil non-aktif ("Segera"). */}
+                {current.latitude != null && current.longitude != null ? (
+                  <Link
+                    href={`/peta?wisata=${slugify(current.nama)}#peta-interaktif`}
+                    className="inline-flex items-center gap-2 rounded-md border-[1.5px] border-[#006572] bg-white px-4 py-2.5 font-body text-sm font-semibold text-[#006572] no-underline motion-safe:transition-colors hover:bg-[#006572]/5 focus-visible:outline-2 focus-visible:outline-[#006572] focus-visible:outline-offset-2"
+                  >
+                    <MapIcon />
+                    Lihat di Peta Desa
+                  </Link>
+                ) : (
+                  <span
+                    aria-disabled="true"
+                    title="Titik koordinat belum diisi admin"
+                    className="inline-flex cursor-not-allowed items-center gap-2 rounded-md border-[1.5px] border-[#006572]/25 bg-white px-4 py-2.5 font-body text-sm font-semibold text-[#006572]/50"
+                  >
+                    <MapIcon />
+                    Lihat di Peta Desa
+                    <span className="rounded-full bg-[#006572]/10 px-2 py-0.5 font-body text-[11px] font-semibold uppercase tracking-wide text-[#006572]">
+                      Segera
+                    </span>
                   </span>
-                </span>
+                )}
               </div>
             </div>
 

@@ -12,7 +12,7 @@ import { fetchGaleri, fetchPaket } from "@/lib/konten";
 import { getVillage } from "@/lib/desa";
 
 export const metadata: Metadata = {
-  title: "Beranda",
+  title: "Harmoni Buton Selatan | Desa Gerak Makmur",
   description:
     "Selamat datang di website resmi Desa Gerak Makmur, Buton Selatan — jelajahi Karamba, wisata bahari unggulan.",
 };

@@ -3,7 +3,6 @@
 import dynamic from "next/dynamic";
 import { Reveal } from "@/components/ui/Reveal";
 import type { Wisata } from "@/types/wisata";
-import type { Umkm } from "@/types/umkm";
 
 // Leaflet butuh `window`/`document` — wajib dimuat khusus client (ssr:false),
 // dan hanya boleh dipanggil dari Client Component (bukan langsung di page
@@ -20,10 +19,10 @@ const WebGISMapInner = dynamic(
   },
 );
 
-export function PetaWebGIS({ wisata, umkm }: { wisata: Wisata[]; umkm: Umkm[] }) {
-  const jumlahBerkoordinat =
-    wisata.filter((w) => w.latitude != null && w.longitude != null).length +
-    umkm.filter((u) => u.latitude != null && u.longitude != null).length;
+export function PetaWebGIS({ wisata }: { wisata: Wisata[] }) {
+  const jumlahBerkoordinat = wisata.filter(
+    (w) => w.latitude != null && w.longitude != null,
+  ).length;
 
   return (
     <section
@@ -43,7 +42,7 @@ export function PetaWebGIS({ wisata, umkm }: { wisata: Wisata[]; umkm: Umkm[] })
             </h2>
             <p className="max-w-[46rem] font-body text-lg leading-relaxed text-[#006572]/80">
               Geser dan perbesar peta untuk melihat sebaran destinasi wisata
-              dan UMKM Desa Gerak Makmur.{" "}
+              Desa Gerak Makmur.{" "}
               {jumlahBerkoordinat > 0
                 ? "Klik penanda untuk membuka detail tiap titik, atau pakai tombol filter di pojok peta."
                 : "Titik lokasi akan tampil setelah admin melengkapi koordinatnya."}
@@ -51,9 +50,9 @@ export function PetaWebGIS({ wisata, umkm }: { wisata: Wisata[]; umkm: Umkm[] })
           </div>
         </Reveal>
 
-        <Reveal delay={90}>
+        <Reveal delay={90} dropTransformWhenVisible>
           <div className="h-[65vh] min-h-[420px] w-full overflow-hidden rounded-xl border-[1.5px] border-[#006572] lg:h-[75vh]">
-            <WebGISMapInner wisata={wisata} umkm={umkm} />
+            <WebGISMapInner wisata={wisata} />
           </div>
         </Reveal>
       </div>

@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import {
   GeoJSON,
   MapContainer,
   Marker,
+  Pane,
   Popup,
   TileLayer,
   ZoomControl,
@@ -18,15 +19,30 @@ import { Layers, Maximize2, Minimize2, SlidersHorizontal } from "lucide-react";
 import { VILLAGE_MAP_CENTER, VILLAGE_MAP_DEFAULT_ZOOM } from "@/lib/constants";
 import { slugify } from "@/lib/utils";
 import type { Wisata } from "@/types/wisata";
-import type { Umkm } from "@/types/umkm";
 import type { Feature, FeatureCollection } from "geojson";
 
-const WARNA_WISATA = "#006572";
-const WARNA_UMKM = "#F45B69";
+// Coral — dulu dipakai UMKM (sudah dihapus dari peta ini), sekarang jadi
+// warna khusus Wisata supaya beda dari semua warna layer lain (teal Batas
+// Desa, hitam Batas Wilayah, abu-abu/hijau/ungu/oranye/biru Bangunan, emas
+// Fasilitas Umum).
+const WARNA_WISATA = "#F45B69";
 const WARNA_BATAS_WILAYAH = "#2E2E2E";
 const WARNA_BATAS_DESA = "#006572";
 const WARNA_BANGUNAN = "#5A5A5A";
 const WARNA_FASILITAS = "#C9A227";
+
+/**
+ * Tumpukan layer (bawah → atas): Kec. Sampolawa, Batas Desa, Bangunan,
+ * Fasilitas Umum. Keempat layer di-fetch async terpisah, jadi urutan
+ * mount-nya tidak bisa diandalkan mengikuti urutan JSX — layer yang fetch-nya
+ * kelar duluan bisa nongol di atas walau ditulis lebih dulu di kode. `Pane`
+ * dengan z-index eksplisit ini yang benar-benar mengunci urutan tampil,
+ * terlepas dari kapan masing-masing selesai di-fetch.
+ */
+const PANE_KEC_SAMPOLAWA = "pane-kec-sampolawa";
+const PANE_BATAS_DESA = "pane-batas-desa";
+const PANE_BANGUNAN = "pane-bangunan";
+const PANE_FASILITAS_UMUM = "pane-fasilitas-umum";
 
 /**
  * Warna bangunan dibedakan per dusun supaya sebaran tiap dusun gampang
@@ -76,8 +92,7 @@ type BasemapKey = keyof typeof BASEMAP_OPTIONS;
 /**
  * Pin marker kustom (divIcon SVG) — Leaflet default icon butuh berkas
  * gambar terpisah yang gampang putus lewat bundler, jadi diganti SVG inline
- * agar konsisten dengan warna brand. Warna beda per kategori: tosca untuk
- * Wisata, coral untuk UMKM.
+ * agar konsisten dengan warna brand.
  */
 function buatIkonPin(warna: string) {
   return L.divIcon({
@@ -94,7 +109,6 @@ function buatIkonPin(warna: string) {
 }
 
 const ikonWisata = buatIkonPin(WARNA_WISATA);
-const ikonUmkm = buatIkonPin(WARNA_UMKM);
 
 /**
  * Pill toggle filter layer — dipakai dobel: baris horizontal di desktop
@@ -150,7 +164,6 @@ function FilterPill({
 
 interface WebGISMapInnerProps {
   wisata: Wisata[];
-  umkm: Umkm[];
 }
 
 /**
@@ -171,15 +184,41 @@ function SinkronkanUkuranPeta({ isExpanded }: { isExpanded: boolean }) {
 }
 
 /**
- * Peta interaktif (react-leaflet + tile OpenStreetMap). Marker hanya untuk
- * destinasi/usaha yang punya koordinat (`latitude`/`longitude` terisi di
- * admin Wisata/UMKM); klik marker → popup ringkas dengan tautan ke detail.
- * Dua kategori (Wisata, UMKM) digabung di peta yang sama dengan warna pin
- * berbeda + toggle tampil/sembunyi per kategori supaya tidak numpuk.
+ * Deep-link dari halaman lain (mis. tombol "Lihat di Peta Desa" di
+ * `/wisata`) — `?wisata=<slug-nama>` di URL peta ini men-fly-to koordinat
+ * destinasi itu lalu buka popup-nya otomatis.
  */
-export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
+function FokusWisataDariQuery({
+  wisataBerkoordinat,
+  markerRefs,
+}: {
+  wisataBerkoordinat: (Wisata & { latitude: number; longitude: number })[];
+  markerRefs: React.RefObject<Map<string, L.Marker>>;
+}) {
+  const map = useMap();
+  const searchParams = useSearchParams();
+  const fokus = searchParams.get("wisata");
+
+  useEffect(() => {
+    if (!fokus) return;
+    const target = wisataBerkoordinat.find((w) => slugify(w.nama) === fokus);
+    if (!target) return;
+    map.flyTo([target.latitude, target.longitude], 17, { duration: 1.2 });
+    // Popup langsung dibuka — tetap kebaca walau animasi flyTo belum kelar.
+    markerRefs.current.get(fokus)?.openPopup();
+  }, [fokus, map, wisataBerkoordinat, markerRefs]);
+
+  return null;
+}
+
+/**
+ * Peta interaktif (react-leaflet + tile OpenStreetMap). Marker hanya untuk
+ * destinasi yang punya koordinat (`latitude`/`longitude` terisi di admin
+ * Wisata); klik marker → popup ringkas dengan tautan ke detail.
+ */
+export function WebGISMapInner({ wisata }: WebGISMapInnerProps) {
+  const markerRefs = useRef<Map<string, L.Marker>>(new Map());
   const [tampilWisata, setTampilWisata] = useState(true);
-  const [tampilUmkm, setTampilUmkm] = useState(true);
   const [tampilBatasWilayah, setTampilBatasWilayah] = useState(true);
   const [tampilBatasDesa, setTampilBatasDesa] = useState(true);
   const [dusunTersembunyi, setDusunTersembunyi] = useState<Set<string>>(
@@ -264,11 +303,17 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
 
   // Fullscreen API browser (`requestFullscreen`) sering diblok Permissions
   // Policy di dalam iframe preview, jadi "layar penuh" di sini dibuat murni
-  // lewat CSS (`fixed inset-0`). `Reveal` (ancestor section peta) memberi
-  // `transform` lewat class `translate-y-*` saat animasi masuk viewport, dan
-  // `transform` apa pun selain `none` membuat ancestor itu jadi containing
-  // block baru — `position: fixed` di dalamnya jadi kejebak di kotak kecil,
-  // bukan viewport. Makanya versi expanded di-portal ke `document.body`.
+  // lewat CSS (`fixed inset-0`), tanpa portal. `Reveal` (ancestor section
+  // peta di `PetaWebGIS`) dipanggil dengan `dropTransformWhenVisible` supaya
+  // tidak permanen menyisakan `transform: translateY(0)` setelah animasinya
+  // selesai — `transform` apa pun selain `none` bikin ancestor itu jadi
+  // containing block baru yang menjebak `position: fixed` di dalamnya,
+  // bukan di viewport. (Sebelumnya ini "diakali" dengan portal ke
+  // `document.body` saat expanded — tapi portal yang container-nya berubah
+  // antar render bikin React unmount+remount seluruh subtree tiap toggle,
+  // termasuk instance Leaflet map-nya, dan animasi zoom/tooltip yang masih
+  // pending dari instance lama lalu nabrak DOM yang sudah dibongkar dan
+  // lempar `Cannot read properties of undefined (reading '_leaflet_pos')`.)
   useEffect(() => {
     if (!isExpanded) return;
 
@@ -286,15 +331,14 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
     };
   }, [isExpanded]);
 
-  const wisataBerkoordinat = wisata.filter(
-    (w): w is Wisata & { latitude: number; longitude: number } =>
-      w.latitude != null && w.longitude != null,
+  const wisataBerkoordinat = useMemo(
+    () =>
+      wisata.filter(
+        (w): w is Wisata & { latitude: number; longitude: number } =>
+          w.latitude != null && w.longitude != null,
+      ),
+    [wisata],
   );
-  const umkmBerkoordinat = umkm.filter(
-    (u): u is Umkm & { latitude: number; longitude: number } =>
-      u.latitude != null && u.longitude != null,
-  );
-
   // Bangunan dikelompokkan per dusun supaya tiap dusun bisa punya pill
   // filter + warna sendiri — react-leaflet's GeoJSON tidak reaktif ke
   // perubahan `data`/`filter` (cuma `style`), jadi tiap dusun dirender jadi
@@ -340,8 +384,8 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
     <div
       className={
         isExpanded
-          ? "fixed inset-0 z-[2000] h-dvh w-screen bg-white"
-          : "relative h-full w-full bg-white"
+          ? "fixed inset-0 z-[2000] isolate h-dvh w-screen bg-white"
+          : "relative isolate h-full w-full bg-white"
       }
     >
       <button
@@ -402,10 +446,10 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
               inactiveDotColor={WARNA_BATAS_DESA}
             />
           )}
-          {bangunanPerDusun.map(({ dusun, warna, data }) => (
+          {bangunanPerDusun.map(({ dusun, warna }) => (
             <FilterPill
               key={dusun}
-              label={`${dusun} (${data.features.length})`}
+              label="Bangunan"
               active={!dusunTersembunyi.has(dusun)}
               onClick={() => toggleDusun(dusun)}
               warna={warna}
@@ -414,7 +458,7 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
           ))}
           {fasilitasUmum && (
             <FilterPill
-              label={`Fasilitas Umum (${fasilitasUmum.features.length})`}
+              label="Fasilitas Umum"
               active={tampilFasilitas}
               onClick={() => setTampilFasilitas((v) => !v)}
               activeClassName="border-[#C9A227] bg-[#C9A227] text-white shadow-[0_0_14px_rgba(201,162,39,0.5)]"
@@ -431,18 +475,11 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
             />
           )}
           <FilterPill
-            label={`Wisata (${wisataBerkoordinat.length})`}
+            label="Wisata"
             active={tampilWisata}
             onClick={() => setTampilWisata((v) => !v)}
-            activeClassName="border-[#006572] bg-[#006572] text-white shadow-[0_0_14px_rgba(0,101,114,0.55)]"
-            inactiveDotColor={WARNA_WISATA}
-          />
-          <FilterPill
-            label={`UMKM (${umkmBerkoordinat.length})`}
-            active={tampilUmkm}
-            onClick={() => setTampilUmkm((v) => !v)}
             activeClassName="border-[#F45B69] bg-[#F45B69] text-white shadow-[0_0_14px_rgba(244,91,105,0.55)]"
-            inactiveDotColor={WARNA_UMKM}
+            inactiveDotColor={WARNA_WISATA}
           />
         </div>
       </div>
@@ -456,6 +493,10 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
         className="h-full w-full"
       >
         <SinkronkanUkuranPeta isExpanded={isExpanded} />
+        <FokusWisataDariQuery
+          wisataBerkoordinat={wisataBerkoordinat}
+          markerRefs={markerRefs}
+        />
         <ZoomControl position="bottomright" />
         <TileLayer
           key={basemap}
@@ -463,9 +504,15 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
           url={BASEMAP_OPTIONS[basemap].url}
           maxNativeZoom={BASEMAP_OPTIONS[basemap].maxNativeZoom}
         />
+        {/* z-index eksplisit — lihat komentar PANE_* di atas */}
+        <Pane name={PANE_KEC_SAMPOLAWA} style={{ zIndex: 401 }} />
+        <Pane name={PANE_BATAS_DESA} style={{ zIndex: 402 }} />
+        <Pane name={PANE_BANGUNAN} style={{ zIndex: 403 }} />
+        <Pane name={PANE_FASILITAS_UMUM} style={{ zIndex: 404 }} />
         {tampilBatasWilayah && batasWilayah && (
           <GeoJSON
             key="batas-wilayah-sampolawa"
+            pane={PANE_KEC_SAMPOLAWA}
             data={batasWilayah}
             style={{
               color: WARNA_BATAS_WILAYAH,
@@ -474,11 +521,16 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
               fillColor: WARNA_BATAS_WILAYAH,
               fillOpacity: 0.05,
             }}
+            onEachFeature={(feature, layer) => {
+              const nama = feature.properties?.NAMOBJ ?? "Kec. Sampolawa";
+              layer.bindTooltip(nama, { sticky: true });
+            }}
           />
         )}
         {tampilBatasDesa && batasDesa && (
           <GeoJSON
             key="batas-desa-gerak-makmur"
+            pane={PANE_BATAS_DESA}
             data={batasDesa}
             style={{
               color: WARNA_BATAS_DESA,
@@ -497,6 +549,7 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
             !dusunTersembunyi.has(dusun) && (
               <GeoJSON
                 key={`bangunan-${dusun}`}
+                pane={PANE_BANGUNAN}
                 data={data}
                 style={{
                   color: warna,
@@ -513,6 +566,7 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
         {tampilFasilitas && fasilitasUmum && (
           <GeoJSON
             key="fasilitas-umum-desa"
+            pane={PANE_FASILITAS_UMUM}
             data={fasilitasUmum}
             style={{
               color: WARNA_FASILITAS,
@@ -532,6 +586,10 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
               key={w.nama}
               position={[w.latitude, w.longitude]}
               icon={ikonWisata}
+              ref={(instance) => {
+                if (instance) markerRefs.current.set(slugify(w.nama), instance);
+                else markerRefs.current.delete(slugify(w.nama));
+              }}
             >
               <Popup className="map-popup" minWidth={240} maxWidth={260}>
                 <div className="w-[240px] font-body">
@@ -577,34 +635,9 @@ export function WebGISMapInner({ wisata, umkm }: WebGISMapInnerProps) {
               </Popup>
             </Marker>
           ))}
-        {tampilUmkm &&
-          umkmBerkoordinat.map((u) => (
-            <Marker
-              key={u.nama}
-              position={[u.latitude, u.longitude]}
-              icon={ikonUmkm}
-            >
-              <Popup className="map-popup" minWidth={200} maxWidth={220}>
-                <div className="flex w-[200px] flex-col gap-1.5 px-3.5 py-3 font-body">
-                  <p className="text-sm font-bold text-[#F45B69]">{u.nama}</p>
-                  {(u.kategori || u.lokasi) && (
-                    <p className="text-xs text-[#2E2E2E]/70">
-                      {[u.kategori, u.lokasi].filter(Boolean).join(" · ")}
-                    </p>
-                  )}
-                  <Link
-                    href="/informasi#umkm-desa"
-                    className="mt-1 text-xs font-semibold text-[#F45B69] hover:underline"
-                  >
-                    Lihat UMKM desa →
-                  </Link>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
       </MapContainer>
     </div>
   );
 
-  return isExpanded ? createPortal(peta, document.body) : peta;
+  return peta;
 }

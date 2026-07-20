@@ -56,12 +56,12 @@ export function HeroWisata({ imageUrl }: { imageUrl?: string | null }) {
   return (
     <section
       id="hero-wisata"
-      aria-label="Wisata Desa Gerak Makmur"
+      aria-label="Wisata Teluk Lande"
       className="relative flex min-h-screen items-center overflow-hidden pb-[10vh]"
     >
       {/* Background foto */}
       <img
-        src={imageUrl || "/images/wisata-pantai.jpg"}
+        src={imageUrl || "/images/wisata-hero.avif"}
         alt="Panorama wisata bahari Desa Gerak Makmur"
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden
@@ -83,7 +83,7 @@ export function HeroWisata({ imageUrl }: { imageUrl?: string | null }) {
           </p>
 
           <h1 className="mt-3 font-body text-[clamp(2.5rem,6vw,4rem)] font-bold leading-[1.05] tracking-[-0.01em] text-white drop-shadow-sm">
-            Wisata Desa Gerak Makmur
+            Wisata Teluk Lande
           </h1>
 
           <p className="mt-5 font-body text-base leading-[1.7] text-white/85 md:text-lg">

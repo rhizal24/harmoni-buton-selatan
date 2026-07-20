@@ -20,7 +20,7 @@ export function HeroBeranda({ imageUrl }: { imageUrl?: string | null }) {
     >
       {/* Background foto */}
       <img
-        src={imageUrl || "/images/hero-bg.jpg"}
+        src={imageUrl || "/images/beranda-hero.avif"}
         alt="Panorama Desa Gerak Makmur dari udara"
         className="absolute inset-0 h-full w-full object-cover"
         aria-hidden
