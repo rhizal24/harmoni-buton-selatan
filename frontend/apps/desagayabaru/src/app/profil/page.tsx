@@ -11,7 +11,7 @@ import { getStruktur, getDokumen } from "@/data/profil";
 import { getVillage } from "@/lib/desa";
 
 export const metadata: Metadata = {
-  title: "Profil",
+  title: "Profil Desa",
   description:
     "Sejarah, visi-misi, statistik, dan perangkat Desa Gaya Baru, Buton Selatan.",
 };

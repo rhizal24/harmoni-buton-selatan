@@ -6,7 +6,7 @@ import { GaleriOutro } from "./_components/GaleriOutro";
 import { getGaleri } from "@/data/galeri";
 
 export const metadata: Metadata = {
-  title: "Galeri",
+  title: "Galeri Foto Desa",
   description:
     "Galeri foto alam, budaya, dan kehidupan masyarakat Desa Gaya Baru, Buton Selatan.",
 };
