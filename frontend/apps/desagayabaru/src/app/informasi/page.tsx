@@ -4,7 +4,7 @@ import { BeritaTerkini } from "./_components/BeritaTerkini";
 import { getArticles } from "@/data/articles";
 
 export const metadata: Metadata = {
-  title: "Informasi",
+  title: "Berita Desa",
   description:
     "Berita terkini Desa Gaya Baru, Buton Selatan, kabar kegiatan dan perkembangan desa dalam satu halaman.",
 };

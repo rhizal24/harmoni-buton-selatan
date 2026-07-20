@@ -7,7 +7,7 @@ import { getWisata } from "@/data/wisata";
 import { getVillage } from "@/lib/desa";
 
 export const metadata: Metadata = {
-  title: "Peta",
+  title: "Peta & Infografis Desa",
   description:
     "Peta interaktif dan infografis wilayah Desa Gaya Baru, Buton Selatan, sebaran wisata dan batas dusun.",
 };

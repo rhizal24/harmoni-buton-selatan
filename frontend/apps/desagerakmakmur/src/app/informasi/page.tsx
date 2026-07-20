@@ -6,7 +6,7 @@ import { getArticles } from "@/data/articles";
 import { getUmkm } from "@/data/umkm";
 
 export const metadata: Metadata = {
-  title: "Informasi",
+  title: "Berita & UMKM Desa",
   description:
     "Berita terkini dan UMKM Desa Gerak Makmur, Buton Selatan — kabar kegiatan desa dan usaha warga dalam satu halaman.",
 };
