@@ -30,7 +30,7 @@ export default async function PetaPage() {
   return (
     <main>
       <PetaHero />
-      <PetaWebGIS wisata={wisata} umkm={[]} />
+      <PetaWebGIS wisata={wisata} />
       <GambarPeta
         petaWisataUrl={village?.peta_wisata_url}
         petaDusunUrl={village?.peta_dusun_url}

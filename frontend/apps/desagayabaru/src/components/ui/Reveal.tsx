@@ -9,6 +9,15 @@ interface RevealProps {
   /** delay animasi dalam ms untuk efek stagger */
   delay?: number;
   className?: string;
+  /**
+   * `translate-y-0` (state akhir animasi) tetap berupa `transform` non-`none`
+   * secara CSS, jadi tetap membuat containing block baru untuk descendant
+   * `position: fixed`, biasanya tidak masalah, tapi mematahkan konten yang
+   * butuh escape ke viewport penuh (mis. mode layar-penuh peta). Set `true`
+   * untuk melepas class transform begitu animasi selesai, supaya descendant
+   * `position: fixed` bisa lolos dari ancestor ini tanpa perlu di-portal.
+   */
+  dropTransformWhenVisible?: boolean;
 }
 
 /**
@@ -21,6 +30,7 @@ export function Reveal({
   as: Tag = "div",
   delay = 0,
   className = "",
+  dropTransformWhenVisible = false,
 }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
   const [visible, setVisible] = useState(false);
@@ -57,7 +67,9 @@ export function Reveal({
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
       className={`motion-safe:transition-all motion-safe:duration-[600ms] motion-safe:ease-[cubic-bezier(0.16,1,0.3,1)] ${
         visible
-          ? "opacity-100 translate-y-0"
+          ? dropTransformWhenVisible
+            ? "opacity-100"
+            : "opacity-100 translate-y-0"
           : "motion-safe:opacity-0 motion-safe:translate-y-6"
       } ${className}`}
     >
