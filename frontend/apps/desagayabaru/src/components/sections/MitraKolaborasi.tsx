@@ -29,17 +29,33 @@ export async function MitraKolaborasi() {
         </div>
       </div>
 
-      {/* Baris mitra, full-bleed selebar layar, tepi fade */}
+      {/* Baris mitra, full-bleed selebar layar, tepi fade. Kotak SAMA besar
+          untuk semua logo (h-24 w-40), lebar ikut rasio asli tiap logo
+          (`w-auto`) sempat dicoba, tapi logo lebar (mis. Pupuk Kaltim) jadi
+          "makan" ruang dan bikin gap di sebelahnya kelihatan mengecil,
+          padahal gap CSS-nya sama. Kotak tetap + `object-contain` bikin gap
+          antar logo benar-benar rata secara visual. Tanpa
+          background/grayscale, warna logo asli. */}
       <Reveal>
-        <Marquee itemClassName="pr-4" speed={0.4}>
+        <Marquee itemClassName="pr-6" speed={0.7}>
           {mitra.map((m) => (
-            <button
+            <div
               key={m.nama}
-              type="button"
-              className="flex h-[108px] w-[190px] cursor-pointer items-center justify-center rounded-lg border-0 bg-[#d9d9d9] px-3 text-center font-body text-sm font-semibold text-[#31577F] [filter:grayscale(1)] motion-safe:transition-[filter] motion-safe:duration-300 hover:[filter:grayscale(0)_drop-shadow(0_0_16px_rgba(49,87,127,0.55))_drop-shadow(0_0_44px_rgba(49,87,127,0.30))] active:[filter:grayscale(0)_drop-shadow(0_0_20px_rgba(49,87,127,0.7))_drop-shadow(0_0_54px_rgba(49,87,127,0.4))]"
+              className="flex h-24 w-40 shrink-0 items-center justify-center"
             >
-              {m.nama}
-            </button>
+              {m.logo ? (
+                // eslint-disable-next-line @next/next/no-img-element -- logo statis di /public/sponsor
+                <img
+                  src={m.logo}
+                  alt={m.nama}
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <span className="text-center font-body text-sm font-semibold text-[#31577F]">
+                  {m.nama}
+                </span>
+              )}
+            </div>
           ))}
         </Marquee>
       </Reveal>

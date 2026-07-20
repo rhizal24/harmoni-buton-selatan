@@ -12,7 +12,7 @@ import { fetchGaleri, fetchPaket } from "@/lib/konten";
 import { getVillage } from "@/lib/desa";
 
 export const metadata: Metadata = {
-  title: "Beranda",
+  title: "Harmoni Buton Selatan | Desa Gaya Baru",
   description:
     "Selamat datang di website resmi Desa Gaya Baru, Buton Selatan, jelajahi pesona wisata bahari unggulan.",
 };
