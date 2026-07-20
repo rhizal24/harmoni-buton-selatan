@@ -3,6 +3,6 @@
  */
 export interface Mitra {
   nama: string;
-  /** Path logo di `/public/images`. Kosong = tampilkan nama sebagai teks. */
+  /** Path logo di `/public/sponsor`. Kosong = tampilkan nama sebagai teks. */
   logo?: string;
 }

@@ -4,7 +4,6 @@ import { PetaHero } from "./_components/PetaHero";
 import { PetaWebGIS } from "./_components/PetaWebGIS";
 import { GambarPeta } from "./_components/GambarPeta";
 import { getWisata } from "@/data/wisata";
-import { getUmkm } from "@/data/umkm";
 import { getVillage } from "@/lib/desa";
 
 export const metadata: Metadata = {
@@ -23,16 +22,15 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function PetaPage() {
-  const [wisata, umkm, village] = await Promise.all([
+  const [wisata, village] = await Promise.all([
     getWisata(),
-    getUmkm(),
     getVillage().catch(() => null),
   ]);
 
   return (
     <main>
       <PetaHero />
-      <PetaWebGIS wisata={wisata} umkm={umkm} />
+      <PetaWebGIS wisata={wisata} />
       <GambarPeta
         petaWisataUrl={village?.peta_wisata_url}
         petaDusunUrl={village?.peta_dusun_url}

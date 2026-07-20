@@ -111,19 +111,10 @@ export function BeritaTerkini({
           });
         }
 
-        // Panel baca — foto headline lalu tiap blok isi berurutan
-        const blokBaca = konten.querySelectorAll(
-          ":scope article > div:first-child, :scope article > div:last-child > *",
-        );
-        if (blokBaca.length) {
-          gsap.from(blokBaca, {
-            ...masuk,
-            y: 26,
-            stagger: 0.1,
-            delay: 0.2,
-            scrollTrigger: trigger,
-          });
-        }
+        // Panel baca sudah dianimasikan Framer Motion (AnimatePresence di
+        // bawah) — GSAP tidak boleh ikut menyentuh elemen yang sama, karena
+        // dua mesin animasi menulis `opacity`/`transform` di elemen yang
+        // sama pada saat bersamaan bikin kedip sekali pas animasi masuk.
 
         // Kolom kanan — judul, tiap item daftar, lalu blok pengisi berurutan
         const blokAside = konten.querySelectorAll(

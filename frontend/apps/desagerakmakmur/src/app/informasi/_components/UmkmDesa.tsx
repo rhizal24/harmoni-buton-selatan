@@ -85,18 +85,11 @@ export function UmkmDesa({ umkm }: { umkm: Umkm[] }) {
           scrollTrigger: { trigger: listRef.current, start: "top 80%" },
         });
       }
-      if (detailWrapRef.current) {
-        // Per-komponen: foto headline lalu tiap blok isi berurutan
-        const blok = detailWrapRef.current.querySelectorAll(
-          ":scope article > div:first-child, :scope article > div:last-child > *",
-        );
-        gsap.from(blok, {
-          ...masuk,
-          y: 26,
-          stagger: 0.1,
-          scrollTrigger: { trigger: detailWrapRef.current, start: "top 80%" },
-        });
-      }
+      // Panel detail (detailWrapRef) sudah dianimasikan Framer Motion
+      // (AnimatePresence di bawah) — GSAP tidak boleh ikut menyentuh elemen
+      // yang sama, karena dua mesin animasi menulis `opacity`/`transform`
+      // di elemen yang sama pada saat bersamaan bikin kedip sekali pas
+      // animasi masuk.
     });
 
     return () => ctx.revert();
